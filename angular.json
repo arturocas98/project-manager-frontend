@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "teamq-starter-lit-angular-admin": {
+        "project-manager-admin": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
@@ -20,7 +20,7 @@
                 "build": {
                     "builder": "@angular-devkit/build-angular:browser",
                     "options": {
-                        "outputPath": "dist/teamq-starter-lit-angular-admin",
+                        "outputPath": "dist/project-manager-admin",
                         "index": "src/index.html",
                         "main": "src/main.ts",
                         "polyfills": ["zone.js"],
@@ -112,13 +112,13 @@
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
                         "production": {
-                            "browserTarget": "teamq-starter-lit-angular-admin:build:production"
+                            "browserTarget": "project-manager-admin:build:production"
                         },
                         "development": {
-                            "browserTarget": "teamq-starter-lit-angular-admin:build:development"
+                            "browserTarget": "project-manager-admin:build:development"
                         },
                         "qa": {
-                            "browserTarget": "teamq-starter-lit-angular-admin:build:qa"
+                            "browserTarget": "project-manager-admin:build:qa"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -126,7 +126,7 @@
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "teamq-starter-lit-angular-admin:build"
+                        "browserTarget": "project-manager-admin:build"
                     }
                 },
                 "test": {
@@ -151,7 +151,7 @@
             }
         }
     },
-    "defaultProject": "teamq-starter-lit-angular-admin",
+    "defaultProject": "project-manager-admin",
     "cli": {
         "analytics": false,
         "schematicCollections": ["@angular-eslint/schematics"]
