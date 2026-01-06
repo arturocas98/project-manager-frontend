@@ -1,0 +1,59 @@
+{
+    "general": {
+        "back": "Back",
+        "save": "Save",
+        "cancel": "Cancel",
+        "addNew": "Add New",
+        "activity": "Activity",
+        "messageToAction": "Are you sure you want to proceed?",
+        "selectFiles": "Select Files"
+    },
+    "notFound": {
+        "oops": "Oops!",
+        "thereIsNothingHere": "There is nothing here",
+        "goToDashboard": "Go to Dashboard"
+    },
+    "paginator": {
+        "search": "Global Search",
+        "showing": "Showing",
+        "to": "to",
+        "of": "of",
+        "entries": "entries",
+        "empty": "No data"
+    },
+    "menu": {
+        "management": "Management",
+        "userList": "Users",
+        "roleList": "Roles"
+    },
+    "login": {
+        "logIn": "Log In",
+        "helpText": "Please enter your details",
+        "email": "Email",
+        "password": "Password",
+        "rememberMe": "Remember Me",
+        "forgotPassword": "Forgot Password?"
+    },
+    "user": {
+        "create": "Create User",
+        "edit": "Edit User",
+        "update": "Update User",
+        "profile": "Profile",
+        "username": "Username",
+        "email": "Email",
+        "password": "Password",
+        "passwordConfirmation": "Password Confirmation",
+        "id": "ID",
+        "name": "Name",
+        "createdAt": "Created At"
+    },
+    "role": {
+        "create": "Create Role",
+        "edit": "Edit Role",
+        "update": "Update Role",
+        "id": "ID",
+        "name": "Name",
+        "createdAt": "Created At",
+        "title": "Role"
+    }
+}
