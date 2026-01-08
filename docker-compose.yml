@@ -1,0 +1,14 @@
+services:
+  project-managager-frontend:
+    restart: always
+    image: project-managager-frontend-lastest
+    container_name: project-managager-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4002:80"
+    volumes:
+      - sca_node_modules:/app/node_modules
+volumes:
+  sca_node_modules:

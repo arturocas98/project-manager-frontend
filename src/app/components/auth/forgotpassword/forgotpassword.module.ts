@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { AppConfigModule } from 'src/app/layout/config/app.config.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
     imports: [
@@ -15,6 +16,7 @@ import { ReactiveFormsModule } from '@angular/forms';
         ForgotPasswordRoutingModule,
         AppConfigModule,
         ReactiveFormsModule,
+        TranslateModule
     ],
     declarations: [ForgotPasswordComponent]
 })

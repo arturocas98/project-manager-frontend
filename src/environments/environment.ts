@@ -4,7 +4,7 @@
 
 export const environment = {
     production: false,
-    apiUrl: 'https://qa.api.teamq.biz/api',
+    apiUrl: 'http://localhost:8000/api',
 };
 
 /*

@@ -27,12 +27,12 @@
         "roleList": "Roles"
     },
     "login": {
-        "logIn": "Log In",
-        "helpText": "Please enter your details",
-        "email": "Email",
-        "password": "Password",
-        "rememberMe": "Remember Me",
-        "forgotPassword": "Forgot Password?"
+        "logIn": "Iniciar sesión",
+        "helpText": "Por favor ingrese sus credenciales",
+        "email": "Correo",
+        "password": "Contraseña",
+        "rememberMe": "Recordarme",
+        "forgotPassword": "¿Olvidaste tu contraseña?"
     },
     "user": {
         "create": "Create User",
@@ -58,7 +58,7 @@
     },
     "forgotPassword": {
         "resetYourPassword": "Reset Your Password",
-        "enterYourEmail": "Enter your email to reset your password",
+        "enterYourEmail": "Ingresa tu correo para restablecer tu contraseña",
         "sendMeResetLink": "Send Me Reset Link",
         "backToLogin": "Back to Login"
     }
