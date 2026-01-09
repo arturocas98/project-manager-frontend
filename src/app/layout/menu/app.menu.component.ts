@@ -15,23 +15,26 @@ export class AppMenuComponent implements AfterViewChecked {
 
     ngAfterViewChecked(): void {
         if (Object.keys(this.translateService.store.translations).length > Constants.zero && this.model.length === Constants.zero) {
-            this.model.push(
+            this.model.push({
+              label: this.translateService.instant("menu.management"),
+              items: [
                 {
-                    label: this.translateService.instant('menu.management'),
-                    items: [
-                        {
-                            label: this.translateService.instant('menu.userList'),
-                            icon: Constants.icons.menuList,
-                            routerLink: [Constants.routes.userList],
-                        },
-                        {
-                            label: this.translateService.instant('menu.roleList'),
-                            icon: Constants.icons.menuList,
-                            routerLink: [Constants.routes.roleList],
-                        },
-                    ],
+                  label: this.translateService.instant("menu.userList"),
+                  icon: Constants.icons.menuList,
+                  routerLink: [Constants.routes.userList],
                 },
-            );
+                {
+                  label: this.translateService.instant("menu.roleList"),
+                  icon: Constants.icons.menuList,
+                  routerLink: [Constants.routes.roleList],
+                },
+                {
+                  label: this.translateService.instant("menu.projectList"),
+                  icon: Constants.icons.menuList,
+                  routerLink: [Constants.routes.projectList],
+                },
+              ],
+            });
         }
     }
 }

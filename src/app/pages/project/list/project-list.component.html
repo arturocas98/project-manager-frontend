@@ -1,0 +1,22 @@
+<p-card>
+  <ng-template pTemplate="title">
+    <div class="flex align-items-center justify-content-between">
+      <div class="flex align-items-center gap-2">
+        <i class="pi pi-folder-open text-2xl"></i>
+        <span class="text-2xl font-bold">Proyectos</span>
+      </div>
+
+      <p-button>
+        <i class="pi pi-plus mr-2"></i>
+        Nuevo Proyecto
+      </p-button>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-wrap gap-3">
+    <app-project-card
+      *ngFor="let project of projects"
+      [project]="project"
+      class="w-full sm:w-6 md:w-4 lg:w-3"></app-project-card>
+  </div>
+</p-card>

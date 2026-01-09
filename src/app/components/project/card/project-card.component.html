@@ -1,0 +1,26 @@
+<p-card class="project-card" [style]="{ cursor: 'pointer' }">
+  <ng-template pTemplate="header">
+    <div class="header">
+      <p-avatar
+        label="{{ project.name.charAt(0) }}"
+        shape="circle"
+        [style]="{
+          backgroundColor: '#e3f2fd',
+          color: '#1e88e5',
+          fontWeight: 'bold'
+        }"></p-avatar>
+    </div>
+  </ng-template>
+
+  <div class="content">
+    <h4>{{ project.name }}</h4>
+    <p class="description">{{ project.description }}</p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="footer">
+      <i class="pi pi-users"></i>
+      <span>{{ project.membersCount || 0 }} miembros</span>
+    </div>
+  </ng-template>
+</p-card>

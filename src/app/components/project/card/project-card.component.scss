@@ -1,0 +1,56 @@
+.project-card {
+    width: 260px;
+    transition: box-shadow 0.2s;
+
+    .header {
+        display: flex;
+        justify-content: center;
+        padding-top: 3rem;
+        background-color: var(--primary-color);
+    }
+
+    .content {
+        text-align: center;
+
+        h4 {
+            margin: 0.5rem 0;
+        }
+
+        .description {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+    }
+
+    .footer {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+}
+
+:host ::ng-deep .project-card {
+    --card-radius: 24px;
+    --card-border: 1px solid #e0e0e0;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --hover-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+    --hover-transform: translateY(-6px);
+    --transition-time: 0.3s;
+}
+
+:host ::ng-deep .project-card .p-card {
+    border-radius: var(--card-radius) !important;
+    border: var(--card-border) !important;
+    box-shadow: var(--card-shadow) !important;
+    transition: all var(--transition-time) cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+}
+
+:host ::ng-deep .project-card .p-card:hover {
+    transform: var(--hover-transform) !important;
+    box-shadow: var(--hover-shadow) !important;
+    border-color: #7a7a7a !important;
+}

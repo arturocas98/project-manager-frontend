@@ -35,7 +35,7 @@ export class LoginComponent {
         }
 
         this.authService.login(this.ngForm.value).subscribe((response: LoginResponse) => {
-            localStorage.setItem('token', response.data.token);
+            localStorage.setItem("token", response.data.access_token);
             this.router.navigate([Constants.routes.root]);
         });
     }

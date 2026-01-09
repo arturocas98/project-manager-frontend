@@ -23,8 +23,9 @@
     },
     "menu": {
         "management": "Management",
-        "userList": "Users",
-        "roleList": "Roles"
+        "userList": "Usuarios",
+        "roleList": "Roles",
+        "projectList": "Proyectos"
     },
     "login": {
         "logIn": "Iniciar sesión",

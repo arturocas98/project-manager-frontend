@@ -11,3 +11,8 @@ export interface EventPage {
 export interface ParamJson {
     [key: string]: string;
 }
+
+export interface ResponseData<T> {
+  data: T[];
+  meta: ResponseMeta;
+}

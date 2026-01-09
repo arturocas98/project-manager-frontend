@@ -24,7 +24,8 @@
     "menu": {
         "management": "Management",
         "userList": "Users",
-        "roleList": "Roles"
+        "roleList": "Roles",
+        "projectList": "Projects"
     },
     "login": {
         "logIn": "Log In",

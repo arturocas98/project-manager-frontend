@@ -1,8 +1,8 @@
 services:
-  project-managager-frontend:
+  project-manager-frontend:
     restart: always
-    image: project-managager-frontend-lastest
-    container_name: project-managager-frontend
+    image: project-manager-frontend-lastest
+    container_name: project-manager-frontend
     build:
       context: .
       dockerfile: Dockerfile

@@ -11,7 +11,7 @@ export interface LoginData {
 }
 
 interface LoginResponseData {
-    token: string;
+  access_token: string;
 }
 
 export interface LoginResponse {
