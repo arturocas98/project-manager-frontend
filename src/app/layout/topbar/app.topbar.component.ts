@@ -7,6 +7,8 @@ import { LayoutService } from 'src/app/layout/service/app.layout.service';
 })
 export class AppTopbarComponent {
 
+    value3: string | undefined;
+
     @ViewChild('menubutton') menuButton!: ElementRef;
 
     constructor(public layoutService: LayoutService) { }

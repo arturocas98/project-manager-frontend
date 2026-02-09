@@ -1,15 +1,18 @@
 import { Component, ElementRef } from '@angular/core';
 import { LayoutService } from '../service/app.layout.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-sidebar',
-    templateUrl: './app.sidebar.component.html'
+    templateUrl: './app.sidebar.component.html',
 })
+
 export class AppSidebarComponent {
     timeout: any = null;
+    isCollapsed = false;
+    showMoreOptions: boolean = false;
 
-
-    constructor(public layoutService: LayoutService, public el: ElementRef) { }
+    constructor(public layoutService: LayoutService, public el: ElementRef, private translate: TranslateService) { }
 
     onMouseEnter() {
         if (!this.layoutService.state.anchored) {

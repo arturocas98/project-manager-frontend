@@ -2,7 +2,7 @@ import { inject } from "@angular/core";
 import { CanActivateFn, Router, } from "@angular/router"
 import {TokenService} from "../service/token.service";
 
-export const AuthGuard: CanActivateFn = (route, state) => {
+export const AppGuard: CanActivateFn = (route, state) => {
     const tokenService = inject(TokenService);
     const router = inject(Router);
 
@@ -10,8 +10,7 @@ export const AuthGuard: CanActivateFn = (route, state) => {
 
     // Verifica si el token existe (no verifica expiración)
     if (token && token.length > 0) {
-        return true;
+        return false;
     }
-    router.navigate(['/auth/login']);
-    return false;
+    return true;
 };

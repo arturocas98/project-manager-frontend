@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { LayoutService } from '../service/app.layout.service';
+import {TokenService} from "../../service/token.service";
 
 @Component({
     selector: 'app-profilemenu',
@@ -7,7 +8,7 @@ import { LayoutService } from '../service/app.layout.service';
 })
 export class AppProfileSidebarComponent {
 
-    constructor(public layoutService: LayoutService) { }
+    constructor(public layoutService: LayoutService, private tokenService: TokenService) { }
 
     get visible(): boolean {
         return this.layoutService.state.profileSidebarVisible;
@@ -18,7 +19,7 @@ export class AppProfileSidebarComponent {
     }
 
     signOut() {
-        localStorage.removeItem('token');
+        this.tokenService.clearCredentials();
         window.location.href = '/auth/login';
     }
 }

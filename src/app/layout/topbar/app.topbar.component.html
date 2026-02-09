@@ -1,17 +1,51 @@
 <div class="layout-topbar">
     <div class="topbar-start">
         <button #menubutton type="button" class="topbar-menubutton p-link p-trigger" (click)="onMenuButtonClick()">
-            <i class="pi pi-bars"></i>
+            <i class="ph ph-sidebar-simple"></i>
         </button>
     </div>
-
-    <div class="topbar-end">
-        <ul class="topbar-menu">
-            <li class="topbar-profile">
-                <button type="button" class="p-link" (click)="onProfileButtonClick()">
-                    <img src="assets/layout/images/avatar.png" alt="Profile" />
-                </button>
+    <div>
+        <ul class="flex flex-col mt-4 gap-4 font-medium lg:flex-row lg:space-x-2 lg:mt-0 list-none">
+            <li>
+                <a
+                        [routerLink]="['/']"
+                        routerLinkActive="text-white bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
+                        [routerLinkActiveOptions]="{exact: true}"
+                        class="flex items-center gap-3 py-3 pl-4 pr-4 text-gray-700 hover:bg-indigo-500 hover:text-white transition-all duration-300 group" style="border-radius: 20px;"
+                        role="menuitem">
+                    <i class="ph ph-house text-lg"></i>
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <div class="relative bg-white" style="border-radius: 20px;">
+                    <div class='flex items-center justify-center'>
+                        <input pInputText [(ngModel)]="value3" type="text" size="large" placeholder="Buscar..." class="border-none" style="border-radius: 20px;" />
+                        <div class="relative flex items-center justify-center bg-indigo-500" style="border-radius: 20px;">
+                            <button type="submit" class="relative p-3 border-none ph ph-magnifying-glass bg-transparent text-white"></button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <a
+                        [routerLink]="['/']"
+                        routerLinkActive="text-white from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
+                        [routerLinkActiveOptions]="{exact: true}"
+                        class="flex align-center gap-3 py-3 pl-4 pr-4 text-gray-700 hover:bg-indigo-500 hover:text-white transition-all duration-300 group" style="border-radius: 20px;"
+                        role="menuitem">
+                    <i class="ph ph-bell text-lg"></i>
+                    <span>Notification</span>
+                </a>
             </li>
         </ul>
+
+    </div>
+
+
+    <div class="topbar-end flex items-center justify-center relative">
+        <button type="button" class="p-link" (click)="onProfileButtonClick()">
+            <img src="assets/layout/images/avatar.png" alt="Profile" class="w-3rem h-3rem relative" />
+        </button>
     </div>
 </div>

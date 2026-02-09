@@ -5,10 +5,13 @@ import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-	templateUrl: './register.component.html'
+	templateUrl: './register.component.html',
 })
 export class RegisterComponent {
     ngForm: FormGroup;
+    showPassword: boolean = false;
+    showConfirmPassword: boolean = false;
+    loading: boolean = false;
 
 	constructor(
         private layoutService: LayoutService,
@@ -20,6 +23,7 @@ export class RegisterComponent {
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
             password_confirmation: ['', [Validators.required, Validators.minLength(6)]],
+            terms: [false, [Validators.required]],
         });
     }
 

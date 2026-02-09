@@ -1,0 +1,71 @@
+<!-- Componente Toast para mensajes -->
+<p-toast></p-toast>
+
+<!-- ConfirmDialog con tu diseño personalizado -->
+<p-confirmDialog #cd>
+    <ng-template #headless let-message let-acceptCallback="accept" let-rejectCallback="reject">
+        <div *ngIf="message" class="fixed inset-0 z-50 overflow-y-auto" (click)="onBackdropClick($event)">
+            <!-- Fondo oscuro -->
+            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+
+            <div class="flex min-h-full items-center justify-center p-4 text-center">
+                <!-- Modal container -->
+                <div class="relative transform overflow-hidden rounded-lg shadow-xl transition-all w-full max-w-md" (click)="$event.stopPropagation()">
+                    <!-- Contenido del modal -->
+                    <div class="px-6 py-4 {{bgColor}}">
+                        <div class="flex items-start">
+                            <!-- Icono -->
+                            <div class="flex-shrink-0">
+                                <i [class]="iconClass + ' ' + textColor"></i>
+                            </div>
+
+                            <!-- Contenido -->
+                            <div class="ml-4 w-full">
+                                <!-- Título -->
+                                <h3 class="text-xl font-semibold leading-6 {{textColor}} mb-2">
+                                    {{getTitle(message)}}
+                                </h3>
+
+                                <!-- Mensaje -->
+                                <div class="mt-2">
+                                    <p class="text-gray-700 text-base">{{message.message}}</p>
+                                </div>
+
+                                <!-- Status Code (opcional) -->
+                                <div *ngIf="currentStatusCode" class="mt-1">
+                  <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                    Código: {{currentStatusCode}}
+                  </span>
+                                </div>
+                            </div>
+
+                            <!-- Botón cerrar -->
+                            <button *ngIf="showCloseButton"
+                                    type="button"
+                                    class="ml-4 text-gray-400 hover:text-gray-500"
+                                    (click)="rejectCallback()">
+                                <i class="pi pi-times text-xl"></i>
+                            </button>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button *ngIf="currentType === 'error' || currentType === 'warning'"
+                                    type="button"
+                                    class="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    (click)="rejectCallback()">
+                                Cancelar
+                            </button>
+
+                            <button type="button"
+                                    [class]="getButtonClass(currentType)"
+                                    (click)="acceptCallback()">
+                                {{ getButtonText(currentType) }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>

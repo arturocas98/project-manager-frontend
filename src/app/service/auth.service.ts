@@ -1,22 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import {Observable, throwError} from 'rxjs';
 import { Constants } from '../constants/constants';
+import {ApiService, HttpMethodType} from './api.service';
 
 export interface LoginData {
     email: string;
     password: string;
 }
 
-interface LoginResponseData {
-  access_token: string;
+export class LoginResponseData {
+    access_token!: string;
+
+    static fromJson(json: any): LoginResponseData {
+        const obj = new LoginResponseData();
+        obj.access_token = json.data?.access_token;
+        return obj;
+    }
 }
 
-export interface LoginResponse {
-    data: LoginResponseData;
-}
 
 @Injectable({
     providedIn: 'root',
@@ -24,13 +27,19 @@ export interface LoginResponse {
 export class AuthService {
 
     constructor(
-        private http: HttpClient,
         private router: Router,
+        private apiService: ApiService,
     ) { }
 
-    login(data: LoginData): Observable<LoginResponse> {
-        return this.http.post(`${environment.apiUrl}/auth/login`, data) as Observable<LoginResponse>;
+    loginUser(request: LoginData): Observable<LoginResponseData> {
+        return this.apiService.staticRequest<LoginResponseData>(
+            'auth/login',  // APIEndPoints.login
+            HttpMethodType.POST,
+            request,
+            (json) => LoginResponseData.fromJson(json)
+        );
     }
+
 
     canActivate(): boolean {
         return !!localStorage.getItem('token');

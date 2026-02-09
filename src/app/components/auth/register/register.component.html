@@ -1,38 +1,193 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" class="fixed left-0 top-0 min-h-screen min-w-screen" preserveAspectRatio="none">
-    <rect [attr.fill]="dark ? 'var(--primary-900)' : 'var(--primary-500)'" width="1600" height="800"/>
-    <path [attr.fill]="dark ? 'var(--primary-800)' : 'var(--primary-400)'" d="M478.4 581c3.2 0.8 6.4 1.7 9.5 2.5c196.2 52.5 388.7 133.5 593.5 176.6c174.2 36.6 349.5 29.2 518.6-10.2V0H0v574.9c52.3-17.6 106.5-27.7 161.1-30.9C268.4 537.4 375.7 554.2 478.4 581z"/>
-    <path [attr.fill]="dark ? 'var(--primary-700)' : 'var(--primary-300)'" d="M181.8 259.4c98.2 6 191.9 35.2 281.3 72.1c2.8 1.1 5.5 2.3 8.3 3.4c171 71.6 342.7 158.5 531.3 207.7c198.8 51.8 403.4 40.8 597.3-14.8V0H0v283.2C59 263.6 120.6 255.7 181.8 259.4z"/>
-    <path [attr.fill]="dark ? 'var(--primary-600)' : 'var(--primary-200)'" d="M454.9 86.3C600.7 177 751.6 269.3 924.1 325c208.6 67.4 431.3 60.8 637.9-5.3c12.8-4.1 25.4-8.4 38.1-12.9V0H288.1c56 21.3 108.7 50.6 159.7 82C450.2 83.4 452.5 84.9 454.9 86.3z"/>
-    <path [attr.fill]="dark ? 'var(--primary-500)' : 'var(--primary-100)'" d="M1397.5 154.8c47.2-10.6 93.6-25.3 138.6-43.8c21.7-8.9 43-18.8 63.9-29.5V0H643.4c62.9 41.7 129.7 78.2 202.1 107.4C1020.4 178.1 1214.2 196.1 1397.5 154.8z"/>
+    <rect [attr.fill]="dark ? 'var(--green-900)' : 'var(--green-800)'" width="1600" height="800"/>
+    <path [attr.fill]="dark ? 'var(--green-800)' : 'var(--green-700)'" d="M478.4 581c3.2 0.8 6.4 1.7 9.5 2.5c196.2 52.5 388.7 133.5 593.5 176.6c174.2 36.6 349.5 29.2 518.6-10.2V0H0v574.9c52.3-17.6 106.5-27.7 161.1-30.9C268.4 537.4 375.7 554.2 478.4 581z"/>
+    <path [attr.fill]="dark ? 'var(--green-700)' : 'var(--green-600)'" d="M181.8 259.4c98.2 6 191.9 35.2 281.3 72.1c2.8 1.1 5.5 2.3 8.3 3.4c171 71.6 342.7 158.5 531.3 207.7c198.8 51.8 403.4 40.8 597.3-14.8V0H0v283.2C59 263.6 120.6 255.7 181.8 259.4z"/>
+    <path [attr.fill]="dark ? 'var(--green-600)' : 'var(--green-500)'" d="M454.9 86.3C600.7 177 751.6 269.3 924.1 325c208.6 67.4 431.3 60.8 637.9-5.3c12.8-4.1 25.4-8.4 38.1-12.9V0H288.1c56 21.3 108.7 50.6 159.7 82C450.2 83.4 452.5 84.9 454.9 86.3z"/>
+    <path [attr.fill]="dark ? 'var(--green-500)' : 'var(--green-400)'" d="M1397.5 154.8c47.2-10.6 93.6-25.3 138.6-43.8c21.7-8.9 43-18.8 63.9-29.5V0H643.4c62.9 41.7 129.7 78.2 202.1 107.4C1020.4 178.1 1214.2 196.1 1397.5 154.8z"/>
 </svg>
-<div class="px-5 min-h-screen flex justify-content-center align-items-center">
-    <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1">
-        <div class="mb-4">
-            <div class="text-900 text-xl font-bold mb-2">Register</div>
-            <span class="text-600 font-medium">Let's get started</span>
-        </div>
-        <form [formGroup]="ngForm" (ngSubmit)="onSubmit()">
-            <div class="flex flex-column">
-                <span class="p-input-icon-left w-full mb-4">
-                    <i class="pi pi-user"></i>
-                    <input formControlName="username" id="username" type="text" pInputText class="w-full md:w-25rem" placeholder="Username">
-                </span>
-                <span class="p-input-icon-left w-full mb-4">
-                    <i class="pi pi-envelope"></i>
-                    <input formControlName="email" id="email" type="text" pInputText class="w-full md:w-25rem" placeholder="Email">
-                </span>
-                <span class="p-input-icon-left w-full mb-4">
-                    <i class="pi pi-lock"></i>
-                    <input formControlName="password" id="password" type="password" pInputText class="w-full md:w-25rem" placeholder="Password">
-                </span>
-                <span class="p-input-icon-left w-full mb-4">
-                    <i class="pi pi-lock"></i>
-                    <input formControlName="password_confirmation" id="passwordConfirm" type="password" pInputText class="w-full md:w-25rem" placeholder="Confirm Password">
-                </span>
-                <button pButton pRipple label="Sign Up" class="w-full mb-4" type="submit"></button>
-                <span class="font-medium text-600">Already have an account? <a class="font-semibold cursor-pointer text-900 hover:text-primary transition-colors transition-duration-300" [routerLink]="['/auth/login']">Login</a></span>
+<div class="px-5 min-h-screen flex justify-content-center align-items-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1 shadow-2xl w-[90%] md:w-[70%] max-w-6xl mx-auto">
+        <div class="flex flex-column md:flex-row gap-8 md:gap-12">
+            <!-- Sección de imagen/ilustración (izquierda en desktop) -->
+            <div class="hidden md:flex flex-1 align-items-center justify-content-center relative">
+                <div class="flex flex-column align-items-center text-center p-5 w-full">
+                    <!-- Espacio para imagen -->
+                    <div class="register-image-container mb-1 z-2">
+                        <div class="overflow-hidden z-2 w-22rem h-22rem bg-no-repeat bg-cover bg-center" style="background-image:  url(../../../../assets/General/Register_Smartgob.png); ">  </div>
+                    </div>
+                    <div class="absolute z-0 w-19rem h-19rem bg-green-500" style="border-radius: 50%;"></div>
+
+                    <div class="flex flex-column gap-3 mt-6 w-full">
+                        <div class="flex align-items-center justify-content-start">
+                            <i class="pi pi-check-circle text-green-500 text-xl mr-3"></i>
+                            <span class="text-900 font-medium">{{'register.benefit1' | translate }}</span>
+                        </div>
+                        <div class="flex align-items-center justify-content-start">
+                            <i class="pi pi-check-circle text-green-500 text-xl mr-3"></i>
+                            <span class="text-900 font-medium">{{'register.benefit2' | translate }}</span>
+                        </div>
+                        <div class="flex align-items-center justify-content-start">
+                            <i class="pi pi-check-circle text-green-500 text-xl mr-3"></i>
+                            <span class="text-900 font-medium">{{'register.benefit3' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </form>
+
+            <!-- Sección de formulario (derecha en desktop) -->
+            <div class="md:basis-[45%] md:flex-none">
+                <div class="mb-3">
+                    <div class="text-900 text-3xl md:text-4xl font-bold mb-2">{{'register.register' | translate }}</div>
+                    <span class="text-600 font-medium text-lg">{{'register.helpText' | translate }}</span>
+                </div>
+
+                <form [formGroup]="ngForm" (ngSubmit)="onSubmit()" class="w-full">
+                    <div class="flex flex-column">
+                        <!-- Username Input -->
+                        <div class="mb-2">
+                            <label for="username" class="block text-900 font-medium mb-2">{{'register.username' | translate }}</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">
+                                    <i class="pi pi-user"></i>
+                                </span>
+                                <input
+                                        formControlName="username"
+                                        id="username"
+                                        type="text"
+                                        pInputText
+                                        class="w-full p-3"
+                                        [placeholder]="'register.usernamePlaceholder' | translate"
+                                        [ngClass]="{'p-invalid': ngForm.get('username')?.invalid && ngForm.get('username')?.touched}">
+                            </div>
+                            <small *ngIf="ngForm.get('username')?.invalid && ngForm.get('username')?.touched"
+                                   class="p-error block mt-2">
+                                {{'validation.usernameRequired' | translate }}
+                            </small>
+                        </div>
+
+                        <!-- Email Input -->
+                        <div class="mb-2">
+                            <label for="email" class="block text-900 font-medium mb-2">{{'register.email' | translate }}</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">
+                                    <i class="pi pi-envelope"></i>
+                                </span>
+                                <input
+                                        formControlName="email"
+                                        id="email"
+                                        type="email"
+                                        pInputText
+                                        class="w-full p-3"
+                                        [placeholder]="'register.emailPlaceholder' | translate"
+                                        [ngClass]="{'p-invalid': ngForm.get('email')?.invalid && ngForm.get('email')?.touched}">
+                            </div>
+                            <small *ngIf="ngForm.get('email')?.invalid && ngForm.get('email')?.touched"
+                                   class="p-error block mt-2">
+                                {{'validation.emailInvalid' | translate }}
+                            </small>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="mb-2">
+                            <label for="password" class="block text-900 font-medium mb-2">{{'register.password' | translate }}</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">
+                                    <i class="pi pi-lock"></i>
+                                </span>
+                                <input
+                                        formControlName="password"
+                                        id="password"
+                                        [type]="showPassword ? 'text' : 'password'"
+                                        pInputText
+                                        class="w-full p-3"
+                                        [placeholder]="'register.passwordPlaceholder' | translate"
+                                        [ngClass]="{'p-invalid': ngForm.get('password')?.invalid && ngForm.get('password')?.touched}">
+                                <span class="p-inputgroup-addon cursor-pointer" (click)="showPassword = !showPassword">
+                                    <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                                </span>
+                            </div>
+                            <small *ngIf="ngForm.get('password')?.invalid && ngForm.get('password')?.touched"
+                                   class="p-error block mt-2">
+                                {{'validation.passwordMinLength' | translate }}
+                            </small>
+                        </div>
+
+                        <!-- Confirm Password Input -->
+                        <div class="mb-2">
+                            <label for="passwordConfirm" class="block text-900 font-medium mb-2">{{'register.confirmPassword' | translate }}</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon">
+                                    <i class="pi pi-lock"></i>
+                                </span>
+                                <input
+                                        formControlName="password_confirmation"
+                                        id="passwordConfirm"
+                                        [type]="showConfirmPassword ? 'text' : 'password'"
+                                        pInputText
+                                        class="w-full p-3"
+                                        [placeholder]="'register.confirmPasswordPlaceholder' | translate"
+                                        [ngClass]="{'p-invalid': ngForm.get('password_confirmation')?.invalid && ngForm.get('password_confirmation')?.touched}">
+                                <span class="p-inputgroup-addon cursor-pointer" (click)="showConfirmPassword = !showConfirmPassword">
+                                    <i [class]="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                                </span>
+                            </div>
+                            <small *ngIf="ngForm.get('password_confirmation')?.invalid && ngForm.get('password_confirmation')?.touched"
+                                   class="p-error block mt-2">
+                                {{'validation.passwordsMustMatch' | translate }}
+                            </small>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="mb-2">
+                            <div class="flex align-items-center">
+                                <p-checkbox
+                                        formControlName="terms"
+                                        [binary]="true"
+                                        inputId="terms"
+                                        styleClass="mr-3">
+                                </p-checkbox>
+                                <label for="terms" class="text-900 cursor-pointer">
+                                    {{'register.agreeToTerms' | translate }}
+                                    <a class="text-green-600 hover:text-green-800 ml-1 cursor-pointer">
+                                        {{'register.termsAndConditions' | translate }}
+                                    </a>
+                                </label>
+                            </div>
+                            <small *ngIf="ngForm.get('terms')?.invalid && ngForm.get('terms')?.touched"
+                                   class="p-error block mt-2">
+                                {{'validation.termsRequired' | translate }}
+                            </small>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button
+                                pButton
+                                pRipple
+                                [label]="'register.register' | translate"
+                                class="w-full p-button-raised p-button-lg mb-2"
+                                [disabled]="ngForm.invalid"
+                                [loading]="loading">
+                        </button>
+
+                        <!-- Divider -->
+                        <div class="flex align-items-center justify-content-center my-2">
+                            <div class="border-top-1 border-300 flex-grow-1"></div>
+                            <span class="px-3 text-600 font-medium">{{'general.or' | translate }}</span>
+                            <div class="border-top-1 border-300 flex-grow-1"></div>
+                        </div>
+
+                        <!-- Login Link -->
+                        <div class="text-center mt-3">
+                            <span class="text-600">{{'register.alreadyHaveAccount' | translate }}</span>
+                            <a class="text-green-600 hover:text-green-800 font-medium ml-2 cursor-pointer transition-colors"
+                               [routerLink]="['/auth/login']">
+                                {{'register.logIn' | translate }}
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

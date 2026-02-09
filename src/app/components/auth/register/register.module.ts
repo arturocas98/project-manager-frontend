@@ -8,6 +8,7 @@ import { RippleModule } from 'primeng/ripple';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { AppConfigModule } from 'src/app/layout/config/app.config.module';
+import {TranslateModule} from "@ngx-translate/core";
 
 @NgModule({
     imports: [
@@ -19,7 +20,8 @@ import { AppConfigModule } from 'src/app/layout/config/app.config.module';
         InputTextModule,
         CheckboxModule,
         AppConfigModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        TranslateModule
     ],
     declarations: [RegisterComponent]
 })
