@@ -159,7 +159,7 @@ export class ApiService {
      */
     handleResponse<T>(
         response: HttpResponse<T>,
-        parser: (data: any) => T
+        parser: (data: any, status?: number) => T
     ): Observable<T> {
         // Verificar conexión a internet
         if (!navigator.onLine) {
@@ -177,7 +177,7 @@ export class ApiService {
         if (statusCode >= 200 && statusCode < 300) {
             try {
                 const body = response.body;
-                return of(parser(body));
+                return of(parser(body, statusCode));
             } catch (error) {
                 this.errorService.showModal(
                     'Invalid response format from server',
@@ -207,7 +207,7 @@ export class ApiService {
         parser?: (data: any) => T
     ): Observable<T> {
         return this.buildHttpResponse<T>(endPoint, method, data, extraKeys).pipe(
-            switchMap(response => this.handleResponse(response, parser || ((d: any) => d as T)))
+            switchMap(response => this.handleResponse(response, parser || ((d: any, s?: number) => d as T)))
         );
     }
 
@@ -333,7 +333,7 @@ export class ApiService {
         endPoint: string,
         method: HttpMethodType,
         request: any,
-        parser: (data: any) => T,
+        parser: (data: any, status?: number) => T,
         extraKeys?: ExtraKeys
     ): Observable<T> {
         return this.request<T>(

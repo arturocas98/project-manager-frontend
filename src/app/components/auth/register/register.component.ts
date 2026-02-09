@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
-import { environment } from 'src/environments/environment';
+import {AuthService, RegisterResponseData} from "../../../service/auth.service";
+import {Router} from "@angular/router";
 
 @Component({
 	templateUrl: './register.component.html',
@@ -16,28 +16,62 @@ export class RegisterComponent {
 	constructor(
         private layoutService: LayoutService,
         private fb: FormBuilder,
-        private http: HttpClient,
+        private authService: AuthService,
+        private router: Router,
     ) {
         this.ngForm = this.fb.group({
-            username: ['', [Validators.required, Validators.minLength(3)]],
+            name: ['', [Validators.required, Validators.minLength(3)]],
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(6)]],
             password_confirmation: ['', [Validators.required, Validators.minLength(6)]],
-            terms: [false, [Validators.required]],
-        });
+            terms: [false, [Validators.requiredTrue]],
+        },
+            {
+                validators: this.passwordMatchValidator
+            }
+        );
+    }
+
+    passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+        const password = group.get('password')?.value;
+        const passwordConfirm = group.get('password_confirmation')?.value;
+
+        return password === passwordConfirm ? null : { passwordsMismatch: true };
     }
 
 	get dark(): boolean {
 		return this.layoutService.config.colorScheme !== 'light';
 	}
 
+    getSelectedValues(fields: string[]) {
+        const result: any = {};
+        fields.forEach(field => {
+            result[field] = this.ngForm.get(field)?.value;
+        });
+        return result;
+    }
+
     onSubmit(): void {
         if (this.ngForm.invalid) {
             return;
         }
+        this.loading = true;
+        let FormValue = this.getSelectedValues(['name', 'email', 'password']);
+        console.log(FormValue);
+        this.authService.RegisterUser(FormValue).subscribe({
+            next: (response: RegisterResponseData) => {
+                console.log('Register successful:', response);
+                this.loading = false;
 
-        this.http.post(`${environment.apiUrl}/register`, this.ngForm.value).subscribe((response) => {
-            console.log(response);
+                setTimeout(() => {
+                    this.router.navigate(['/auth/login']);
+                }, 1000);
+            },
+            error: (error) => {
+                console.error('Register failed:', error);
+                this.loading = false;
+
+            }
         });
     }
 }

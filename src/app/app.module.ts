@@ -9,6 +9,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppLayoutModule } from './layout/app.layout.module';
+import {AuthModule} from "./components/auth/auth.module";
+import {ModalModule} from "./components/Modal/modal.module";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {BrowserModule} from "@angular/platform-browser";
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
@@ -19,6 +23,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     imports: [
         AppRoutingModule,
         AppLayoutModule,
+        BrowserAnimationsModule,
+        BrowserModule,
         TranslateModule.forRoot({
             defaultLanguage: 'es',
             loader: {
@@ -27,6 +33,8 @@ export function HttpLoaderFactory(http: HttpClient) {
                 deps: [HttpClient],
             },
         }),
+        AuthModule,
+        ModalModule,
     ],
     providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
     bootstrap: [AppComponent],

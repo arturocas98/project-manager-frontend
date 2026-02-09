@@ -17,3 +17,8 @@ $gutter: 1rem; //for primeflex grid system
 @import "assets/demo/styles/flags/flags.css";
 @import "assets/demo/styles/badges.scss";
 @import "assets/demo/styles/code.scss";
+
+@import "../node_modules/@phosphor-icons/web/src/regular/style.css";
+@import "../node_modules/@phosphor-icons/web/src/light/style.css";
+@import "../node_modules/@phosphor-icons/web/src/bold/style.css";
+@import "../node_modules/@phosphor-icons/web/src/thin/style.css";

@@ -5,8 +5,28 @@
     <path [attr.fill]="dark ? 'var(--green-600)' : 'var(--green-500)'" d="M454.9 86.3C600.7 177 751.6 269.3 924.1 325c208.6 67.4 431.3 60.8 637.9-5.3c12.8-4.1 25.4-8.4 38.1-12.9V0H288.1c56 21.3 108.7 50.6 159.7 82C450.2 83.4 452.5 84.9 454.9 86.3z"/>
     <path [attr.fill]="dark ? 'var(--green-500)' : 'var(--green-400)'" d="M1397.5 154.8c47.2-10.6 93.6-25.3 138.6-43.8c21.7-8.9 43-18.8 63.9-29.5V0H643.4c62.9 41.7 129.7 78.2 202.1 107.4C1020.4 178.1 1214.2 196.1 1397.5 154.8z"/>
 </svg>
-<div class="px-5 min-h-screen flex justify-content-center align-items-center bg-gradient-to-br from-blue-50 to-indigo-100">
-    <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1 shadow-2xl w-[90%] md:w-[70%] max-w-6xl mx-auto">
+<div class="sm:px-5 min-h-screen flex flex-column sm:justify-content-center sm:align-items-center align-items-end bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div class="flex flex-column align-items-center justify-content-center text-center z-1 w-full mt-3 mb-3 p-3 sm:hidden">
+        <div class="flex align-content-center justify-content-center">
+            <div class="overflow-hidden z-2 w-22rem h-22rem bg-no-repeat bg-cover bg-center" style="background-image:  url(../../../../assets/General/Register_Smartgob.png); ">  </div>
+            <div class="absolute z-0 w-19rem h-19rem bg-white" style="border-radius: 50%;"></div>
+        </div>
+        <div class="flex flex-column align-items-center justify-content-center gap-3 mt-6 w-full">
+            <div class="flex align-items-center justify-content-start">
+                <i class="pi pi-check-circle text-green-500 text-xl mr-3"></i>
+                <span class="text-white font-medium">{{'register.benefit1' | translate }}</span>
+            </div>
+            <div class="flex align-items-center justify-content-start">
+                <i class="pi pi-check-circle text-green-500 text-xl mr-3"></i>
+                <span class="text-white font-medium">{{'register.benefit2' | translate }}</span>
+            </div>
+            <div class="flex align-items-center justify-content-start">
+                <i class="pi pi-check-circle text-green-500 text-xl mr-3"></i>
+                <span class="text-white font-medium">{{'register.benefit3' | translate }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="w-full sm:w-auto border-round-top-3xl sm:border-round-top border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1 shadow-2xl w-[90%] md:w-[70%] max-w-6xl mx-auto">
         <div class="flex flex-column md:flex-row gap-8 md:gap-12">
             <!-- Sección de imagen/ilustración (izquierda en desktop) -->
             <div class="hidden md:flex flex-1 align-items-center justify-content-center relative">
@@ -41,25 +61,25 @@
                     <span class="text-600 font-medium text-lg">{{'register.helpText' | translate }}</span>
                 </div>
 
-                <form [formGroup]="ngForm" (ngSubmit)="onSubmit()" class="w-full">
+                 <form [formGroup]="ngForm"  class="w-full">
                     <div class="flex flex-column">
                         <!-- Username Input -->
                         <div class="mb-2">
                             <label for="username" class="block text-900 font-medium mb-2">{{'register.username' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon">
+                                <span class="p-inputgroup-addon bg-white">
                                     <i class="pi pi-user"></i>
                                 </span>
                                 <input
-                                        formControlName="username"
+                                        formControlName="name"
                                         id="username"
                                         type="text"
                                         pInputText
                                         class="w-full p-3"
                                         [placeholder]="'register.usernamePlaceholder' | translate"
-                                        [ngClass]="{'p-invalid': ngForm.get('username')?.invalid && ngForm.get('username')?.touched}">
+                                        [ngClass]="{'p-invalid': ngForm.get('name')?.invalid && ngForm.get('name')?.touched}">
                             </div>
-                            <small *ngIf="ngForm.get('username')?.invalid && ngForm.get('username')?.touched"
+                            <small *ngIf="ngForm.get('name')?.invalid && ngForm.get('name')?.touched"
                                    class="p-error block mt-2">
                                 {{'validation.usernameRequired' | translate }}
                             </small>
@@ -69,7 +89,7 @@
                         <div class="mb-2">
                             <label for="email" class="block text-900 font-medium mb-2">{{'register.email' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon">
+                                <span class="p-inputgroup-addon bg-white">
                                     <i class="pi pi-envelope"></i>
                                 </span>
                                 <input
@@ -91,7 +111,7 @@
                         <div class="mb-2">
                             <label for="password" class="block text-900 font-medium mb-2">{{'register.password' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon">
+                                <span class="p-inputgroup-addon bg-white">
                                     <i class="pi pi-lock"></i>
                                 </span>
                                 <input
@@ -102,7 +122,7 @@
                                         class="w-full p-3"
                                         [placeholder]="'register.passwordPlaceholder' | translate"
                                         [ngClass]="{'p-invalid': ngForm.get('password')?.invalid && ngForm.get('password')?.touched}">
-                                <span class="p-inputgroup-addon cursor-pointer" (click)="showPassword = !showPassword">
+                                <span class="p-inputgroup-addon cursor-pointer" (click)="showPassword = !showPassword ">
                                     <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                                 </span>
                             </div>
@@ -116,7 +136,7 @@
                         <div class="mb-2">
                             <label for="passwordConfirm" class="block text-900 font-medium mb-2">{{'register.confirmPassword' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon">
+                                <span class="p-inputgroup-addon bg-white">
                                     <i class="pi pi-lock"></i>
                                 </span>
                                 <input
@@ -153,7 +173,7 @@
                                     </a>
                                 </label>
                             </div>
-                            <small *ngIf="ngForm.get('terms')?.invalid && ngForm.get('terms')?.touched"
+                            <small *ngIf="ngForm.get('terms')?.touched && ngForm.get('terms')?.value == false"
                                    class="p-error block mt-2">
                                 {{'validation.termsRequired' | translate }}
                             </small>
@@ -163,9 +183,11 @@
                         <button
                                 pButton
                                 pRipple
+                                type="button"
+                                (click)="onSubmit()"
                                 [label]="'register.register' | translate"
                                 class="w-full p-button-raised p-button-lg mb-2"
-                                [disabled]="ngForm.invalid"
+                                [disabled]="ngForm.invalid || loading"
                                 [loading]="loading">
                         </button>
 

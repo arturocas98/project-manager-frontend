@@ -1,66 +1,117 @@
 {
-    "general": {
-        "back": "Back",
-        "save": "Save",
-        "cancel": "Cancel",
-        "addNew": "Add New",
-        "activity": "Activity",
-        "messageToAction": "Are you sure you want to proceed?",
-        "selectFiles": "Select Files"
-    },
-    "notFound": {
-        "oops": "Oops!",
-        "thereIsNothingHere": "There is nothing here",
-        "goToDashboard": "Go to Dashboard"
-    },
-    "paginator": {
-        "search": "Global Search",
-        "showing": "Showing",
-        "to": "to",
-        "of": "of",
-        "entries": "entries",
-        "empty": "No data"
-    },
-    "menu": {
-        "management": "Management",
-        "userList": "Usuarios",
-        "roleList": "Roles",
-        "projectList": "Proyectos"
-    },
-    "login": {
-        "logIn": "Iniciar sesión",
-        "helpText": "Por favor ingrese sus credenciales",
-        "email": "Correo",
-        "password": "Contraseña",
-        "rememberMe": "Recordarme",
-        "forgotPassword": "¿Olvidaste tu contraseña?"
-    },
-    "user": {
-        "create": "Create User",
-        "edit": "Edit User",
-        "update": "Update User",
-        "profile": "Profile",
-        "username": "Username",
-        "email": "Email",
-        "password": "Password",
-        "passwordConfirmation": "Password Confirmation",
-        "id": "ID",
-        "name": "Name",
-        "createdAt": "Created At"
-    },
-    "role": {
-        "create": "Create Role",
-        "edit": "Edit Role",
-        "update": "Update Role",
-        "id": "ID",
-        "name": "Name",
-        "createdAt": "Created At",
-        "title": "Role"
-    },
-    "forgotPassword": {
-        "resetYourPassword": "Reset Your Password",
-        "enterYourEmail": "Ingresa tu correo para restablecer tu contraseña",
-        "sendMeResetLink": "Send Me Reset Link",
-        "backToLogin": "Back to Login"
-    }
+  "general": {
+    "back": "Volver",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "addNew": "Agregar Nuevo",
+    "activity": "Actividad",
+    "messageToAction": "¿Estás seguro de que quieres continuar?",
+    "selectFiles": "Seleccionar Archivos",
+    "or": "o"
+  },
+  "notFound": {
+    "oops": "¡Ups!",
+    "thereIsNothingHere": "No hay nada aquí",
+    "goToDashboard": "Ir al Dashboard"
+  },
+  "paginator": {
+    "search": "Búsqueda Global",
+    "showing": "Mostrando",
+    "to": "a",
+    "of": "de",
+    "entries": "registros",
+    "empty": "Sin datos"
+  },
+  "menu": {
+    "management": "Gestión",
+    "userList": "Usuarios",
+    "roleList": "Roles",
+    "projectList": "Proyectos"
+  },
+  "login": {
+    "logIn": "Iniciar sesión",
+    "helpText": "Por favor ingrese sus credenciales",
+    "email": "Correo",
+    "password": "Contraseña",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes una cuenta?",
+    "register": "Registrarse",
+    "securityTitle": "Autenticación Segura",
+    "securityDescription": "Tus datos están protegidos con encriptación de nivel industrial"
+  },
+  "sideBar": {
+    "forYou": "Para ti",
+    "space": "Espacio",
+    "recent": "Recientes",
+    "myKanbanSpace": "Mi espacio de Kanban",
+    "moreSpaces": "Más espacios",
+    "recommended": "Recomendado",
+    "createSheet": "Crear una hoja... [PROBAR]",
+    "more": "Más",
+    "markedAsFavorites": "Marcados como favoritos",
+    "applications": "Aplicaciones",
+    "plans": "Planes",
+    "filters": "Filtros",
+    "panels": "Paneles",
+    "goals": "Metas",
+    "teams": "Equipos",
+    "projects": "Proyectos",
+    "customizeSidebar": "Personalizar barra lateral"
+  },
+  "validation": {
+    "usernameRequired": "El nombre de usuario es requerido",
+    "emailInvalid": "Por favor ingresa un email válido",
+    "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+    "passwordsMustMatch": "Las contraseñas deben coincidir",
+    "termsRequired": "Debes aceptar los términos y condiciones"
+  },
+  "user": {
+    "create": "Crear Usuario",
+    "edit": "Editar Usuario",
+    "update": "Actualizar Usuario",
+    "profile": "Perfil",
+    "username": "Nombre de Usuario",
+    "email": "Correo",
+    "password": "Contraseña",
+    "passwordConfirmation": "Confirmar Contraseña",
+    "id": "ID",
+    "name": "Nombre",
+    "createdAt": "Creado el"
+  },
+  "role": {
+    "create": "Crear Rol",
+    "edit": "Editar Rol",
+    "update": "Actualizar Rol",
+    "id": "ID",
+    "name": "Nombre",
+    "createdAt": "Creado el",
+    "title": "Rol"
+  },
+  "forgotPassword": {
+    "resetYourPassword": "Restablecer tu Contraseña",
+    "enterYourEmail": "Ingresa tu correo para restablecer tu contraseña",
+    "sendMeResetLink": "Enviarme Enlace de Restablecimiento",
+    "backToLogin": "Volver a Iniciar Sesión"
+  },
+  "register": {
+    "register": "Registrarse",
+    "createAccount": "Crear Cuenta",
+    "helpText": "Completa tus datos para crear una cuenta",
+    "username": "Nombre de Usuario",
+    "usernamePlaceholder": "john_doe",
+    "email": "Correo",
+    "emailPlaceholder": "ejemplo@correo.com",
+    "password": "Contraseña",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirmar Contraseña",
+    "confirmPasswordPlaceholder": "••••••••",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "logIn": "Iniciar Sesión",
+    "agreeToTerms": "Acepto los",
+    "termsAndConditions": "Términos y Condiciones",
+    "benefit1": "Cuenta segura y protegida",
+    "benefit2": "Acceso inmediato a todas las funciones",
+    "benefit3": "Soporte 24/7 disponible"
+  }
 }

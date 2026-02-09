@@ -10,6 +10,12 @@ export interface LoginData {
     password: string;
 }
 
+export interface RegisterData {
+    name: string;
+    email: string;
+    password: string;
+}
+
 export class LoginResponseData {
     access_token!: string;
 
@@ -19,6 +25,34 @@ export class LoginResponseData {
         return obj;
     }
 }
+
+
+export class RegisterResponseData {
+    success!: boolean;
+    message?: string;
+
+    static fromJson(json: any, status?: number): RegisterResponseData {
+        const obj = new RegisterResponseData();
+
+        // Debug: mostrar lo que llega
+        console.log('Status recibido:', status);
+        console.log('JSON recibido:', json);
+
+        // Determinar éxito basado en status 201 o presencia de usuario
+        obj.success = status === 201 ||
+            (json && (json.user !== undefined || json.id !== undefined));
+
+        obj.message = json?.message || (obj.success ? 'Registro exitoso' : undefined);
+
+        console.log('Resultado final:', {
+            success: obj.success,
+            message: obj.message
+        });
+
+        return obj;
+    }
+}
+
 
 
 @Injectable({
@@ -33,10 +67,19 @@ export class AuthService {
 
     loginUser(request: LoginData): Observable<LoginResponseData> {
         return this.apiService.staticRequest<LoginResponseData>(
-            'auth/login',  // APIEndPoints.login
+            'auth/login',
             HttpMethodType.POST,
             request,
             (json) => LoginResponseData.fromJson(json)
+        );
+    }
+    RegisterUser(request: RegisterData): Observable<RegisterResponseData> {
+        console.log(request);
+        return this.apiService.staticRequest<RegisterResponseData>(
+            'auth/register',
+            HttpMethodType.POST,
+            request,
+            (json, status) => RegisterResponseData.fromJson(json,status)
         );
     }
 
