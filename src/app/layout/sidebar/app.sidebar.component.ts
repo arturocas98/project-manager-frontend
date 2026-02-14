@@ -1,4 +1,4 @@
-import { Component, ElementRef } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { LayoutService } from '../service/app.layout.service';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -7,10 +7,10 @@ import { TranslateService } from '@ngx-translate/core';
     templateUrl: './app.sidebar.component.html',
 })
 
-export class AppSidebarComponent {
+export class AppSidebarComponent  {
+    @ViewChild('recentsOverlay') recentsOverlay: any;
     timeout: any = null;
-    isCollapsed = false;
-    showMoreOptions: boolean = false;
+
 
     constructor(public layoutService: LayoutService, public el: ElementRef, private translate: TranslateService) { }
 

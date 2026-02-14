@@ -88,7 +88,4 @@ export class AuthService {
         return !!localStorage.getItem('token');
     }
 
-    redirectIfUnauthenticated(): void {
-        this.router.navigate([Constants.routes.login]);
-    }
 }

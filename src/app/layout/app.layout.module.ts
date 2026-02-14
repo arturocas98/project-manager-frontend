@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { InputTextModule } from 'primeng/inputtext';
@@ -20,6 +20,11 @@ import { AppMenuitemComponent } from './menu/menu-item/app.menui-tem.component';
 import { AppTopbarComponent } from './topbar/app.topbar.component';
 import { AppProfileSidebarComponent } from './profile-sidebar/app.profile-sidebar.component';
 import { TranslateModule } from '@ngx-translate/core';
+import {ButtonModule} from "primeng/button";
+import { InputGroupModule } from 'primeng/inputgroup';
+import {InputGroupAddonModule} from "primeng/inputgroupaddon";
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 @NgModule({
     declarations: [
@@ -35,6 +40,8 @@ import { TranslateModule } from '@ngx-translate/core';
     ],
     imports: [
         BrowserModule,
+        OverlayPanelModule,
+        TieredMenuModule,
         FormsModule,
         HttpClientModule,
         BrowserAnimationsModule,
@@ -47,6 +54,10 @@ import { TranslateModule } from '@ngx-translate/core';
         RippleModule,
         RouterModule,
         TranslateModule,
+        ButtonModule,
+        InputGroupModule,
+        InputGroupAddonModule,
+        ReactiveFormsModule,
     ]
 })
 export class AppLayoutModule { }

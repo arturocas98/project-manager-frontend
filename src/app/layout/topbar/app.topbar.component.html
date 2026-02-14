@@ -1,41 +1,39 @@
 <div class="layout-topbar">
-    <div class="topbar-start">
-        <button #menubutton type="button" class="topbar-menubutton p-link p-trigger" (click)="onMenuButtonClick()">
+    <div class="topbar-start w-3rem">
+        <button #menubutton type="button" class="topbar-menubutton p-link w-3rem h-3rem p-trigger" (click)="onMenuButtonClick()">
             <i class="ph ph-sidebar-simple"></i>
         </button>
     </div>
     <div>
-        <ul class="flex flex-col mt-4 gap-4 font-medium lg:flex-row lg:space-x-2 lg:mt-0 list-none">
-            <li>
+        <ul class="flex mt-4 sm:gap-4 font-medium flex-row align-items-center space-x-2 list-none p-0 m-0">
+        <li class="hidden sm:flex">
                 <a
                         [routerLink]="['/']"
                         routerLinkActive="text-white bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
                         [routerLinkActiveOptions]="{exact: true}"
-                        class="flex items-center gap-3 py-3 pl-4 pr-4 text-gray-700 hover:bg-indigo-500 hover:text-white transition-all duration-300 group" style="border-radius: 20px;"
+                        class="flex align-items-center gap-3 py-3 pl-4 pr-4 text-gray-700 hover:bg-indigo-500 hover:text-white transition-all duration-300 group" style="border-radius: 20px;"
                         role="menuitem">
                     <i class="ph ph-house text-lg"></i>
                     <span>Home</span>
                 </a>
             </li>
             <li>
-                <div class="relative bg-white" style="border-radius: 20px;">
-                    <div class='flex items-center justify-center'>
-                        <input pInputText [(ngModel)]="value3" type="text" size="large" placeholder="Buscar..." class="border-none" style="border-radius: 20px;" />
-                        <div class="relative flex items-center justify-center bg-indigo-500" style="border-radius: 20px;">
-                            <button type="submit" class="relative p-3 border-none ph ph-magnifying-glass bg-transparent text-white"></button>
-                        </div>
-                    </div>
+                <div class="p-inputgroup h-3rem">
+                    <input pInputText class="w-full p-3 border-round-left-2xl" placeholder="Search">
+                    <span class="p-inputgroup-addon cursor-pointer border-round-right-2xl" >
+                        <i [class]="'ph ph-magnifying-glass'"></i>
+                    </span>
                 </div>
             </li>
-            <li>
+            <li class="hidden sm:flex">
                 <a
                         [routerLink]="['/']"
                         routerLinkActive="text-white from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
                         [routerLinkActiveOptions]="{exact: true}"
-                        class="flex align-center gap-3 py-3 pl-4 pr-4 text-gray-700 hover:bg-indigo-500 hover:text-white transition-all duration-300 group" style="border-radius: 20px;"
+                        class="flex align-items-center gap-3 py-3 pl-4 pr-4 text-gray-700 hover:bg-indigo-500 hover:text-white transition-all duration-300 group" style="border-radius: 20px;"
                         role="menuitem">
-                    <i class="ph ph-bell text-lg"></i>
-                    <span>Notification</span>
+                    <i class="ph ph-stack-plus text-lg"></i>
+                    <span>Agregar</span>
                 </a>
             </li>
         </ul>
@@ -43,7 +41,7 @@
     </div>
 
 
-    <div class="topbar-end flex items-center justify-center relative">
+    <div class="topbar-end flex align-items-center justify-center relative">
         <button type="button" class="p-link" (click)="onProfileButtonClick()">
             <img src="assets/layout/images/avatar.png" alt="Profile" class="w-3rem h-3rem relative" />
         </button>

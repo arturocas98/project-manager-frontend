@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Importaciones de PrimeNG
@@ -13,27 +13,24 @@ import {TimedModalService} from "../../../service/Modals/timed-modal.service";
     templateUrl: './modal-auth.component.html',
     // NO pongas providers aquí si ya los pusiste en AppModule
 })
-export class ModalAuthComponent implements OnInit, OnDestroy {
-    @Output() confirmAction = new EventEmitter<void>();
+export class ModalAuthComponent{
+    private confirmationService = inject(ConfirmationService);
+    private messageService = inject(MessageService);
+    private modalService = inject(TimedModalService);
 
     // Propiedades para el diseño
-    iconClass = '';
-    bgColor = '';
-    textColor = '';
-    showCloseButton = true;
     currentType: 'success' | 'error' | 'warning' | 'info' = 'info';
     currentStatusCode?: string;
+    bgColor = '';
+    textColor = '';
+    iconBgColor = '';
+    acceptButtonClass = '';
+    rejectButtonClass = '';
+    iconClass: string = '';
 
     private modalStateSubscription!: Subscription;
-    private currentMessage?: Confirmation;
 
-    constructor(
-        private confirmationService: ConfirmationService,
-        private messageService: MessageService,
-        private modalService: TimedModalService
-    ) {}
-
-    ngOnInit() {
+    constructor() {
         this.setupModalSubscriptions();
     }
 
@@ -59,32 +56,28 @@ export class ModalAuthComponent implements OnInit, OnDestroy {
         this.currentStatusCode = config.statusCode;
 
         this.setupModalStyle();
-        this.showCloseButton = config.showCloseButton !== false;
 
         this.confirmationService.confirm({
             message: config.message,
             header: this.getTitleFromConfig(config),
             icon: 'none',
-
             accept: () => {
                 this.handleAccept();
             },
-
             reject: () => {
                 this.handleReject();
             },
-
             acceptLabel: this.getButtonText(this.currentType),
             rejectLabel: (this.currentType === 'error' || this.currentType === 'warning') ? 'Cancelar' : undefined,
-
             acceptButtonStyleClass: 'hidden',
             rejectButtonStyleClass: 'hidden',
-
         } as any);
-
     }
 
-    // Resto de los métodos se mantienen igual...
+    getTitle(message: Confirmation): string {
+        return message.header || 'Información';
+    }
+
     private getTitleFromConfig(config: any): string {
         if (config.title) return config.title;
 
@@ -96,31 +89,39 @@ export class ModalAuthComponent implements OnInit, OnDestroy {
         }
     }
 
-    getTitle(message: Confirmation): string {
-        return message.header || 'Información';
-    }
-
     private setupModalStyle() {
         switch(this.currentType) {
             case 'success':
-                this.iconClass = 'pi pi-check-circle text-4xl';
+                this.iconClass = 'pi pi-check-circle';
                 this.bgColor = 'bg-green-50';
                 this.textColor = 'text-green-800';
+                this.iconBgColor = 'bg-green-100';
+                this.acceptButtonClass = 'bg-green-600 hover:bg-green-700 border-green-600';
+                this.rejectButtonClass = 'border-green-600 text-green-600 hover:bg-green-50';
                 break;
             case 'error':
-                this.iconClass = 'pi pi-times-circle text-4xl';
+                this.iconClass = 'pi pi-times-circle';
                 this.bgColor = 'bg-red-50';
                 this.textColor = 'text-red-800';
+                this.iconBgColor = 'bg-red-100';
+                this.acceptButtonClass = 'bg-red-600 hover:bg-red-700 border-red-600';
+                this.rejectButtonClass = 'border-red-600 text-red-600 hover:bg-red-50';
                 break;
             case 'warning':
-                this.iconClass = 'pi pi-exclamation-triangle text-4xl';
+                this.iconClass = 'pi pi-exclamation-triangle';
                 this.bgColor = 'bg-yellow-50';
                 this.textColor = 'text-yellow-800';
+                this.iconBgColor = 'bg-yellow-100';
+                this.acceptButtonClass = 'bg-yellow-600 hover:bg-yellow-700 border-yellow-600';
+                this.rejectButtonClass = 'border-yellow-600 text-yellow-600 hover:bg-yellow-50';
                 break;
             default: // info
-                this.iconClass = 'pi pi-info-circle text-4xl';
+                this.iconClass = 'pi pi-info-circle';
                 this.bgColor = 'bg-blue-50';
                 this.textColor = 'text-blue-800';
+                this.iconBgColor = 'bg-blue-100';
+                this.acceptButtonClass = 'bg-blue-600 hover:bg-blue-700 border-blue-600';
+                this.rejectButtonClass = 'border-blue-600 text-blue-600 hover:bg-blue-50';
                 break;
         }
     }
@@ -133,21 +134,6 @@ export class ModalAuthComponent implements OnInit, OnDestroy {
         if (code >= 400 && code < 500) return 'error';
         if (code >= 500) return 'error';
         return 'info';
-    }
-
-    getButtonClass(type: 'success' | 'error' | 'warning' | 'info'): string {
-        const baseClass = 'inline-flex justify-center rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ';
-
-        switch(type) {
-            case 'success':
-                return baseClass + 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500';
-            case 'error':
-                return baseClass + 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500';
-            case 'warning':
-                return baseClass + 'bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500';
-            default:
-                return baseClass + 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500';
-        }
     }
 
     getButtonText(type: 'success' | 'error' | 'warning' | 'info'): string {
@@ -165,7 +151,8 @@ export class ModalAuthComponent implements OnInit, OnDestroy {
         const type = config.type || this.getTypeFromStatusCode(config.statusCode);
 
         if (type === 'error' || type === 'warning') {
-            this.confirmAction.emit();
+            // Emitir evento si es necesario
+            // this.confirmAction.emit();
         }
 
         this.modalService.hideModal();
@@ -173,16 +160,5 @@ export class ModalAuthComponent implements OnInit, OnDestroy {
 
     private handleReject() {
         this.modalService.hideModal();
-    }
-
-    onBackdropClick(event: MouseEvent) {
-        const config = this.modalService.modalConfigSignal();
-        if (config.showCloseButton !== false) {
-            const rejectButton = document.querySelector('[data-pc-section="rejectbutton"]') as HTMLElement;
-            if (rejectButton) {
-                rejectButton.click();
-            }
-        }
-        event.stopPropagation();
     }
 }
