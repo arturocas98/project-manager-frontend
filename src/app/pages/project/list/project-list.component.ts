@@ -8,14 +8,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { Constants, NUMBERS } from 'src/app/constants/constants';
-import { ParamJson, ResponseData } from 'src/app/models/response';
-import { Role } from 'src/app/models/role';
-import { RoleService } from 'src/app/service/role.service';
-import { ProjectCardComponent } from "src/app/components/project/card/project-card.component";
-import { Project } from 'src/app/models/project';
-import { ProjectService } from 'src/app/service/project.service';
+import { Constants, NUMBERS } from 'src/app/shared/constants/constants';
+import { ParamJson, ResponseData } from 'src/app/shared/models/response';
+import { Role } from 'src/app/shared/models/role';
+import { ProjectCardComponent } from "src/app/shared/components/project/card/project-card.component";
+import { Project } from 'src/app/shared/models/project';
 import { CardModule } from 'primeng/card';
+import { ProjectService } from 'src/app/core/service/project.service';
 
 @Component({
   templateUrl: "./project-list.component.html",

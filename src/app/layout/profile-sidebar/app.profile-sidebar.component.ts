@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { LayoutService } from '../service/app.layout.service';
-import {TokenService} from "../../service/token.service";
+import { TokenService } from 'src/app/core/service/token.service';
 
 @Component({
     selector: 'app-profilemenu',

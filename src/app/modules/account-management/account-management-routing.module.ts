@@ -6,21 +6,20 @@ import { RouterModule } from "@angular/router";
     RouterModule.forChild([
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
       {
-        path: "dashboard",
-        loadComponent: () =>
-          import("./dashboard/dashboard.component").then(
-            (m) => m.DashboardComponent,
-          ),
+        path: "users",
+        data: { breadcrumb: "Users" },
+        loadChildren: () =>
+          import("./users/user.module").then((m) => m.UserModule),
       },
       {
-        path: "project",
-        data: { breadcrumb: "Project Management" },
+        path: "roles",
+        data: { breadcrumb: "Roles" },
         loadChildren: () =>
-          import("./project/project.module").then((m) => m.ProjectModule),
+          import("./roles/role.module").then((m) => m.RoleModule),
       },
       { path: "**", redirectTo: "/notfound" },
     ]),
   ],
   exports: [RouterModule],
 })
-export class PagesRoutingModule {}
+export class AccountManagementRoutingModule {}

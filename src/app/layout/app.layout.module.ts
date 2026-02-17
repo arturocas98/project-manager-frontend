@@ -13,7 +13,7 @@ import { RippleModule } from 'primeng/ripple';
 import { AppLayoutComponent } from './app.layout.component';
 import { RouterModule } from '@angular/router';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from '../auth/auth.interceptor';
+import { AuthInterceptor } from '../core/interceptors/auth.interceptor';
 import { AppSidebarComponent } from './sidebar/app.sidebar.component';
 import { AppMenuComponent } from './menu/app.menu.component';
 import { AppMenuitemComponent } from './menu/menu-item/app.menui-tem.component';

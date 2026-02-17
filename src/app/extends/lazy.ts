@@ -1,7 +1,7 @@
 import { FilterMetadata } from 'primeng/api';
 import { TableLazyLoadEvent } from 'primeng/table';
-import { Constants } from '../constants/constants';
-import { EventPage, ParamJson, ResponseMeta } from '../models/response';
+import { Constants } from '../shared/constants/constants';
+import { EventPage, ParamJson, ResponseMeta } from '../shared/models/response';
 
 export class LazyPaginator {
     firstPage: number = 1;

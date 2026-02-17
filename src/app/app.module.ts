@@ -9,8 +9,8 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppLayoutModule } from './layout/app.layout.module';
-import {AuthModule} from "./components/auth/auth.module";
-import {ModalModule} from "./components/Modal/modal.module";
+import {AuthModule} from "./shared/components/auth/auth.module";
+import {ModalModule} from "./shared/components/Modal/modal.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {BrowserModule} from "@angular/platform-browser";
 

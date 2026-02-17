@@ -2,7 +2,7 @@ import { AfterViewChecked } from '@angular/core';
 import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MenuItem } from 'primeng/api';
-import { Constants } from 'src/app/constants/constants';
+import { Constants } from 'src/app/shared/constants/constants';
 
 @Component({
     selector: 'app-menu',
