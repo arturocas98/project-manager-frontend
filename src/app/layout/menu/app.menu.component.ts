@@ -33,12 +33,28 @@ export class AppMenuComponent implements AfterViewChecked {
             icon: Constants.icons.recents,
             routerLink: [Constants.routes.dashboard],
             expanded: false,
+              items: [
+                  {
+                      label: this.translateService.instant("configuracion"),
+                      icon: Constants.icons.configuracion,
+                      routerLink: [Constants.routes.dashboard],
+                      expanded: false,
+                  },
+              ],
           },
           {
             label: this.translateService.instant("favoritos"),
             icon: Constants.icons.favoritos,
             routerLink: [Constants.routes.dashboard],
             expanded: false,
+              items: [
+                  {
+                      label: this.translateService.instant("configuracion"),
+                      icon: Constants.icons.configuracion,
+                      routerLink: [Constants.routes.dashboard],
+                      expanded: false,
+                  },
+              ],
           },
           {
             label: this.translateService.instant("planes"),
@@ -57,33 +73,19 @@ export class AppMenuComponent implements AfterViewChecked {
             icon: Constants.icons.filtros,
             routerLink: [Constants.routes.dashboard],
             expanded: false,
+              items: [
+                  {
+                      label: this.translateService.instant("configuracion"),
+                      icon: Constants.icons.configuracion,
+                      routerLink: [Constants.routes.dashboard],
+                      expanded: false,
+                  },
+              ],
           },
           {
             label: this.translateService.instant("paneles"),
             icon: Constants.icons.paneles,
             routerLink: [Constants.routes.dashboard],
-            expanded: false,
-          },
-
-          {
-            label: this.translateService.instant("metas"),
-            icon: Constants.icons.metas,
-            routerLink: [Constants.routes.dashboard],
-            more: true,
-            expanded: false,
-          },
-          {
-            label: this.translateService.instant("equipos"),
-            icon: Constants.icons.equipos,
-            routerLink: [Constants.routes.dashboard],
-            more: true,
-            expanded: false,
-          },
-          {
-            label: this.translateService.instant("proyectos"),
-            icon: Constants.icons.proyectos,
-            routerLink: [Constants.routes.projectList],
-            more: true,
             expanded: false,
           },
           {
@@ -100,6 +102,27 @@ export class AppMenuComponent implements AfterViewChecked {
               },
             ],
           },
+            {
+                label: this.translateService.instant("metas"),
+                icon: Constants.icons.metas,
+                routerLink: [Constants.routes.dashboard],
+                more: true,
+                expanded: false,
+            },
+            {
+                label: this.translateService.instant("equipos"),
+                icon: Constants.icons.equipos,
+                routerLink: [Constants.routes.dashboard],
+                more: true,
+                expanded: false,
+            },
+            {
+                label: this.translateService.instant("proyectos"),
+                icon: Constants.icons.proyectos,
+                routerLink: [Constants.routes.projectList],
+                more: true,
+                expanded: false,
+            },
         ],
       });
     }

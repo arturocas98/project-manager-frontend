@@ -12,6 +12,7 @@
                 <i *ngIf="child.icon" [class]="child.icon"></i>
                 <span>{{child.label}}</span>
                 <i class="ph ph-caret-right ml-auto" [ngClass]="{'rotate-90': child['expanded']}"></i>
+
             </a>
 
             <a *ngIf="child['more']"
