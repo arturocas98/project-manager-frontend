@@ -88,9 +88,8 @@ export class AppMenuComponent implements AfterViewChecked {
           },
           {
             label: this.translateService.instant("personalizar"),
-            icon: Constants.icons.configuracion,
+            icon: Constants.icons.personality,
             routerLink: [Constants.routes.dashboard],
-            more: true,
             expanded: false,
             items: [
               {

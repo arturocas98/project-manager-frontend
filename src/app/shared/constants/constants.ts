@@ -19,6 +19,7 @@ export const Constants = {
   },
     icons: {
         dashboard: 'ph ph-house',
+        personality: 'ph ph-sliders',
         recents: 'ph ph-clock',
         favoritos: 'ph ph-star',
         planes: 'ph ph-projector-screen-chart',
