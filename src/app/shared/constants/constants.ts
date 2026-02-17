@@ -19,21 +19,21 @@ export const Constants = {
   },
     icons: {
         dashboard: 'ph ph-house',
-        personality: 'ph ph-sliders',
-        recents: 'ph ph-clock',
-        favoritos: 'ph ph-star',
-        planes: 'ph ph-projector-screen-chart',
-        espacios: 'ph ph-squares-four',
-        filtros: 'ph ph-funnel-simple',
-        paneles: 'ph ph-layout',
+        customize: 'ph ph-sliders',
+        recent: 'ph ph-clock',
+        favorites: 'ph ph-star',
+        plans: 'ph ph-projector-screen-chart',
+        spaces: 'ph ph-squares-four',
+        filters: 'ph ph-funnel-simple',
+        panels: 'ph ph-layout',
 
-        metas: 'ph ph-person-simple-run',
-        equipos: 'ph ph-users-three',
-        proyectos: 'ph ph-rocket-launch',
-        configuracion: 'ph ph-gear-six',
+        goals: 'ph ph-person-simple-run',
+        teams: 'ph ph-users-three',
+        projects: 'ph ph-rocket-launch',
+        settings: 'ph ph-gear-six',
 
         caretRight: 'ph ph-caret-right',
-        arrowCircleRight: 'ph ph-arrow-circle-right'
+        arrowRightCircle: 'ph ph-arrow-circle-right'
     },
 
     defaultPaginator: { current_page: 1, total: 0, from: 0, to: 0 },
