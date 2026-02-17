@@ -35,7 +35,7 @@ const routes: Routes = [
         pathMatch: "full",
       },
       {
-        path: "pages",
+        path: "",
         data: { breadcrumb: "Pages" },
         loadChildren: () =>
           import("./pages/pages.module").then((m) => m.PagesModule),
