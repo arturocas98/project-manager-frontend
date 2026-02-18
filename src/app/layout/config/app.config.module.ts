@@ -8,19 +8,13 @@ import { CommonModule } from '@angular/common';
 import { AppConfigComponent } from './app.config.component';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        // FormsModule,
-        // SidebarModule,
-        // RadioButtonModule,
-        // ButtonModule,
-        // InputSwitchModule
-    ],
-    declarations: [
-        AppConfigComponent
-    ],
-    exports: [
-        AppConfigComponent
-    ]
+  imports: [
+    CommonModule,
+    // FormsModule,
+    // SidebarModule,
+    // RadioButtonModule,
+    // ButtonModule,
+    // InputSwitchModule
+  ],
 })
-export class AppConfigModule { }
+export class AppConfigModule {}

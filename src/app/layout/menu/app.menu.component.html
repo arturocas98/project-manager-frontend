@@ -4,13 +4,13 @@
         <li *ngFor="let child of item.items" class="menu-item-wrapper">
             <!-- Si tiene subitems -->
             <a *ngIf="child.items && child.items.length > 0"
-               class="flex align-items-center gap-3 px-3 py-2 rounded-lg text-gray-700 font-medium hover:bg-indigo-50 hover:text-indigo-500"
+               class="flex align-items-center gap-4 px-3 py-2 rounded-lg border-round-2xl text-gray-700 text-xl hover:bg-indigo-50 hover:text-indigo-500 text-xl"
                style="cursor:pointer"
                (click)="toggleSubmenu(child)"
                [class.text-indigo-500]="child['expanded']"
                [class.bg-indigo-50]="child['expanded']">
                 <i *ngIf="child.icon" [class]="child.icon"></i>
-                <span>{{child.label}}</span>
+                <span  style="font-size:1.3rem;">{{child.label}}</span>
                 <i class="ph ph-caret-right ml-auto" [ngClass]="{'rotate-90': child['expanded']}"></i>
 
             </a>
@@ -19,13 +19,13 @@
                [routerLink]="child.routerLink"
                routerLinkActive="bg-indigo-50"
                [routerLinkActiveOptions]="{exact: true}"
-               class="flex align-items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-indigo-500 transition-all"
+               class="flex align-items-center gap-3 px-3 py-2 rounded-lg border-round-2xl text-gray-700 hover:bg-gray-100 hover:text-indigo-500 transition-all text-xl"
                style="cursor:pointer">
-                <div class="w-3rem h-2rem border-round-2xl bg-indigo-100 flex align-items-center justify-content-center text-indigo-500">
-                    <i [class]="child.icon || 'ph ph-person-simple-run'"></i>
+                <div class="w-3rem h-2rem border-round-2xl  bg-indigo-100 flex align-items-center justify-content-center text-indigo-500">
+                    <i [class]="child.icon || 'ph ph-person-simple-run'" class="text-3xl"></i>
                 </div>
-                <span class="font-medium">{{child.label}}</span>
-                <i class="ph ph-arrow-circle-right ml-auto text-xl"></i>
+                <span style="font-size:1.3rem;">{{child.label}}</span>
+                <i class="ph ph-arrow-circle-right ml-auto text-3xl"></i>
             </a>
 
             <!-- Si es un item simple (sin hijos) -->
@@ -33,10 +33,10 @@
                [routerLink]="child.routerLink"
                routerLinkActive="bg-indigo-50 text-indigo-500"
                [routerLinkActiveOptions]="{exact: true}"
-               class="flex align-items-center gap-3 px-3 py-2 rounded-lg text-gray-700 font-medium hover:bg-indigo-50 hover:text-indigo-500"
+               class="flex align-items-center gap-3 px-3 py-2 rounded-lg border-round-2xl text-gray-700 text-xl hover:bg-indigo-50 hover:text-indigo-500 text-xl"
                style="cursor:pointer">
-                <i *ngIf="child.icon" [class]="child.icon"></i>
-                <span>{{child.label}}</span>
+                <i *ngIf="child.icon" [class]="child.icon" class="text-base text-3xl"></i>
+                <span style="font-size:1.3rem;">{{child.label}}</span>
             </a>
 
             <!-- Submenu -->
@@ -45,10 +45,10 @@
                     <a [routerLink]="subItem.routerLink"
                        routerLinkActive="bg-indigo-50 text-indigo-500"
                        [routerLinkActiveOptions]="{exact: true}"
-                       class="flex align-items-center gap-3 px-3 py-2 rounded-lg text-gray-600 font-medium hover:bg-indigo-50 hover:text-indigo-500 text-sm"
+                       class="flex align-items-center gap-3 px-3 py-2 rounded-lg border-round-2xl text-gray-600 text-xl hover:bg-indigo-50 hover:text-indigo-500 text-3xl"
                        style="cursor:pointer">
-                        <i *ngIf="subItem.icon" [class]="subItem.icon" class="text-base"></i>
-                        <span>{{subItem.label}}</span>
+                        <i *ngIf="subItem.icon" [class]="subItem.icon" class="text-base text-3xl"></i>
+                        <span style="font-size:1.3rem;">{{subItem.label}}</span>
                     </a>
                 </li>
             </ul>

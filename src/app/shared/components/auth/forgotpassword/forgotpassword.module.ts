@@ -7,17 +7,18 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AppConfigModule } from 'src/app/layout/config/app.config.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { AppConfigComponent } from 'src/app/layout/config/app.config.component';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        ButtonModule,
-        InputTextModule,
-        ForgotPasswordRoutingModule,
-        AppConfigModule,
-        ReactiveFormsModule,
-        TranslateModule
-    ],
-    declarations: [ForgotPasswordComponent]
+  imports: [
+    CommonModule,
+    ButtonModule,
+    InputTextModule,
+    ForgotPasswordRoutingModule,
+    AppConfigComponent,
+    ReactiveFormsModule,
+    TranslateModule,
+  ],
+  declarations: [ForgotPasswordComponent],
 })
-export class ForgotPasswordModule { }
+export class ForgotPasswordModule {}

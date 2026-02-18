@@ -7,38 +7,39 @@ import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-	templateUrl: './newpassword.component.html'
+  templateUrl: './newpassword.component.html',
 })
 export class NewPasswordComponent {
-    ngForm: FormGroup;
+  ngForm: FormGroup;
 
-    constructor(
-        private layoutService: LayoutService,
-        private fb: FormBuilder,
-        private http: HttpClient,
-        private router: Router,
-        private activatedRoute: ActivatedRoute,
-    ) {
-        this.ngForm = this.fb.group({
-            password: ['', [Validators.required]],
-            password_confirmation: ['', [Validators.required]],
+  constructor(
+    private layoutService: LayoutService,
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {
+    this.ngForm = this.fb.group({
+      password: ['', [Validators.required]],
+      password_confirmation: ['', [Validators.required]],
+    });
+  }
+
+  get dark(): boolean {
+    return this.layoutService.config().colorScheme !== 'light';
+  }
+
+  onSubmit() {
+    if (this.ngForm.valid) {
+      this.http
+        .post(`${environment.apiUrl}/auth/reset-password`, {
+          token: this.activatedRoute.snapshot.paramMap.get('token'),
+          email: this.activatedRoute.snapshot.queryParams['email'],
+          ...this.ngForm.value,
+        })
+        .subscribe(() => {
+          this.router.navigate([Constants.routes.login]);
         });
     }
-
-	get dark(): boolean {
-		return this.layoutService.config.colorScheme !== 'light';
-	}
-
-    onSubmit() {
-        if (this.ngForm.valid) {
-            this.http.post(`${environment.apiUrl}/auth/reset-password`, {
-                token: this.activatedRoute.snapshot.paramMap.get('token'),
-                email: this.activatedRoute.snapshot.queryParams['email'],
-                ...this.ngForm.value,
-            }).subscribe(() => {
-                this.router.navigate([Constants.routes.login]);
-            });
-        }
-    }
-
+  }
 }

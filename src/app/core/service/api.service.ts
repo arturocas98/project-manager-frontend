@@ -365,7 +365,7 @@ export class ApiService {
     endPoint: string,
     method: HttpMethodType,
     request: any,
-    parser: (data: any, status?: number) => T,
+    parser?: (data: any, status?: number) => T,
     extraKeys?: ExtraKeys,
   ): Observable<T> {
     return this.request<T>(endPoint, method, request, extraKeys, parser);

@@ -17,6 +17,7 @@ import { CardModule } from 'primeng/card';
 import { ProjectService } from 'src/app/core/service/project.service';
 
 @Component({
+  selector: 'app-project-list',
   templateUrl: "./project-list.component.html",
   providers: [ConfirmationService],
   imports: [

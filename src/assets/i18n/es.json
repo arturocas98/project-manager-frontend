@@ -7,7 +7,23 @@
     "activity": "Actividad",
     "messageToAction": "¿Estás seguro de que quieres continuar?",
     "selectFiles": "Seleccionar Archivos",
-    "or": "o"
+    "or": "o",
+    "customizeScreen": "Personalizar pantalla",
+    "welcome": "Hola",
+    "version": "Versión",
+    "scale": "Escala",
+    "menuType": "Tipo de menú",
+    "static": "Estático",
+    "overlay": "Sobrepuesto",
+    "slim": "Fino",
+    "slimPlus": "Fino +",
+    "reveal": "Revelado",
+    "drawer": "Bandeja",
+    "horizontal": "Horizontal",
+    "theme": "Tema",
+    "light": "Ligero",
+    "dim": "Tenue",
+    "dark": "Oscuro"
   },
   "notFound": {
     "oops": "¡Ups!",
@@ -38,7 +54,8 @@
     "noAccount": "¿No tienes una cuenta?",
     "register": "Registrarse",
     "securityTitle": "Autenticación Segura",
-    "securityDescription": "Tus datos están protegidos con encriptación de nivel industrial"
+    "securityDescription": "Tus datos están protegidos con encriptación de nivel industrial",
+    "logOut": "Cerrar sesión"
   },
   "sideBar": {
     "forYou": "Para ti",
@@ -65,6 +82,9 @@
     "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
     "passwordsMustMatch": "Las contraseñas deben coincidir",
     "termsRequired": "Debes aceptar los términos y condiciones"
+  },
+  "profile": {
+    "welcomeName": "¡Hola, {{name}}!"
   },
   "user": {
     "create": "Crear Usuario",

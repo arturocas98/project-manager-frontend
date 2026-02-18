@@ -1,49 +1,68 @@
-
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import {TokenService} from "../service/token.service";
-import { Observable, throwError } from 'rxjs';
+import { Constants, HEADER_KEYS, I18N, LOCAL_STORAGE_KEYS, STATUS_CODE } from 'src/app/shared/constants/constants';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  constructor(private readonly router: Router) {}
 
-    constructor(
-        private router: Router,
-        private tokenService: TokenService // ← Inyectar el servicio
-    ) {}
+  intercept(req: HttpRequest<object>, next: HttpHandler): Observable<HttpEvent<object>> {
+    const token = localStorage.getItem(LOCAL_STORAGE_KEYS.token);
+    const lng = localStorage.getItem(LOCAL_STORAGE_KEYS.language) ?? I18N.es;
 
-    intercept(req: HttpRequest<object>, next: HttpHandler): Observable<HttpEvent<object>> {
-        const token = this.tokenService.getToken(); // ← Usar servicio
+    const publicRoutes = [
+      Constants.routes.newpassword,
+      Constants.routes.forgotpassword,
+      Constants.routes.login,
+      Constants.routes.register,
+      Constants.routes.accessdenied,
+      Constants.routes.error,
+    ];
 
-        // Lista de endpoints públicos (ajusta según tu API)
-        const publicEndpoints = [
-            'auth/login',
-            'auth/register',
-            'auth/forgotpassword',
-            'auth/reset-password'
-        ];
-
-        // Verificar si el endpoint es público
-        const isPublicEndpoint = publicEndpoints.some(endpoint =>
-            req.url.includes(endpoint)
-        );
-
-        if (isPublicEndpoint) {
-            return next.handle(req);
-        }
-
-        if (token && token.length > 0) {
-            const authReq = req.clone({
-                headers: req.headers.set('Authorization', `Bearer ${token}`)
-            });
-            return next.handle(authReq);
-        } else {
-            // Solo redirigir si NO es una petición de API
-            if (!req.url.includes('/api/')) {
-                this.router.navigate(['/auth/login']);
-            }
-            return next.handle(req);
-        }
+    if (publicRoutes.includes(req.url)) {
+      return next.handle(req);
     }
+
+    const headers = token
+      ? new HttpHeaders({
+          Authorization: `Bearer ${token}`,
+          [HEADER_KEYS.X_LANGUAGE]: lng,
+        })
+      : req.headers.set(HEADER_KEYS.X_LANGUAGE, lng);
+
+
+    const clonedRequest = req.clone({ headers });
+
+    return next.handle(clonedRequest).pipe(
+      tap({
+        error: err => {
+          if (!(err instanceof HttpErrorResponse)) return;
+
+          const isAuthEndpoint = publicRoutes.some(route =>
+            req.url.includes(route)
+          );
+
+          if (err.status === STATUS_CODE.unauthorized && !isAuthEndpoint) {
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.token);
+            this.router.navigate([Constants.routes.login]);
+          }
+
+
+          if (err.status === STATUS_CODE.forbidden) {
+            localStorage.setItem(LOCAL_STORAGE_KEYS.errorMessage, err.error.message);
+            this.router.navigate([Constants.routes.notFound]);
+          }
+        },
+      })
+    );
+  }
 }

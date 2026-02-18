@@ -12,12 +12,6 @@ import { RouterModule } from "@angular/router";
             (m) => m.DashboardComponent,
           ),
       },
-      {
-        path: "project",
-        data: { breadcrumb: "Project Management" },
-        loadChildren: () =>
-          import("./project/project.module").then((m) => m.ProjectModule),
-      },
       { path: "**", redirectTo: "/notfound" },
     ]),
   ],

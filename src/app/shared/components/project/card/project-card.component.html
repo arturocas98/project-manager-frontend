@@ -1,26 +1,99 @@
-<p-card class="project-card" [style]="{ cursor: 'pointer' }">
+<p-card
+  class="project-card group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+  [style]="{
+    borderRadius: '1rem',
+    border: '1px solid #f0f0f0',
+    overflow: 'hidden'
+  }">
+
+  <!-- Header con gradiente y efectos visuales -->
   <ng-template pTemplate="header">
-    <div class="header">
-      <p-avatar
-        label="{{ project.name.charAt(0) }}"
-        shape="circle"
-        [style]="{
-          backgroundColor: '#e3f2fd',
-          color: '#1e88e5',
-          fontWeight: 'bold'
-        }"></p-avatar>
+    <div class="relative overflow-hidden from-indigo-50 to-purple-50 p-6">
+      <!-- Efecto de patrón de puntos decorativo -->
+      <div class="absolute inset-0 opacity-20"
+           style="background-image: radial-gradient(circle at 2px 2px, #6366f1 1px, transparent 0);
+                  background-size: 24px 24px;">
+      </div>
+
+      <!-- Avatar mejorado con efectos -->
+      <div class="relative flex justify-content-center">
+        <div class="transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+          <p-avatar
+            label="{{ project.name.charAt(0) }}"
+            shape="circle"
+            [style]="{
+              backgroundColor: '#4f46e5',
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '1.5rem',
+              width: '5rem',
+              height: '5rem',
+              boxlhadow: '0 10px 15px -3px rgba(79, 70, 229, 0.2)'
+            }"
+            class="shadow-lg"></p-avatar>
+        </div>
+      </div>
+
+      <!-- Badge de estado (ejemplo) -->
+      <div class="absolute top-3 right-3">
+        <span class="flex align-items-center w-6rem py-0.5 rounded-full text-xl font-medium text-green-800 gap-3">
+          <span class="w-full h-1.5 mr-1 bg-green-500 border-round-2xl text-white animate-pulse flex flex-row align-content-center justify-content-center">Activo</span>
+        </span>
+      </div>
     </div>
   </ng-template>
 
-  <div class="content">
-    <h4>{{ project.name }}</h4>
-    <p class="description">{{ project.description }}</p>
+  <!-- Contenido mejorado -->
+  <div class="content p-4">
+    <h4 class="text-lg font-bold text-gray-800 mb-2 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+      {{ project.name }}
+    </h4>
+
+    <p class="description text-xl text-gray-600 line-clamp-2 leading-relaxed">
+      {{ project.description }}
+    </p>
+
+    <!-- Barra de progreso (ejemplo) -->
+    <div class="mt-4">
+      <div class="flex items-center justify-content-between text-xl mb-1">
+        <span class="text-gray-500">Progreso: </span>
+        <span class="font-semibold text-indigo-600">0%</span>
+      </div>
+      <div class="flex items-center justify-content-between text-xl mb-1">
+        <span class="text-gray-500">Incidencias: </span>
+        <span class="font-semibold text-indigo-600">0</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-1.5">
+        <div class="bg-indigo-600 h-1.5 rounded-full" style="width: 75%"></div>
+      </div>
+    </div>
   </div>
 
+  <!-- Footer mejorado -->
   <ng-template pTemplate="footer">
-    <div class="footer">
-      <i class="pi pi-users"></i>
-      <span>{{ project.membersCount || 0 }} miembros</span>
+    <div class="footer px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center justify-content-between">
+      <div class="flex items-center gap-2 text-gray-600">
+        <i class="pi pi-users text-indigo-500 text-3xl"></i>
+        <span class="text-xl font-medium">{{ project.membersCount || 0 }} miembros</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Avatares de miembros (ejemplo) -->
+        <div class="flex -space-x-2">
+          <div class="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-content-center">
+            <span class="text-xl font-medium text-indigo-600">JD</span>
+          </div>
+          <div class="w-6 h-6 rounded-full bg-purple-100 border-2 border-white flex items-center justify-content-center">
+            <span class="text-xl font-medium text-purple-600">MA</span>
+          </div>
+          <div class="w-6 h-6 rounded-full bg-pink-100 border-2 border-white flex items-center justify-content-center">
+            <span class="text-xl font-medium text-pink-600">+3</span>
+          </div>
+        </div>
+
+        <!-- Indicador de hover -->
+        <i class="pi pi-arrow-right text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
+      </div>
     </div>
   </ng-template>
 </p-card>
