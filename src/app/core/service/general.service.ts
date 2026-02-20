@@ -4,10 +4,10 @@ import { MessageService } from 'primeng/api';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { ColumnTable } from 'src/app/shared/models/response';
 import { flattenErrors } from 'src/app/shared/helpers/functions.helper';
 import { NUMBERS, SEVERITY, TABLE_KEY_FIELDS } from 'src/app/shared/constants/constants';
 import { Dashboard, ErrorResponse } from 'src/app/shared/models/general';
+import {ColumnTable} from "../../shared/models/column-table.model";
 @Injectable({
   providedIn: 'root',
 })

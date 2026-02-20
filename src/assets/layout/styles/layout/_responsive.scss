@@ -4,13 +4,13 @@
             .layout-sidebar {
                 transition: transform var(--transition-duration);
             }
-            
+
             .layout-content-wrapper {
-                margin-left: 18rem;
+                margin-left: 25rem;
                 transition: margin-left var(--transition-duration);
             }
         }
-        
+
         &.layout-static-inactive {
             .layout-sidebar {
                 transform: translateX(-100%);
@@ -41,7 +41,7 @@
 
         .content-breadcrumb {
             display: none;
-        } 
+        }
     }
 }
 
@@ -55,7 +55,7 @@
             margin-left: 0;
             padding: 1rem;
         }
-    
+
         .layout-sidebar {
             z-index: 999;
             transform: translateX(-100%);
@@ -95,7 +95,7 @@
 
 
     }
-    
+
 }
 
 @media screen and (min-width: 1960px) {
@@ -104,7 +104,7 @@
         margin-left: auto !important;
         margin-right: auto !important;
     }
-    
+
     .layout-topbar {
         width: 1504px;
         margin-left: auto !important;

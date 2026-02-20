@@ -52,7 +52,7 @@ export interface ResponseLinks {
  * MODELO GENÉRICO PRINCIPAL
  * T representa el tipo de los datos en 'data'
  */
-export interface ApiResponse<T = any> {
+export interface  ApiResponse<T = any> {
   data: T;
   meta?: MetaData;
   links?: ResponseLinks;
@@ -105,3 +105,4 @@ export interface ApiEmptyResponse {
   meta?: MetaData;
   links?: ResponseLinks;
 }
+

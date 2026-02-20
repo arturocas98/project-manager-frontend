@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ParamJson, ResponseMeta } from 'src/app/shared/models/response';
 import { Role } from 'src/app/shared/models/role';
 import { environment } from 'src/environments/environment';
+import {ParamJson} from "../../../../shared/models/params.model";
+import {MetaData} from "../../../../core/service/apiResponse.model";
 
 export interface RoleCollectionResponse {
     data: Role[];
-    meta: ResponseMeta;
+    meta: MetaData;
 }
 
 export interface RoleResponse {

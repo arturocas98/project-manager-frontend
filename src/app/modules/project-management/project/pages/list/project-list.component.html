@@ -1,22 +1,20 @@
-<p-card>
-  <ng-template pTemplate="title">
-    <div class="flex align-items-center justify-content-between">
-      <div class="flex align-items-center gap-2">
-        <i class="ph ph-rocket text-3xl"></i>
-        <span class="text-2xl">Proyectos</span>
-      </div>
+<div>
+  <!-- Estado de carga -->
+  <div *ngIf="loading" class="flex justify-content-center p-4">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
 
-      <p-button class="border-round-2xl">
-        <i class="pi pi-plus mr-2"></i>
-        Nuevo Proyecto
-      </p-button>
-    </div>
-  </ng-template>
-
-  <div class="flex flex-wrap gap-3">
+  <!-- Lista de proyectos -->
+  <div *ngIf="!loading" class="flex flex-wrap gap-2">
     <app-project-card
       *ngFor="let project of projects"
       [project]="project"
-      class="w-full sm:w-6 md:w-4 lg:w-3"></app-project-card>
+      class="w-full sm:w-6 md:w-4 lg:w-3">
+    </app-project-card>
+
+    <!-- Mensaje si no hay proyectos -->
+    <div *ngIf="projects.length === 0" class="text-center w-full p-4 text-gray-500">
+      No hay proyectos disponibles
+    </div>
   </div>
-</p-card>
+</div>

@@ -1,20 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
-import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { Constants, NUMBERS } from 'src/app/shared/constants/constants';
-import { ParamJson, ResponseData } from 'src/app/shared/models/response';
-import { Role } from 'src/app/shared/models/role';
+import { TableModule } from 'primeng/table';
 import { ProjectCardComponent } from "src/app/shared/components/project/card/project-card.component";
 import { Project } from 'src/app/shared/models/project';
 import { CardModule } from 'primeng/card';
 import { ProjectService } from 'src/app/core/service/project.service';
+import {ProgressSpinnerModule} from "primeng/progressspinner";
+import {ApiListResponse} from "../../../../../core/service/apiResponse.model";
 
 @Component({
   selector: 'app-project-list',
@@ -29,19 +27,39 @@ import { ProjectService } from 'src/app/core/service/project.service';
     ConfirmDialogModule,
     TranslateModule,
     ProjectCardComponent,
-    CardModule
+    CardModule,
+    ProgressSpinnerModule
   ],
   standalone: true,
 })
-export class ProjectListComponent {
+export class ProjectListComponent implements OnInit {
   projects: Project[] = [];
+  loading = false;
 
   constructor(private projectService: ProjectService) {}
 
   ngOnInit() {
-    this.projectService.getAll().subscribe((data:ResponseData<Project>) => {
-      this.projects = data.data;
-      console.log(this.projects)
+    this.loadProjects();
+  }
+
+  loadProjects() {
+    this.loading = true;
+
+    this.projectService.getAll().subscribe({
+      next: (response: ApiListResponse<Project>) => {
+        this.projects = response.data; // TypeScript sabe que es Project[]
+        console.log('Proyectos cargados:', this.projects);
+        this.loading = false;
+
+        // Puedes acceder a meta si existe
+        if (response.meta?.pagination) {
+          console.log('Total de proyectos:', response.meta.total);
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando proyectos:', error);
+        this.loading = false;
+      }
     });
   }
 }

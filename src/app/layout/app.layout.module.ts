@@ -28,6 +28,7 @@ import { OverlayPanelModule } from "primeng/overlaypanel";
 import { AvatarModule } from "primeng/avatar";
 import { AppConfigModule } from "./config/app.config.module";
 import { AppConfigComponent } from "./config/app.config.component";
+import {SkeletonModule} from "primeng/skeleton";
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { AppConfigComponent } from "./config/app.config.component";
     ReactiveFormsModule,
     AvatarModule,
     AppConfigComponent,
+    SkeletonModule,
   ],
 })
 export class AppLayoutModule {}

@@ -31,13 +31,11 @@ export class AppMenuComponent implements AfterViewChecked {
           {
             label: this.translateService.instant("recents"),
             icon: Constants.icons.recent,
-            routerLink: [Constants.routes.dashboard],
             expanded: false,
               items: [
                   {
                       label: this.translateService.instant("configuracion"),
                       icon: Constants.icons.settings,
-                      routerLink: [Constants.routes.dashboard],
                       expanded: false,
                   },
               ],
@@ -45,74 +43,63 @@ export class AppMenuComponent implements AfterViewChecked {
           {
             label: this.translateService.instant("favoritos"),
             icon: Constants.icons.favorites,
-            routerLink: [Constants.routes.dashboard],
             expanded: false,
               items: [
                   {
                       label: this.translateService.instant("configuracion"),
                       icon: Constants.icons.settings,
-                      routerLink: [Constants.routes.dashboard],
                       expanded: false,
                   },
               ],
-          },
-          {
-            label: this.translateService.instant("planes"),
-            icon: Constants.icons.goals,
-            routerLink: [Constants.routes.dashboard],
-            expanded: false,
-          },
-          {
-            label: this.translateService.instant("espacios"),
-            icon: Constants.icons.spaces,
-            routerLink: [Constants.routes.dashboard],
-            expanded: false,
           },
           {
             label: this.translateService.instant("filtros"),
             icon: Constants.icons.filters,
-            routerLink: [Constants.routes.dashboard],
-            expanded: false,
-              items: [
-                  {
-                      label: this.translateService.instant("configuracion"),
-                      icon: Constants.icons.settings,
-                      routerLink: [Constants.routes.dashboard],
-                      expanded: false,
-                  },
-              ],
-          },
-          {
-            label: this.translateService.instant("paneles"),
-            icon: Constants.icons.panels,
-            routerLink: [Constants.routes.dashboard],
-            expanded: false,
-          },
-          {
-            label: this.translateService.instant("personalizar"),
-            icon: Constants.icons.customize,
-            routerLink: [Constants.routes.dashboard],
             expanded: false,
             items: [
               {
                 label: this.translateService.instant("configuracion"),
                 icon: Constants.icons.settings,
-                routerLink: [Constants.routes.dashboard],
                 expanded: false,
               },
             ],
           },
+          {
+            label: this.translateService.instant("personalizar"),
+            icon: Constants.icons.customize,
+            expanded: false,
+            items: [
+              {
+                label: this.translateService.instant("configuracion"),
+                icon: Constants.icons.settings,
+                expanded: false,
+              },
+            ],
+          },
+          {
+            label: this.translateService.instant("planes"),
+            icon: Constants.icons.plans,
+            expanded: false,
+          },
+          {
+            label: this.translateService.instant("espacios"),
+            icon: Constants.icons.spaces,
+            expanded: false,
+          },
+          {
+            label: this.translateService.instant("paneles"),
+            icon: Constants.icons.panels,
+            expanded: false,
+          },
             {
                 label: this.translateService.instant("metas"),
                 icon: Constants.icons.goals,
-                routerLink: [Constants.routes.dashboard],
                 more: true,
                 expanded: false,
             },
             {
                 label: this.translateService.instant("equipos"),
                 icon: Constants.icons.teams,
-                routerLink: [Constants.routes.dashboard],
                 more: true,
                 expanded: false,
             },

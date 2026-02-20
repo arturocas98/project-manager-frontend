@@ -9,12 +9,12 @@ import { InputTextModule } from "primeng/inputtext";
 import { RippleModule } from "primeng/ripple";
 import { Table, TableLazyLoadEvent, TableModule } from "primeng/table";
 import { Constants, NUMBERS } from "src/app/shared/constants/constants";
-import { ParamJson } from "src/app/shared/models/response";
 import { User } from "src/app/shared/models/user";
 import {
   UserCollectionResponse,
   UserService,
 } from "../../services/user.service";
+import {ParamJson} from "../../../../../shared/models/params.model";
 
 @Component({
   templateUrl: "./user-list.component.html",
@@ -48,7 +48,6 @@ export class UserListComponent {
     this.userService.getUsers(params).subscribe({
       next: (response: UserCollectionResponse) => {
         this.users = response.data;
-        this.totalRecords = response.meta.total;
         this.loadingTable.set(false);
       },
       error: () => {

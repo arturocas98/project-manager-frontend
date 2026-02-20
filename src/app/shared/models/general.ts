@@ -1,4 +1,7 @@
-export type Replace_Type<T, R> = Omit<T, keyof R> & R;
+
+
+// Tipos originales que se mantienen igual
+import {ApiResponse} from "../../core/service/apiResponse.model";
 
 export type Severity = 'success' | 'secondary' | 'info' | 'warning' | 'danger' | 'contrast' | undefined;
 
@@ -32,9 +35,13 @@ export interface ItemOption {
   value: string | number;
 }
 
+// Actualizamos ErrorResponse para que sea compatible con ApiErrorResponse
+// pero mantenemos la interfaz original para compatibilidad
 export interface ErrorResponse {
   errors: Record<string, string | string[]>;
   message: string;
+  status?: number;
+  success?: false;
 }
 
 export enum DOCUMENT_TYPE {
@@ -42,13 +49,47 @@ export enum DOCUMENT_TYPE {
   RUC,
 }
 
+// Mejoramos el Dashboard con tipos más específicos
 export interface Dashboard {
-  [DashboardCardType.CLIENT]: DashboardCard;
-  [DashboardCardType.EMPLOYEE]: DashboardCard;
-  [DashboardCardType.ORDER]: DashboardCard;
-  [DashboardCardType.PROFILE]: DashboardCard;
-  [DashboardCardType.QUOTE]: DashboardCard;
-  [DashboardCardType.WORK_ORDER]: DashboardCard;
+  [DashboardCardType.CLIENT]?: DashboardCard;
+  [DashboardCardType.EMPLOYEE]?: DashboardCard;
+  [DashboardCardType.ORDER]?: DashboardCard;
+  [DashboardCardType.PROFILE]?: DashboardCard;
+  [DashboardCardType.QUOTE]?: DashboardCard;
+  [DashboardCardType.WORK_ORDER]?: DashboardCard;
+
+  // Propiedades adicionales que podrían venir de la API
+  totalClients?: number;
+  totalEmployees?: number;
+  totalOrders?: number;
+  totalQuotes?: number;
+  recentActivities?: Activity[];
+  statistics?: DashboardStatistics;
+  charts?: DashboardCharts;
+}
+
+export interface Activity {
+  id: number;
+  description: string;
+  user: string;
+  userId?: number;
+  timestamp: string | Date;
+  type: 'create' | 'update' | 'delete' | 'view' | 'login' | 'logout';
+  icon?: string;
+  color?: string;
+}
+
+export interface DashboardStatistics {
+  ordersByStatus?: { [key: string]: number };
+  clientsByMonth?: { month: string; count: number }[];
+  topEmployees?: { id: number; name: string; count: number }[];
+  revenueData?: { date: string; amount: number }[];
+}
+
+export interface DashboardCharts {
+  ordersChart?: ChartData;
+  clientsChart?: ChartData;
+  revenueChart?: ChartData;
 }
 
 export enum DashboardCardType {
@@ -66,6 +107,10 @@ export interface DashboardCard {
   count?: number;
   percentage?: number;
   variation?: number[];
+  icon?: string;
+  color?: string;
+  route?: string;
+  queryParams?: { [key: string]: any };
 }
 
 export interface ChartData {
@@ -77,7 +122,15 @@ export interface ChartData {
     hoverBackgroundColor?: string[];
     borderColor?: string;
     tension?: number;
+    fill?: boolean;
+    borderWidth?: number;
   }[];
+  options?: {
+    responsive?: boolean;
+    maintainAspectRatio?: boolean;
+    plugins?: any;
+    scales?: any;
+  };
 }
 
 export interface PercentageProps {
@@ -87,4 +140,53 @@ export interface PercentageProps {
 
 export interface UploadEvent {
   files: File[];
+  originalEvent?: Event;
 }
+
+// ============================================
+// NUEVOS TIPOS UTILIZANDO ApiResponse
+// ============================================
+
+
+export type DashboardResponse = ApiResponse<Dashboard>;
+
+
+export type DashboardListResponse = ApiResponse<Dashboard[]>;
+
+
+export type DashboardCardResponse = ApiResponse<DashboardCard>;
+
+
+export type ChartDataResponse = ApiResponse<ChartData>;
+
+
+export type ActivitiesResponse = ApiResponse<Activity[]>;
+
+
+export type StatisticsResponse = ApiResponse<DashboardStatistics>;
+
+// ============================================
+// UTILIDADES PARA TRABAJAR CON RESPUESTAS
+// ============================================
+
+
+export function isSuccessfulResponse<T>(response: ApiResponse<T>): response is ApiResponse<T> & { success: true } {
+  return response.success !== false;
+}
+
+
+export function isErrorResponse(response: any): response is ErrorResponse {
+  return response && response.message !== undefined && (response.errors !== undefined || response.success === false);
+}
+
+
+export function toDefaultPaginator(meta: any): DefaultPaginatorI {
+  return {
+    from: meta?.from || 0,
+    to: meta?.to || 0,
+    total: meta?.total || 0,
+    current_page: meta?.current_page || 1,
+    last_page: meta?.last_page || 1
+  };
+}
+

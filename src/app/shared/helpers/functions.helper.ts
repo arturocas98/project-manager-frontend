@@ -21,7 +21,7 @@ import {
   subMonths,
 } from "date-fns";
 import { es } from "date-fns/locale";
-import { ResponseMeta } from "../models/response";
+import {MetaData} from "../../core/service/apiResponse.model";
 
 export function markAllAsTouched(form: FormGroup): void {
   for (const inner in form.controls) {
@@ -228,7 +228,7 @@ export const getUserInitials = (name: string): string => {
   }
 };
 
-export function defaultPaginator(array: any[]): ResponseMeta {
+export function defaultPaginator(array: any[]): MetaData {
   return {
     from: array.length ? NUMBERS.ONE : NUMBERS.ZERO,
     to: array.length,
