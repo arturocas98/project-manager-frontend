@@ -1,141 +1,259 @@
-<div class="p-8 min-h-screen">
+<div class="p-6 min-h-screen space-y-6">
+  <!-- CONTENEDOR PRINCIPAL FLEX COLUMN -->
+  <div class="p-6 surface-ground min-h-screen flex flex-column gap-6">
 
-  <!-- HEADER -->
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Resumen del Proyecto</h1>
-    <p class="p-text-secondary text-xl">Métricas generales y rendimiento del equipo</p>
-  </div>
+    <!-- HEADER CON TÍTULO Y FILTROS -->
+    <div class="flex flex-column md:flex-row md:align-items-center md:justify-content-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-color">Dashboard Analítico</h1>
+        <p class="text-sm text-color mt-1">Visión general del rendimiento y métricas del proyecto</p>
+      </div>
+      <div class="flex align-items-center gap-3">
+      <span class="px-3 py-2 surface-card border-round-lg text-sm text-color flex align-items-center gap-2 shadow-1 border-1 border-gray-200">
+        <i class="pi pi-calendar text-color"></i>
+        Últimos 30 días
+        <i class="pi pi-chevron-down text-xs ml-2 text-color"></i>
+      </span>
+        <p-button
+          label="Actualizar"
+          icon="pi pi-refresh"
+          styleClass="bg-blue-600 border-none hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium">
+        </p-button>
+      </div>
+    </div>
 
-  <!-- GRID PRINCIPAL -->
-  <div class="grid grid-cols-12 gap-6">
+    <!-- ================= KPI ROW FLEX ================= -->
+    <div class="flex flex-wrap gap-4 ">
+      <ng-container *ngFor="let kpi of kpis">
+        <div class="flex-1 min-w-160px surface-card border-round-xl shadow-1 hover:shadow-2 transition-all duration-200 p-5 flex align-items-center justify-content-between border-1 border-gray-100">
+          <div>
+            <p class="text-xs font-medium text-color uppercase tracking-wider">{{ kpi.label }}</p>
+            <p class="text-2xl font-bold text-color mt-1 hover:text-blue-600 transition-colors">{{ kpi.value }}</p>
+            <p class="text-xs text-green-600 mt-1" *ngIf="kpi.trend">+{{ kpi.trend }}% vs mes anterior</p>
+          </div>
+          <div class="w-12 h-12 border-round-xl flex align-items-center justify-content-center"
+               [ngClass]="kpi.bgClass || 'bg-gray-100'">
+            <i [class]="kpi.icon + ' text-lg'" [ngClass]="kpi.iconClass || 'text-color'"></i>
+          </div>
+        </div>
+      </ng-container>
+    </div>
 
-    <!-- IZQUIERDA - PRIORIDADES -->
-    <div class="col-span-8">
-      <p-card class="shadow-lg rounded-2xl border-0">
-        <ng-template pTemplate="header">
-          <div class="flex justify-between items-center px-4 pt-4">
-            <div>
-              <h2 class="text-xl font-semibold text-gray-800">
-                Distribución por Prioridad
-              </h2>
-              <p class="text-xl p-text-secondary">
-                Clasificación actual de tareas
-              </p>
+    <!-- ================= GRÁFICOS SUPERIORES FLEX ================= -->
+    <div class="flex flex-wrap gap-6">
+      <!-- ESTADO CON DONUT CHART -->
+      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+          <div>
+            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Estado</h2>
+            <p class="text-xs text-color-secondary mt-0.5">Estado actual de las tareas</p>
+          </div>
+          <div class="flex align-items-center gap-2">
+            <span class="w-2 h-2 bg-green-500 border-circle"></span>
+            <span class="text-xs text-color-secondary">12 completadas</span>
+          </div>
+        </div>
+        <div class="p-5">
+          <p-chart type="doughnut"
+                   [data]="statusData"
+                   [options]="doughnutOptions"
+                   class="h-64 w-full block text-color">
+          </p-chart>
+        </div>
+      </div>
+
+      <!-- PRIORIDAD CON BARRAS HORIZONTALES -->
+      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+          <div>
+            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Prioridad</h2>
+            <p class="text-xs text-color-secondary mt-0.5">Clasificación de tareas por urgencia</p>
+          </div>
+          <p-tag value="Alta: 8" severity="danger" class="text-xs"></p-tag>
+        </div>
+        <div class="p-5">
+          <p-chart type="bar"
+                   [data]="priorityData"
+                   [options]="horizontalBarOptions"
+                   class="h-64 w-full block">
+          </p-chart>
+        </div>
+        <div class="flex align-items-center justify-content-center">
+          <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
+            <img
+              src="assets/General/Cartoon_Projects.png"
+              alt="Crear Proyecto"
+              class="w-15rem z-1 h-20rem sm:w-25rem sm:h-30rem object-fit-cover mt-8 sm:mt-0">
+            <div class="relative rotate-45">
+              <div class="absolute opacity-80 z-0 w-20rem h-20rem bg-green-600" style="top: 0; right: 0; border-radius: 100%">
+                <div class="absolute opacity-80 z-1 w-19rem h-19rem bg-green-500" style="top: 0; right: 0; border-radius: 100%"></div>
+              </div>
             </div>
           </div>
-        </ng-template>
+        </div>
+      </div>
+    </div>
 
-        <div class="px-4 pb-6">
-          <p-chart
-            type="bar"
-            [data]="priorityChartData"
-            [options]="barOptions"
-            class="h-80">
+    <!-- ================= GRÁFICOS INFERIORES FLEX ================= -->
+    <div class="flex flex-wrap gap-6">
+      <!-- CARGA POR USUARIO -->
+      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-6 py-4 border-bottom-1 surface-border">
+          <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Carga por Usuario</h2>
+          <p class="text-xs text-color-secondary mt-0.5">Distribución de tareas asignadas</p>
+        </div>
+        <div class="p-5">
+          <p-chart type="bar"
+                   [data]="userLoadData"
+                   [options]="verticalBarOptions"
+                   class="h-64 w-full block">
           </p-chart>
         </div>
-      </p-card>
-    </div>
-
-    <!-- DERECHA - MÉTRICAS -->
-    <div class="col-span-4 grid grid-cols-1 gap-4">
-
-      <div class=" rounded-2xl shadow-md p-5 hover:shadow-lg transition">
-        <p class="text-xl p-text-secondary">Tareas creadas</p>
-        <div class="flex items-center justify-between mt-2">
-          <p class="text-3xl font-bold text-blue-600">
-            {{ metrics.created }}
-          </p>
-          <i class="pi pi-plus-circle text-blue-400 text-2xl"></i>
-        </div>
       </div>
 
-      <div class="rounded-2xl shadow-md p-5 hover:shadow-lg transition">
-        <p class="text-xl p-text-secondary">Actualizadas</p>
-        <div class="flex items-center justify-between mt-2">
-          <p class="text-3xl font-bold text-indigo-600">
-            {{ metrics.updated }}
-          </p>
-          <i class="pi pi-refresh text-indigo-400 text-2xl"></i>
-        </div>
-      </div>
-
-      <div class=" rounded-2xl shadow-md p-5 hover:shadow-lg transition">
-        <p class="text-xl p-text-secondary">Por finalizar</p>
-        <div class="flex items-center justify-between mt-2">
-          <p class="text-3xl font-bold text-amber-600">
-            {{ metrics.pending }}
-          </p>
-          <i class="pi pi-clock text-amber-400 text-2xl"></i>
-        </div>
-      </div>
-
-      <div class=" rounded-2xl shadow-md p-5 hover:shadow-lg transition">
-        <p class="text-xl p-text-secondary">Completadas</p>
-        <div class="flex items-center justify-between mt-2">
-          <p class="text-3xl font-bold text-green-600">
-            {{ metrics.completed }}
-          </p>
-          <i class="pi pi-check-circle text-green-400 text-2xl"></i>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- SEGUNDA FILA -->
-  <div class="grid grid-cols-12 gap-6 mt-8">
-
-    <!-- EFICIENCIA MIEMBROS -->
-    <div class="col-span-6">
-      <p-card class="shadow-lg rounded-2xl border-0">
-        <ng-template pTemplate="header">
-          <div class="px-4 pt-4">
-            <h2 class="text-xl font-semibold text-gray-800">
-              Eficiencia de Miembros
-            </h2>
-            <p class="text-xl p-text-secondary">
-              Progreso individual en tareas asignadas
-            </p>
+      <!-- TENDENCIA -->
+      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+          <div>
+            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Tendencia de Actividad</h2>
+            <p class="text-xs text-color-secondary mt-0.5">Últimos 7 días</p>
           </div>
-        </ng-template>
-
-        <div class="px-4 pb-6">
-          <p-chart
-            type="bar"
-            [data]="memberEfficiencyData"
-            [options]="horizontalOptions"
-            class="h-80">
-          </p-chart>
-        </div>
-      </p-card>
-    </div>
-
-    <!-- TIPOS DE TAREAS -->
-    <div class="col-span-6">
-      <p-card class="shadow-lg rounded-2xl border-0">
-        <ng-template pTemplate="header">
-          <div class="px-4 pt-4">
-            <h2 class="text-xl font-semibold text-gray-800">
-              Distribución por Tipo
-            </h2>
-            <p class="text-xl p-text-secondary">
-              Clasificación estructural del proyecto
-            </p>
+          <div class="flex gap-3">
+          <span class="flex align-items-center gap-1">
+            <span class="w-2 h-2 bg-blue-500 border-circle"></span>
+            <span class="text-xs text-color-secondary">Completadas</span>
+          </span>
+            <span class="flex align-items-center gap-1">
+            <span class="w-2 h-2 bg-gray-300 border-circle"></span>
+            <span class="text-xs text-color-secondary">Creadas</span>
+          </span>
           </div>
-        </ng-template>
-
-        <div class="px-4 pb-6">
-          <p-chart
-            type="bar"
-            [data]="taskTypeData"
-            [options]="horizontalOptions"
-            class="h-80">
+        </div>
+        <div class="p-5">
+          <p-chart type="line"
+                   [data]="trendData"
+                   [options]="lineOptions"
+                   class="h-64 w-full block">
           </p-chart>
         </div>
-      </p-card>
+      </div>
     </div>
 
-  </div>
+    <!-- ================= SECCIÓN INFERIOR FLEX ================= -->
+    <div class="flex flex-wrap gap-6">
+      <!-- TABLA DE ISSUES CRÍTICAS (FLEX GROW 2) -->
+      <div class="flex-2 min-w-500px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+          <div>
+            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Issues Críticas</h2>
+            <p class="text-xs text-color-secondary mt-0.5">Tareas bloqueadas o de alta prioridad</p>
+          </div>
+          <div class="flex gap-2">
+            <p-button
+              label="Ver todas"
+              size="small"
+              styleClass="bg-red-50 text-red-600 border-none hover:bg-red-100">
+            </p-button>
+          </div>
+        </div>
 
+        <div class="p-5">
+          <p-table
+            [value]="criticalIssues"
+            sortField="priority"
+            [sortOrder]="-1"
+            [paginator]="true"
+            [rows]="4"
+            responsiveLayout="scroll"
+            styleClass="p-datatable-sm">
+
+            <ng-template pTemplate="header">
+              <tr class="surface-ground text-xs uppercase text-color-secondary">
+                <th class="px-4 py-3 font-semibold">ID</th>
+                <th class="px-4 py-3 font-semibold">Título</th>
+                <th class="px-4 py-3 font-semibold">Proyecto</th>
+                <th class="px-4 py-3 font-semibold">Prioridad</th>
+                <th class="px-4 py-3 font-semibold">Responsable</th>
+                <th class="px-4 py-3 font-semibold">Estado</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-issue>
+              <tr class="hover:surface-ground transition text-sm border-bottom-1 surface-border">
+                <td class="px-4 py-3 font-mono text-xs text-blue-600">#{{ issue.id }}</td>
+                <td class="px-4 py-3 font-medium text-color">{{ issue.title }}</td>
+                <td class="px-4 py-3 text-color-secondary">{{ issue.project }}</td>
+                <td class="px-4 py-3">
+                  <p-tag [value]="issue.priority"
+                         [severity]="getPrioritySeverity(issue.priority)"
+                         class="text-xs">
+                  </p-tag>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex align-items-center gap-2">
+                    <p-avatar [label]="issue.assignee[0]" shape="circle" size="normal" class="w-6 h-6"></p-avatar>
+                    <span class="text-xs text-color-secondary">{{ issue.assignee }}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <p-tag [value]="issue.status"
+                         [severity]="getStatusSeverity(issue.status)"
+                         class="text-xs">
+                  </p-tag>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <!-- ACTIVIDAD RECIENTE (FLEX 1) -->
+      <div class="flex-1 min-w-300px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+          <div>
+            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Actividad Reciente</h2>
+            <p class="text-xs text-color-secondary mt-0.5">Últimas actualizaciones</p>
+          </div>
+          <span class="w-2 h-2 bg-green-500 border-circle animate-pulse"></span>
+        </div>
+
+        <div class="p-4 flex flex-column gap-3 max-h-320px overflow-y-auto">
+          <div *ngFor="let act of activity"
+               class="flex align-items-start gap-3 p-3 hover:surface-ground border-round transition border-1 border-transparent hover:surface-border">
+            <p-avatar
+              [label]="act.user[0]"
+              shape="circle"
+              size="normal"
+              class="text-blue-600 font-semibold">
+            </p-avatar>
+            <div class="flex-1">
+              <p class="text-sm">
+                <span class="font-semibold text-color">{{ act.user }}</span>
+                <span class="text-color-secondary ml-1">{{ act.action }}</span>
+              </p>
+              <div class="flex align-items-center gap-2 mt-1.5">
+                <span class="text-xs surface-ground px-2 py-0.5 border-round-full text-color-secondary">{{ act.project }}</span>
+                <span class="text-xs text-color-secondary flex align-items-center gap-1">
+                <i class="pi pi-clock text-xxs"></i>
+                  {{ act.time }}
+              </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PIE DE ACTIVIDAD -->
+        <div class="px-6 py-3 surface-ground border-top-1 surface-border">
+          <p-button
+            label="Ver toda la actividad"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [text]="true"
+            size="small"
+            styleClass="bg-blue-50 text-xs text-blue-600 hover:text-white hover:bg-blue-600 font-medium flex align-items-center gap-1">
+          </p-button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
