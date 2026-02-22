@@ -41,7 +41,6 @@
 }
 
 :host ::ng-deep .project-card .p-card {
-    border-radius: var(--card-radius) !important;
     border: var(--card-border) !important;
     box-shadow: var(--card-shadow) !important;
     transition: all var(--transition-time) cubic-bezier(0.25, 0.8, 0.25, 1) !important;

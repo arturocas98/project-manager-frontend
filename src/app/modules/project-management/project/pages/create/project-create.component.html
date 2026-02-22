@@ -1,0 +1,121 @@
+<div class="flex align-items-center justify-content-center px-4">
+
+  <div class="w-full max-w-6xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl overflow-hidden">
+
+    <!-- Imagen / Panel Decorativo -->
+    <div class="w-full md:w-6 flex flex-column p-5 align-items-center justify-content-center relative">
+      <!-- Imagen -->
+      <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
+        <img
+          src="assets/General/Cartoon-project-create.png"
+          alt="Crear Proyecto"
+          class="w-24rem z-1 h-22rem sm:w-30rem sm:h-26rem object-fit-cover mt-8 sm:mt-0">
+        <div class="absolute w-full h-full rotate-45">
+          <div class="absolute opacity-60 z-0 w-16rem h-16rem bg-indigo-600" style="top: 45%; left: 30% "></div>
+          <div class="absolute opacity-60 z-0 w-16rem h-16rem bg-indigo-400" style="right: 30%; bottom: 45%"></div>
+        </div>
+      </div>
+
+      <!-- Texto decorativo opcional -->
+      <div class="text-center z-1 text-white px-4 py-4">
+        <h3 class="text-2xl font-bold">Organiza tu equipo</h3>
+        <p class="text-primary">Crea proyectos y asigna miembros fácilmente</p>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <div class="w-full md:w-6 p-6 md:p-8">
+
+      <!-- Header -->
+      <div class="mb-6 text-center">
+        <h2 class="text-3xl font-bold text-color mb-2">
+          Crear Proyecto
+        </h2>
+        <p class="text-color-secondary">
+          Completa la información para registrar un nuevo proyecto
+        </p>
+      </div>
+
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
+
+        <!-- Nombre -->
+        <div>
+          <label class="block text-color font-medium mb-2">
+            Nombre del Proyecto
+          </label>
+
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-folder"></i>
+            </span>
+            <input
+              pInputText
+              formControlName="name"
+              class="w-full"
+              placeholder="Ej: Sistema de Gestión Interna"
+              [ngClass]="{'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched}">
+          </div>
+
+          <small *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
+                 class="p-error block mt-2">
+            El nombre es obligatorio
+          </small>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label class="block text-color font-medium mb-2">
+            Descripción
+          </label>
+
+          <textarea
+            pInputTextarea
+            rows="4"
+            formControlName="description"
+            class="w-full"
+            placeholder="Describe brevemente el propósito del proyecto"
+            [ngClass]="{'p-invalid': projectForm.get('description')?.invalid && projectForm.get('description')?.touched}">
+          </textarea>
+
+          <small *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"
+                 class="p-error block mt-2">
+            La descripción es obligatoria
+          </small>
+        </div>
+
+        <!-- Miembros -->
+        <div>
+          <label class="block text-color font-medium mb-2">
+            Miembros del Proyecto
+          </label>
+
+          <p-multiSelect
+            formControlName="members"
+            [options]="users"
+            optionLabel="name"
+            display="chip"
+            class="w-full"
+            placeholder="Seleccionar miembros"
+            [filter]="true">
+          </p-multiSelect>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-content-end gap-3 mt-3">
+          <button
+            pButton
+            type="submit"
+            label="Crear Proyecto"
+            icon="pi pi-check"
+            class="p-button-raised"
+            [disabled]="projectForm.invalid"
+            [loading]="loading">
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+</div>

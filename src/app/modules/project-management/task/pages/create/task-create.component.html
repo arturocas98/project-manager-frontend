@@ -1,0 +1,147 @@
+<div class="min-h-screen flex align-items-center justify-content-center px-4 py-6">
+
+  <div class="w-full max-w-3xl surface-card surface-border border-1 border-round-3xl shadow-2xl p-6 md:p-8">
+
+    <!-- Header -->
+    <div class="mb-6 text-center">
+      <h2 class="text-3xl font-bold text-color mb-2">
+        Crear Tarea
+      </h2>
+      <p class="text-color-secondary">
+        Completa la información para registrar una nueva tarea
+      </p>
+    </div>
+
+    <form [formGroup]="taskForm"
+          (ngSubmit)="onSubmit()"
+          class="flex flex-column gap-4">
+
+      <!-- Name -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Nombre
+        </label>
+
+        <input
+          pInputText
+          formControlName="name"
+          class="w-full"
+          placeholder="Ej: Implementación backend"
+          [ngClass]="{'p-invalid': taskForm.get('name')?.invalid && taskForm.get('name')?.touched}">
+
+        <small *ngIf="taskForm.get('name')?.invalid && taskForm.get('name')?.touched"
+               class="p-error block mt-2">
+          El nombre es obligatorio
+        </small>
+      </div>
+
+      <!-- Title -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Título
+        </label>
+
+        <input
+          pInputText
+          formControlName="title"
+          class="w-full"
+          placeholder="Ej: Crear endpoint para tareas"
+          [ngClass]="{'p-invalid': taskForm.get('title')?.invalid && taskForm.get('title')?.touched}">
+
+        <small *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+               class="p-error block mt-2">
+          El título es obligatorio
+        </small>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Descripción
+        </label>
+
+        <textarea
+          pInputTextarea
+          rows="4"
+          formControlName="description"
+          class="w-full"
+          placeholder="Describe el objetivo de la tarea"
+          [ngClass]="{'p-invalid': taskForm.get('description')?.invalid && taskForm.get('description')?.touched}">
+        </textarea>
+
+        <small *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
+               class="p-error block mt-2">
+          La descripción es obligatoria
+        </small>
+      </div>
+
+      <!-- Priority -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Prioridad
+        </label>
+
+        <p-dropdown
+          formControlName="priority"
+          [options]="priorities"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar prioridad"
+          class="w-full"
+          [ngClass]="{'p-invalid': taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched}">
+        </p-dropdown>
+
+        <small *ngIf="taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched"
+               class="p-error block mt-2">
+          La prioridad es obligatoria
+        </small>
+      </div>
+
+      <!-- Type -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Tipo
+        </label>
+
+        <p-dropdown
+          formControlName="type"
+          [options]="types"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar tipo"
+          class="w-full"
+          [ngClass]="{'p-invalid': taskForm.get('type')?.invalid && taskForm.get('type')?.touched}">
+        </p-dropdown>
+
+        <small *ngIf="taskForm.get('type')?.invalid && taskForm.get('type')?.touched"
+               class="p-error block mt-2">
+          El tipo es obligatorio
+        </small>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-content-end gap-3 mt-3">
+
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          class="p-button-text">
+        </button>
+
+        <button
+          pButton
+          type="submit"
+          label="Crear Tarea"
+          icon="pi pi-check"
+          class="p-button-raised"
+          [disabled]="taskForm.invalid"
+          [loading]="loading">
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+</div>

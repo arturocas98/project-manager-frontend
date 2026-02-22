@@ -13,10 +13,10 @@
       class="flex mt-4 sm:gap-4 font-medium flex-row align-items-center space-x-2 list-none p-0 m-0">
       <li class="hidden sm:flex">
         <a
-          [routerLink]="['/']"
-          routerLinkActive="text-white bg-gradient-to-r from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
+          [routerLink]="['/pages/dashboard']"
+          routerLinkActive="text-white bg-indigo-500 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="flex align-items-center gap-3 py-3 pl-4 pr-4 text-gray-800 hover:bg-indigo-500 hover:text-white transition-all duration-300 group"
+          class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-indigo-500 hover:text-white transition-all duration-300 group"
           style="border-radius: 20px"
           role="menuitem">
           <i class="ph ph-house text-xl"></i>
@@ -37,10 +37,10 @@
       </li>
       <li class="hidden sm:flex">
         <a
-          [routerLink]="['/']"
-          routerLinkActive="text-white from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
+          [routerLink]="['/project-management/projects/create']"
+          routerLinkActive="text-white bg-green-700 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="flex align-items-center gap-3 py-3 pl-4 pr-4 text-gray-700 hover:bg-indigo-500 hover:text-white transition-all duration-300 group"
+          class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-green-700 hover:text-white transition-all duration-300 group"
           style="border-radius: 20px"
           role="menuitem">
           <i class="ph ph-stack-plus text-xl"></i>

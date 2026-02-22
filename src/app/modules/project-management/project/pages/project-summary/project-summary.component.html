@@ -1,0 +1,141 @@
+<div class="p-8 min-h-screen">
+
+  <!-- HEADER -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Resumen del Proyecto</h1>
+    <p class="p-text-secondary text-xl">Métricas generales y rendimiento del equipo</p>
+  </div>
+
+  <!-- GRID PRINCIPAL -->
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- IZQUIERDA - PRIORIDADES -->
+    <div class="col-span-8">
+      <p-card class="shadow-lg rounded-2xl border-0">
+        <ng-template pTemplate="header">
+          <div class="flex justify-between items-center px-4 pt-4">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-800">
+                Distribución por Prioridad
+              </h2>
+              <p class="text-xl p-text-secondary">
+                Clasificación actual de tareas
+              </p>
+            </div>
+          </div>
+        </ng-template>
+
+        <div class="px-4 pb-6">
+          <p-chart
+            type="bar"
+            [data]="priorityChartData"
+            [options]="barOptions"
+            class="h-80">
+          </p-chart>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- DERECHA - MÉTRICAS -->
+    <div class="col-span-4 grid grid-cols-1 gap-4">
+
+      <div class=" rounded-2xl shadow-md p-5 hover:shadow-lg transition">
+        <p class="text-xl p-text-secondary">Tareas creadas</p>
+        <div class="flex items-center justify-between mt-2">
+          <p class="text-3xl font-bold text-blue-600">
+            {{ metrics.created }}
+          </p>
+          <i class="pi pi-plus-circle text-blue-400 text-2xl"></i>
+        </div>
+      </div>
+
+      <div class="rounded-2xl shadow-md p-5 hover:shadow-lg transition">
+        <p class="text-xl p-text-secondary">Actualizadas</p>
+        <div class="flex items-center justify-between mt-2">
+          <p class="text-3xl font-bold text-indigo-600">
+            {{ metrics.updated }}
+          </p>
+          <i class="pi pi-refresh text-indigo-400 text-2xl"></i>
+        </div>
+      </div>
+
+      <div class=" rounded-2xl shadow-md p-5 hover:shadow-lg transition">
+        <p class="text-xl p-text-secondary">Por finalizar</p>
+        <div class="flex items-center justify-between mt-2">
+          <p class="text-3xl font-bold text-amber-600">
+            {{ metrics.pending }}
+          </p>
+          <i class="pi pi-clock text-amber-400 text-2xl"></i>
+        </div>
+      </div>
+
+      <div class=" rounded-2xl shadow-md p-5 hover:shadow-lg transition">
+        <p class="text-xl p-text-secondary">Completadas</p>
+        <div class="flex items-center justify-between mt-2">
+          <p class="text-3xl font-bold text-green-600">
+            {{ metrics.completed }}
+          </p>
+          <i class="pi pi-check-circle text-green-400 text-2xl"></i>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- SEGUNDA FILA -->
+  <div class="grid grid-cols-12 gap-6 mt-8">
+
+    <!-- EFICIENCIA MIEMBROS -->
+    <div class="col-span-6">
+      <p-card class="shadow-lg rounded-2xl border-0">
+        <ng-template pTemplate="header">
+          <div class="px-4 pt-4">
+            <h2 class="text-xl font-semibold text-gray-800">
+              Eficiencia de Miembros
+            </h2>
+            <p class="text-xl p-text-secondary">
+              Progreso individual en tareas asignadas
+            </p>
+          </div>
+        </ng-template>
+
+        <div class="px-4 pb-6">
+          <p-chart
+            type="bar"
+            [data]="memberEfficiencyData"
+            [options]="horizontalOptions"
+            class="h-80">
+          </p-chart>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- TIPOS DE TAREAS -->
+    <div class="col-span-6">
+      <p-card class="shadow-lg rounded-2xl border-0">
+        <ng-template pTemplate="header">
+          <div class="px-4 pt-4">
+            <h2 class="text-xl font-semibold text-gray-800">
+              Distribución por Tipo
+            </h2>
+            <p class="text-xl p-text-secondary">
+              Clasificación estructural del proyecto
+            </p>
+          </div>
+        </ng-template>
+
+        <div class="px-4 pb-6">
+          <p-chart
+            type="bar"
+            [data]="taskTypeData"
+            [options]="horizontalOptions"
+            class="h-80">
+          </p-chart>
+        </div>
+      </p-card>
+    </div>
+
+  </div>
+
+</div>

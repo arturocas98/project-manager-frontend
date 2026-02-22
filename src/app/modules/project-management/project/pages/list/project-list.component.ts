@@ -13,6 +13,7 @@ import { CardModule } from 'primeng/card';
 import { ProjectService } from 'src/app/core/service/project.service';
 import {ProgressSpinnerModule} from "primeng/progressspinner";
 import {ApiListResponse} from "../../../../../core/service/apiResponse.model";
+import {Route, Router} from "@angular/router";
 
 @Component({
   selector: 'app-project-list',
@@ -36,7 +37,11 @@ export class ProjectListComponent implements OnInit {
   projects: Project[] = [];
   loading = false;
 
-  constructor(private projectService: ProjectService) {}
+  constructor(private projectService: ProjectService, private router: Router) {}
+
+  goToProject(id: number) {
+    this.router.navigate(['/project-management/projects/kanban']);
+  }
 
   ngOnInit() {
     this.loadProjects();

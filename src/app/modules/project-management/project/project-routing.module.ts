@@ -10,6 +10,41 @@ const routes: Routes = [
         (m) => m.ProjectListComponent,
       ),
   },
+  {
+    path: "create",
+    data: { breadcrumb: "Create" },
+    loadComponent: () =>
+      import("./pages/create/project-create.component").then(
+        (m) => m.ProjectCreateComponent,
+      ),
+  },
+  {
+    path: "kanban",
+    data: { breadcrumb: "Create" },
+    loadComponent: () =>
+      import("./pages/view-project/view-project.component").then(
+        (m) => m.ViewProjectComponent,
+      ),
+    children: [
+      { path: "", redirectTo: "project-summary", pathMatch: "full" },
+      {
+        path: "project-summary",
+        data: { breadcrumb: "summary" },
+        loadComponent: () =>
+          import("./pages/project-summary/project-summary.component").then(
+            (m) => m.ProjectSummaryComponent,
+          ),
+      },
+    ]
+  },
+  {
+    path: "create-task",
+    data: { breadcrumb: "Create" },
+    loadComponent: () =>
+      import("../task/pages/create/task-create.component").then(
+        (m) => m.TaskCreateComponent,
+      ),
+  },
   { path: "", redirectTo: "list", pathMatch: "full" },
   { path: "**", redirectTo: "/notfound" },
 ];

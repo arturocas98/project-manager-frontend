@@ -5,15 +5,17 @@
   </div>
 
   <!-- Lista de proyectos -->
-  <div *ngIf="!loading" class="flex flex-wrap gap-2">
+  <div *ngIf="!loading" class="flex flex-wrap">
     <app-project-card
       *ngFor="let project of projects"
       [project]="project"
+      (click)="goToProject(project.id)"
       class="w-full sm:w-6 md:w-4 lg:w-3">
     </app-project-card>
 
     <!-- Mensaje si no hay proyectos -->
-    <div *ngIf="projects.length === 0" class="text-center w-full p-4 text-gray-500">
+    <div *ngIf="projects.length === 0"
+         class="text-center w-full p-4 text-color-secondary">
       No hay proyectos disponibles
     </div>
   </div>
