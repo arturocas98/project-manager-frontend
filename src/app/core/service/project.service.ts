@@ -5,6 +5,8 @@ import { Role } from "src/app/shared/models/role";
 import { environment } from "src/environments/environment";
 import {ApiListResponse, ApiResponse, ApiSingleResponse} from "../../shared/models/api-response.model";
 import {map, Observable} from "rxjs";
+import {ApiService} from "./api.service";
+import {ProjectSummaryData} from "../../shared/models/summary-response";
 
 export interface RoleCollectionResponse {
   data: Role[];
@@ -18,7 +20,7 @@ export interface RoleResponse {
   providedIn: "root",
 })
 export class ProjectService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private apiService: ApiService) {}
 
   getAll(): Observable<ApiListResponse<Project>> {
     return this.http.get<RawProjectResponse>(`${environment.apiUrl}/projects`)
@@ -35,6 +37,9 @@ export class ProjectService {
           };
         })
       );
+  }
+  getProjectSummary(projectId: number): Observable<ProjectSummaryData> {
+    return this.apiService.get<ProjectSummaryData>(`projects/${projectId}/summary`);
   }
 
   // Para un proyecto específico (show)

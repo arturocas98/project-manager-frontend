@@ -40,7 +40,7 @@ export class ProjectListComponent implements OnInit {
   constructor(private projectService: ProjectService, private router: Router) {}
 
   goToProject(id: number) {
-    this.router.navigate(['/project-management/projects/kanban']);
+    this.router.navigate(['/project-management/projects/kanban', id]);
   }
 
   ngOnInit() {

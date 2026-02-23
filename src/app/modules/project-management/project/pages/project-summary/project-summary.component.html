@@ -17,7 +17,8 @@
         <p-button
           label="Actualizar"
           icon="pi pi-refresh"
-          styleClass="bg-blue-600 border-none hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium">
+          styleClass="bg-blue-600 border-none hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium"
+          (onClick)="refresh()">
         </p-button>
       </div>
     </div>
@@ -32,8 +33,8 @@
             <p class="text-xs text-green-600 mt-1" *ngIf="kpi.trend">+{{ kpi.trend }}% vs mes anterior</p>
           </div>
           <div class="w-12 h-12 border-round-xl flex align-items-center justify-content-center"
-               [ngClass]="kpi.bgClass || 'bg-gray-100'">
-            <i [class]="kpi.icon + ' text-lg'" [ngClass]="kpi.iconClass || 'text-color'"></i>
+               [ngClass]="kpi.bgClass || 'surface-ground'">
+            <i [class]="kpi.icon + ' text-2xl'" [ngClass]="kpi.iconClass || 'text-color'"></i>
           </div>
         </div>
       </ng-container>
@@ -182,7 +183,7 @@
               <tr class="hover:surface-ground transition text-sm border-bottom-1 surface-border">
                 <td class="px-4 py-3 font-mono text-xs text-blue-600">#{{ issue.id }}</td>
                 <td class="px-4 py-3 font-medium text-color">{{ issue.title }}</td>
-                <td class="px-4 py-3 text-color-secondary">{{ issue.project }}</td>
+                <td class="px-4 py-3 text-color-secondary">{{ issue.project_name }}</td>
                 <td class="px-4 py-3">
                   <p-tag [value]="issue.priority"
                          [severity]="getPrioritySeverity(issue.priority)"
@@ -191,8 +192,12 @@
                 </td>
                 <td class="px-4 py-3">
                   <div class="flex align-items-center gap-2">
-                    <p-avatar [label]="issue.assignee[0]" shape="circle" size="normal" class="w-6 h-6"></p-avatar>
-                    <span class="text-xs text-color-secondary">{{ issue.assignee }}</span>
+                    <p-avatar
+                      [label]="issue.assigned_user_name?.[0] || '?'"
+                      shape="circle"
+                      size="normal" class="w-6 h-6">
+                    </p-avatar>
+                    <span class="text-xs text-color-secondary">{{ issue.assigned_user_name }}</span>
                   </div>
                 </td>
                 <td class="px-4 py-3">

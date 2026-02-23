@@ -2,9 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/core/service/auth.service';
-import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import {AuthService, RegisterData} from 'src/app/core/service/auth.service';
 
 @Component({
   templateUrl: './register.component.html',
@@ -20,7 +18,6 @@ export class RegisterComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private readonly http: HttpClient
   ) {
     this.ngForm = this.fb.group(
       {
@@ -55,33 +52,37 @@ export class RegisterComponent {
     return result;
   }
 
-  //   onSubmit(): void {
-  //     if (this.ngForm.invalid) {
-  //       return;
-  //     }
-  //     this.loading = true;
-  //     let FormValue = this.getSelectedValues(["name", "email", "password"]);
-  //     console.log(FormValue);
-  //     this.authService.RegisterUser(FormValue).subscribe({
-  //       next: (response: RegisterResponseData) => {
-  //         console.log("Register successful:", response);
-  //         this.loading = false;
-
-  //         setTimeout(() => {
-  //           this.router.navigate(["/auth/login"]);
-  //         }, 1000);
-  //       },
-  //       error: (error) => {
-  //         console.error("Register failed:", error);
-  //         this.loading = false;
-  //       },
-  //     });
-  //   }
   onSubmit(): void {
+
     if (this.ngForm.invalid) {
       return;
     }
 
-    this.http.post(`${environment.apiUrl}/register`, this.ngForm.value).subscribe(response => {});
+    this.loading = true;
+
+    const formValue: RegisterData = this.getSelectedValues([
+      "name",
+      "email",
+      "password"
+    ]);
+
+    this.authService.register(formValue).subscribe({
+
+      next: (response) => {
+
+        this.loading = false;
+
+        if (response.status === 201) {
+          this.router.navigate(["/auth/login"]);
+        }
+
+      },
+
+      error: (error) => {
+        console.error("Register failed:", error);
+        this.loading = false;
+      }
+
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ChartOptions } from 'chart.js';
 import {CardModule} from "primeng/card";
 import {ChartModule} from "primeng/chart";
@@ -9,6 +9,15 @@ import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {ButtonModule} from "primeng/button";
 import {CalendarModule} from "primeng/calendar";
 import {FormsModule} from "@angular/forms";
+import {ActivatedRoute} from "@angular/router";
+import {ProjectService} from "../../../../../core/service/project.service";
+import {
+  HighPriorityTask,
+  ProjectSummaryData,
+  KpiItem,
+  RecentIncidence,
+  WeeklyTrend
+} from "../../../../../shared/models/summary-response";
 
 @Component({
   selector: 'app-project-summary',
@@ -28,77 +37,25 @@ import {FormsModule} from "@angular/forms";
   ],
   templateUrl: './project-summary.component.html',
 })
-export class ProjectSummaryComponent {
+export class ProjectSummaryComponent implements OnInit {
+  projectId!: number;
   selectedMonth: Date = new Date();
-  kpis = [
-    {
-      label: 'Proyectos activos',
-      value: 4,
-      icon: 'pi pi-briefcase',
-      bgClass: 'bg-blue-50',
-      iconClass: 'text-blue-500',
-      trend: 12
-    },
-    {
-      label: 'Issues abiertas',
-      value: 86,
-      icon: 'pi pi-folder-open',
-      bgClass: 'bg-indigo-50',
-      iconClass: 'text-indigo-500',
-      trend: 8
-    },
-    {
-      label: 'En progreso',
-      value: 34,
-      icon: 'pi pi-clock',
-      bgClass: 'bg-gray-100',
-      iconClass: 'text-color',
-      trend: -5
-    },
-    {
-      label: 'Bloqueadas',
-      value: 7,
-      icon: 'pi pi-lock',
-      bgClass: 'bg-red-50',
-      iconClass: 'text-red-500',
-      trend: -15
-    },
-    {
-      label: 'Cerradas semana',
-      value: 22,
-      icon: 'pi pi-check-circle',
-      bgClass: 'bg-green-50',
-      iconClass: 'text-green-500',
-      trend: 25
-    },
-    {
-      label: 'Críticas activas',
-      value: 5,
-      icon: 'pi pi-exclamation-triangle',
-      bgClass: 'bg-red-50',
-      iconClass: 'text-red-600',
-      trend: 40
-    }
-  ];
 
-  criticalIssues = [
-    { id: 'INC-12', title: 'Error en login con autenticación', project: 'Core', priority: 'Alta', assignee: 'Ana García', days: 6, status: 'Bloqueada' },
-    { id: 'INC-18', title: 'Pago duplicado en facturación', project: 'Billing', priority: 'Crítica', assignee: 'Luis Martínez', days: 9, status: 'Abierta' },
-    { id: 'INC-23', title: 'Base de datos desconectada', project: 'Infra', priority: 'Crítica', assignee: 'Carlos Ruiz', days: 2, status: 'Bloqueada' },
-    { id: 'INC-31', title: 'Error 500 en API', project: 'Backend', priority: 'Alta', assignee: 'María López', days: 4, status: 'Review' },
-    { id: 'INC-45', title: 'Fallo en notificaciones', project: 'Mobile', priority: 'Media', assignee: 'Pedro Sánchez', days: 7, status: 'In Progress' }
-  ];
+  // Datos reales que vendrán del API
+  summaryData: ProjectSummaryData | null = null;
+  loading: boolean = true;
+  error: string | null = null;
 
-  activity = [
-    { user: 'Ana García', action: 'creó la issue INC-32', project: 'Core', time: 'Hace 1 hora' },
-    { user: 'Luis Martínez', action: 'movió INC-18 a Done', project: 'Billing', time: 'Hace 2 horas' },
-    { user: 'Carlos Ruiz', action: 'cambió prioridad a Alta', project: 'Infra', time: 'Hace 4 horas' },
-    { user: 'María López', action: 'comentó en INC-31', project: 'Backend', time: 'Hace 5 horas' },
-    { user: 'Pedro Sánchez', action: 'actualizó estado de INC-45', project: 'Mobile', time: 'Hace 6 horas' },
-    { user: 'Laura Torres', action: 'asignó nueva issue', project: 'Frontend', time: 'Hace 8 horas' }
-  ];
+  // KPIs transformados para la vista
+  kpis: any[] = [];
 
-  // OPCIONES DE GRÁFICOS CORREGIDAS
+  // Issues críticas de alta prioridad
+  criticalIssues: HighPriorityTask[] = [];
+
+  // Actividad reciente
+  activity: any[] = [];
+
+  // OPCIONES DE GRÁFICOS
   barOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -124,7 +81,6 @@ export class ProjectSummaryComponent {
     }
   };
 
-  // OPCIONES PARA GRÁFICO DONUT (CORREGIDO)
   doughnutOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -178,39 +134,159 @@ export class ProjectSummaryComponent {
     }
   };
 
+  // Datos para los gráficos
   statusData: any;
   priorityData: any;
   userLoadData: any;
   trendData: any;
 
-  constructor() {}
+  constructor(
+    private route: ActivatedRoute,
+    private projectService: ProjectService
+  ) {}
 
-  ngOnInit(): void {
-    this.initCharts();
+  ngOnInit() {
+    this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
+    this.loadSummaryData();
   }
-  initCharts() {
-    // DISTRIBUCIÓN POR ESTADO - Configuración específica para doughnut
 
-    let documentStyle = getComputedStyle(document.documentElement);
-    let textColor = documentStyle.getPropertyValue('--text-color');
+  refresh(){
+    this.loadSummaryData();
+  }
+  /**
+   * Carga los datos del summary desde el API
+   */
+  loadSummaryData() {
+    this.loading = true;
+    this.error = null;
+
+    this.projectService.getProjectSummary(this.projectId).subscribe({
+      next: (data) => {
+        this.summaryData = data;
+        this.transformDataForView();
+        this.initCharts();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading project summary:', error);
+        this.error = 'Error al cargar los datos del proyecto';
+        this.loading = false;
+      }
+    });
+  }
+
+  /**
+   * Transforma los datos del API al formato que necesita la vista
+   */
+  private transformDataForView() {
+    if (!this.summaryData) return;
+
+    // Transformar KPIs
+    this.kpis = [
+      {
+        label: 'Total Tareas',
+        value: this.summaryData.kpis.total_tasks.value,
+        icon: 'pi pi-briefcase',
+        bgClass: 'bg-blue-50',
+        iconClass: 'text-blue-500',
+        trend: this.extractTrendValue(this.summaryData.kpis.total_tasks.comparison)
+      },
+      {
+        label: 'En Progreso',
+        value: this.summaryData.kpis.in_progress_tasks.value,
+        icon: 'pi pi-clock',
+        bgClass: 'bg-gray-100',
+        iconClass: 'text-gray-900',
+        trend: this.extractTrendValue(this.summaryData.kpis.in_progress_tasks.comparison)
+      },
+      {
+        label: 'Finalizadas',
+        value: this.summaryData.kpis.finished_tasks.value,
+        icon: 'pi pi-check-circle',
+        bgClass: 'bg-green-50',
+        iconClass: 'text-green-500',
+        trend: this.extractTrendValue(this.summaryData.kpis.finished_tasks.comparison)
+      },
+      {
+        label: 'Por vencer esta semana',
+        value: this.summaryData.kpis.expiring_this_week,
+        icon: 'pi pi-calendar-times',
+        bgClass: 'bg-yellow-50',
+        iconClass: 'text-yellow-500',
+        trend: null
+      },
+      {
+        label: 'Críticas activas',
+        value: this.summaryData.kpis.critical_priority_tasks.value,
+        icon: 'pi pi-exclamation-triangle',
+        bgClass: 'bg-red-50',
+        iconClass: 'text-red-600',
+        trend: this.extractTrendValue(this.summaryData.kpis.critical_priority_tasks.comparison)
+      }
+    ];
+
+    // Asignar issues críticas
+    this.criticalIssues = this.summaryData.high_priority_tasks;
+
+    // Transformar actividad reciente
+    this.activity = this.summaryData.recent_incidences.map(inc => ({
+      user: inc.created_by_name,
+      action: `creó la issue ${inc.title}`,
+      project: inc.title || 'Proyecto actual',
+      time: this.getRelativeTime(inc.created_at),
+      priority: inc.priority,
+      state: inc.state
+    }));
+  }
+
+  /**
+   * Extrae el valor numérico del trend de un string como "+12.5%"
+   */
+  private extractTrendValue(trend: string): number | null {
+    if (!trend || trend === '0%') return 0;
+    const numericValue = parseFloat(trend.replace(/[^0-9.-]/g, ''));
+    return isNaN(numericValue) ? null : numericValue;
+  }
+
+  /**
+   * Convierte fecha ISO a texto relativo (hace X horas, etc)
+   */
+  private getRelativeTime(dateStr: string): string {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+
+    if (diffHrs < 1) return `Hace ${diffMins} minutos`;
+    if (diffHrs < 24) return `Hace ${diffHrs} horas`;
+    const diffDays = Math.floor(diffHrs / 24);
+    return `Hace ${diffDays} días`;
+  }
+
+  initCharts() {
+    if (!this.summaryData) return;
+
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color');
+
+    // DISTRIBUCIÓN POR ESTADO
+    const stateLabels = Object.keys(this.summaryData.distribution_by_state);
+    const stateValues = Object.values(this.summaryData.distribution_by_state);
+
     this.statusData = {
-      labels: ['To Do', 'In Progress', 'Review', 'Bloqueadas', 'Done'],
+      labels: stateLabels.map(label => this.capitalizeFirst(label)),
       datasets: [
         {
-          data: [10, 5, 3, 2, 8],
-          backgroundColor: [
-            '#94a3b8', // gray
-            '#f59e0b', // amber
-            '#3b82f6', // blue
-            '#ef4444', // red
-            '#10b981'  // green
-          ],
+          data: stateValues,
+          backgroundColor: this.generateColors(stateLabels.length),
           borderWidth: 0,
           hoverOffset: 5,
-          cutout: '60%' // EL CUTOUT VA AQUÍ, NO EN OPTIONS
+          cutout: '60%'
         }
       ]
     };
+
     this.doughnutOptions = {
       plugins: {
         legend: {
@@ -222,31 +298,32 @@ export class ProjectSummaryComponent {
     };
 
     // DISTRIBUCIÓN POR PRIORIDAD
+    const priorityLabels = Object.keys(this.summaryData.distribution_by_priority);
+    const priorityValues = Object.values(this.summaryData.distribution_by_priority);
+
     this.priorityData = {
-      labels: ['Crítica', 'Alta', 'Media', 'Baja'],
+      labels: priorityLabels.map(label => this.capitalizeFirst(label)),
       datasets: [
         {
           label: 'Issues por prioridad',
-          data: [2, 6, 10, 4],
-          backgroundColor: [
-            '#ef4444', // red
-            '#f97316', // orange
-            '#eab308', // yellow
-            '#22c55e'  // green
-          ],
+          data: priorityValues,
+          backgroundColor: this.getPriorityColors(priorityLabels),
           borderRadius: 4,
           barPercentage: 0.6
         }
       ]
     };
 
-    // CARGA POR USUARIO - Mejorado con colores
+    // CARGA POR USUARIO
+    const userLabels = Object.keys(this.summaryData.user_workload);
+    const userValues = Object.values(this.summaryData.user_workload);
+
     this.userLoadData = {
-      labels: ['Juan Pérez', 'Ana García', 'Carlos Ruiz', 'María López', 'Pedro Sánchez'],
+      labels: userLabels,
       datasets: [
         {
           label: 'Issues Activas',
-          data: [5, 8, 3, 6, 4],
+          data: userValues,
           backgroundColor: '#3b82f6',
           borderRadius: 4,
           barPercentage: 0.5
@@ -254,13 +331,28 @@ export class ProjectSummaryComponent {
       ]
     };
 
-    // TENDENCIA - Con dos datasets mejorados
+    // TENDENCIA SEMANAL
+    const weeklyTrend = this.summaryData.trends.weekly;
+    const days: (keyof WeeklyTrend)[] = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday'
+    ];
+    const dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+    const createdData = days.map(day => weeklyTrend[day]?.tasks_created || 0);
+    const completedData = days.map(day => weeklyTrend[day]?.tasks_completed || 0);
+
     this.trendData = {
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+      labels: dayLabels,
       datasets: [
         {
           label: 'Creadas',
-          data: [2, 4, 3, 5, 6, 3, 2],
+          data: createdData,
           borderColor: '#94a3b8',
           backgroundColor: 'rgba(148, 163, 184, 0.1)',
           tension: 0.4,
@@ -271,8 +363,8 @@ export class ProjectSummaryComponent {
           pointRadius: 4
         },
         {
-          label : 'Cerradas',
-          data: [1, 3, 4, 2, 5, 4, 3],
+          label: 'Cerradas',
+          data: completedData,
           borderColor: '#10b981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           tension: 0.4,
@@ -286,15 +378,63 @@ export class ProjectSummaryComponent {
     };
   }
 
+  /**
+   * Genera colores para el gráfico de estados
+   */
+  private generateColors(count: number): string[] {
+    const colors = [
+      '#94a3b8', // gray
+      '#f59e0b', // amber
+      '#3b82f6', // blue
+      '#ef4444', // red
+      '#10b981', // green
+      '#8b5cf6', // purple
+      '#ec4899'  // pink
+    ];
+
+    return Array(count).fill(0).map((_, i) => colors[i % colors.length]);
+  }
+
+  /**
+   * Colores específicos para prioridades
+   */
+  private getPriorityColors(priorities: string[]): string[] {
+    const colorMap: { [key: string]: string } = {
+      'critical': '#ef4444',  // red
+      'critica': '#ef4444',   // red
+      'alta': '#f97316',      // orange
+      'high': '#f97316',      // orange
+      'media': '#eab308',     // yellow
+      'medium': '#eab308',    // yellow
+      'baja': '#22c55e',      // green
+      'low': '#22c55e'        // green
+    };
+
+    return priorities.map(p => colorMap[p.toLowerCase()] || '#94a3b8');
+  }
+
+  /**
+   * Capitaliza primera letra
+   */
+  private capitalizeFirst(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   getPrioritySeverity(priority: string): string {
-    switch (priority) {
-      case 'Crítica':
+    const priorityLower = priority.toLowerCase();
+    switch (priorityLower) {
+      case 'critical':
+      case 'crítica':
+      case 'critica':
         return 'danger';
-      case 'Alta':
+      case 'alta':
+      case 'high':
         return 'warning';
-      case 'Media':
+      case 'media':
+      case 'medium':
         return 'info';
-      case 'Baja':
+      case 'baja':
+      case 'low':
         return 'success';
       default:
         return 'secondary';
@@ -302,17 +442,31 @@ export class ProjectSummaryComponent {
   }
 
   getStatusSeverity(status: string): string {
-    switch (status) {
-      case 'Bloqueada':
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
+      case 'bloqueada':
+      case 'blocked':
         return 'danger';
-      case 'In Progress':
+      case 'in progress':
+      case 'progress':
         return 'warning';
-      case 'Review':
+      case 'review':
         return 'info';
-      case 'Done':
+      case 'finished':
+      case 'done':
+      case 'completada':
         return 'success';
       default:
         return 'secondary';
     }
+  }
+
+  /**
+   * Refresca los datos cuando cambia el mes seleccionado
+   */
+  onMonthChange() {
+    // Aquí podrías implementar lógica para cargar datos de un mes específico
+    console.log('Month changed:', this.selectedMonth);
+    this.loadSummaryData(); // Recarga los datos
   }
 }

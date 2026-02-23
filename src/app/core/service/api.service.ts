@@ -10,6 +10,7 @@ import { catchError, timeout, switchMap } from "rxjs/operators";
 import { HttpHeadersService, ExtraKeys } from "./http-headers.service";
 import { ErrorService } from "./error.service";
 import { environment } from "src/environments/environment";
+import {ApiEmptyResponse, ApiResponse} from "../../shared/models/api-response.model";
 
 export enum HttpMethodType {
   GET = "GET",
@@ -43,8 +44,20 @@ export class ApiService {
   }
 
   /**
+   * Extrae el data de la respuesta si tiene estructura ApiResponse
+   */
+  private extractDataFromResponse<T>(responseBody: any): T {
+    // Si la respuesta tiene la estructura ApiResponse { data: ..., meta: ..., links: ... }
+    if (responseBody && typeof responseBody === 'object' && 'data' in responseBody) {
+      return responseBody.data as T;
+    }
+
+    // Si no tiene esa estructura, retorna el body completo
+    return responseBody as T;
+  }
+
+  /**
    * Método principal para construir y ejecutar peticiones HTTP
-   * Similar a buildHttpResponse de Dart
    */
   buildHttpResponse<T>(
     endPoint: string,
@@ -112,7 +125,6 @@ export class ApiService {
   private handleHttpError(error: any): Observable<never> {
     console.error("HTTP Error:", error);
 
-    // Usar modal para errores de red
     if (!navigator.onLine) {
       this.errorService.showModal(
         "No internet connection available",
@@ -134,7 +146,6 @@ export class ApiService {
       return throwError(() => new Error("Request timeout"));
     }
 
-    // Para otros errores HTTP
     if (error instanceof HttpErrorResponse) {
       this.errorService.handleError(error);
     } else {
@@ -150,12 +161,10 @@ export class ApiService {
   }
 
   /**
-   * Maneja la respuesta HTTP y la transforma usando un parser
-   * Similar a handleResponse de Dart
+   * Maneja la respuesta HTTP y retorna SOLO el data
    */
   handleResponse<T>(
     response: HttpResponse<T>,
-    parser: (data: any, status?: number) => T,
   ): Observable<T> {
     // Verificar conexión a internet
     if (!navigator.onLine) {
@@ -173,7 +182,9 @@ export class ApiService {
     if (statusCode >= 200 && statusCode < 300) {
       try {
         const body = response.body;
-        return of(parser(body, statusCode));
+        // Extraer automáticamente el data de la respuesta
+        const extractedData = this.extractDataFromResponse<T>(body);
+        return of(extractedData);
       } catch (error) {
         this.errorService.showModal(
           "Invalid response format from server",
@@ -185,7 +196,6 @@ export class ApiService {
       }
     }
 
-    // Usar modal para errores HTTP específicos
     const errorMessage = this.errorService.mapError(statusCode, response.body);
     this.errorService.showModalByStatusCode(statusCode, errorMessage);
 
@@ -193,105 +203,334 @@ export class ApiService {
   }
 
   /**
-   * Método principal de solicitud - similar al patrón de Dart
+   * Maneja la respuesta HTTP y retorna la ApiResponse completa
+   */
+  handleFullResponse<T>(
+    response: HttpResponse<T>,
+  ): Observable<ApiResponse<T>> {
+    if (!navigator.onLine) {
+      this.errorService.showModal(
+        "No internet connection available",
+        "error",
+        "NETWORK_ERROR",
+        "Network Error",
+      );
+      return throwError(() => new Error("Internet not available"));
+    }
+
+    const statusCode = response.status;
+
+    if (statusCode >= 200 && statusCode < 300) {
+      try {
+        const body = response.body as ApiResponse<T>;
+        return of(body);
+      } catch (error) {
+        this.errorService.showModal(
+          "Invalid response format from server",
+          "error",
+          "PARSE_ERROR",
+          "Parse Error",
+        );
+        return throwError(() => new Error("Invalid response format"));
+      }
+    }
+
+    const errorMessage = this.errorService.mapError(statusCode, response.body);
+    this.errorService.showModalByStatusCode(statusCode, errorMessage);
+
+    return throwError(() => new Error(errorMessage));
+  }
+
+  /**
+   * Maneja respuestas vacías (HTTP 204 No Content, etc)
+   */
+  handleEmptyResponse(
+    response: HttpResponse<any>,
+  ): Observable<ApiEmptyResponse> {
+    if (!navigator.onLine) {
+      this.errorService.showModal(
+        "No internet connection available",
+        "error",
+        "NETWORK_ERROR",
+        "Network Error",
+      );
+      return throwError(() => new Error("Internet not available"));
+    }
+
+    const statusCode = response.status;
+
+    if (statusCode >= 200 && statusCode < 300) {
+      return of({
+        success: true,
+        status: statusCode,
+        message: "Operation completed successfully",
+      });
+    }
+
+    const errorMessage = this.errorService.mapError(statusCode, response.body);
+    this.errorService.showModalByStatusCode(statusCode, errorMessage);
+
+    return throwError(() => new Error(errorMessage));
+  }
+
+  /**
+   * Método principal de solicitud - Retorna SOLO el data
    */
   request<T>(
     endPoint: string,
     method: HttpMethodType = HttpMethodType.GET,
     data?: any,
     extraKeys?: ExtraKeys,
-    parser?: (data: any) => T,
   ): Observable<T> {
     return this.buildHttpResponse<T>(endPoint, method, data, extraKeys).pipe(
-      switchMap((response) =>
-        this.handleResponse(
-          response,
-          parser || ((d: any, s?: number) => d as T),
-        ),
-      ),
+      switchMap((response) => this.handleResponse<T>(response)),
     );
   }
 
   /**
-   * Métodos helpers para tipos de petición específicos
-   * Similar a los métodos estáticos de Dart
+   * Método que retorna la respuesta COMPLETA (con meta, links)
    */
+  requestFull<T>(
+    endPoint: string,
+    method: HttpMethodType = HttpMethodType.GET,
+    data?: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiResponse<T>> {
+    return this.buildHttpResponse<T>(endPoint, method, data, extraKeys).pipe(
+      switchMap((response) => this.handleFullResponse<T>(response)),
+    );
+  }
 
-  // GET request
+  /**
+   * Método para peticiones que esperan respuesta vacía (DELETE, etc)
+   */
+  requestEmpty(
+    endPoint: string,
+    method: HttpMethodType = HttpMethodType.DELETE,
+    data?: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiEmptyResponse> {
+    return this.buildHttpResponse<any>(endPoint, method, data, extraKeys).pipe(
+      switchMap((response) => this.handleEmptyResponse(response)),
+    );
+  }
+
+  /**
+   * GET request - Retorna SOLO el data
+   */
   get<T>(
     endPoint: string,
     extraKeys?: ExtraKeys,
-    parser?: (data: any) => T,
   ): Observable<T> {
     return this.request<T>(
       endPoint,
       HttpMethodType.GET,
       undefined,
       extraKeys,
-      parser,
     );
   }
 
-  // POST request
+  /**
+   * GET request - Retorna la respuesta COMPLETA
+   */
+  getFull<T>(
+    endPoint: string,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiResponse<T>> {
+    return this.requestFull<T>(
+      endPoint,
+      HttpMethodType.GET,
+      undefined,
+      extraKeys,
+    );
+  }
+
+  /**
+   * POST request - Retorna SOLO el data
+   */
   post<T>(
     endPoint: string,
     data: any,
     extraKeys?: ExtraKeys,
-    parser?: (data: any) => T,
   ): Observable<T> {
     return this.request<T>(
       endPoint,
       HttpMethodType.POST,
       data,
       extraKeys,
-      parser,
     );
   }
 
-  // PUT request
+  /**
+   * POST request - Retorna la respuesta COMPLETA
+   */
+  postFull<T>(
+    endPoint: string,
+    data: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiResponse<T>> {
+    return this.requestFull<T>(
+      endPoint,
+      HttpMethodType.POST,
+      data,
+      extraKeys,
+    );
+  }
+
+  /**
+   * POST request - Para cuando no esperas data en respuesta
+   */
+  postEmpty(
+    endPoint: string,
+    data: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiEmptyResponse> {
+    return this.requestEmpty(
+      endPoint,
+      HttpMethodType.POST,
+      data,
+      extraKeys,
+    );
+  }
+
+  /**
+   * PUT request - Retorna SOLO el data
+   */
   put<T>(
     endPoint: string,
     data: any,
     extraKeys?: ExtraKeys,
-    parser?: (data: any) => T,
   ): Observable<T> {
     return this.request<T>(
       endPoint,
       HttpMethodType.PUT,
       data,
       extraKeys,
-      parser,
     );
   }
 
-  // DELETE request
+  /**
+   * PUT request - Retorna la respuesta COMPLETA
+   */
+  putFull<T>(
+    endPoint: string,
+    data: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiResponse<T>> {
+    return this.requestFull<T>(
+      endPoint,
+      HttpMethodType.PUT,
+      data,
+      extraKeys,
+    );
+  }
+
+  /**
+   * PUT request - Para cuando no esperas data en respuesta
+   */
+  putEmpty(
+    endPoint: string,
+    data: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiEmptyResponse> {
+    return this.requestEmpty(
+      endPoint,
+      HttpMethodType.PUT,
+      data,
+      extraKeys,
+    );
+  }
+
+  /**
+   * DELETE request - Retorna SOLO el data
+   */
   delete<T>(
     endPoint: string,
     extraKeys?: ExtraKeys,
-    parser?: (data: any) => T,
   ): Observable<T> {
     return this.request<T>(
       endPoint,
       HttpMethodType.DELETE,
       undefined,
       extraKeys,
-      parser,
     );
   }
 
-  // PATCH request
+  /**
+   * DELETE request - Retorna la respuesta COMPLETA
+   */
+  deleteFull<T>(
+    endPoint: string,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiResponse<T>> {
+    return this.requestFull<T>(
+      endPoint,
+      HttpMethodType.DELETE,
+      undefined,
+      extraKeys,
+    );
+  }
+
+  /**
+   * DELETE request - Para cuando no esperas data en respuesta (recomendado para DELETE)
+   */
+  deleteEmpty(
+    endPoint: string,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiEmptyResponse> {
+    return this.requestEmpty(
+      endPoint,
+      HttpMethodType.DELETE,
+      undefined,
+      extraKeys,
+    );
+  }
+
+  /**
+   * PATCH request - Retorna SOLO el data
+   */
   patch<T>(
     endPoint: string,
     data: any,
     extraKeys?: ExtraKeys,
-    parser?: (data: any) => T,
   ): Observable<T> {
     return this.request<T>(
       endPoint,
       HttpMethodType.PATCH,
       data,
       extraKeys,
-      parser,
+    );
+  }
+
+  /**
+   * PATCH request - Retorna la respuesta COMPLETA
+   */
+  patchFull<T>(
+    endPoint: string,
+    data: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiResponse<T>> {
+    return this.requestFull<T>(
+      endPoint,
+      HttpMethodType.PATCH,
+      data,
+      extraKeys,
+    );
+  }
+
+  /**
+   * PATCH request - Para cuando no esperas data en respuesta
+   */
+  patchEmpty(
+    endPoint: string,
+    data: any,
+    extraKeys?: ExtraKeys,
+  ): Observable<ApiEmptyResponse> {
+    return this.requestEmpty(
+      endPoint,
+      HttpMethodType.PATCH,
+      data,
+      extraKeys,
     );
   }
 
@@ -303,9 +542,21 @@ export class ApiService {
   create<T>(
     endPoint: string,
     data: any,
-    parser?: (data: any) => T,
   ): Observable<T> {
-    return this.post<T>(endPoint, data, undefined, parser).pipe(
+    return this.post<T>(endPoint, data).pipe(
+      switchMap((response) => {
+        this.errorService.showSuccess("Record created successfully");
+        return of(response);
+      }),
+    );
+  }
+
+  // Crear registro (con respuesta completa)
+  createFull<T>(
+    endPoint: string,
+    data: any,
+  ): Observable<ApiResponse<T>> {
+    return this.postFull<T>(endPoint, data).pipe(
       switchMap((response) => {
         this.errorService.showSuccess("Record created successfully");
         return of(response);
@@ -317,9 +568,21 @@ export class ApiService {
   update<T>(
     endPoint: string,
     data: any,
-    parser?: (data: any) => T,
   ): Observable<T> {
-    return this.put<T>(endPoint, data, undefined, parser).pipe(
+    return this.put<T>(endPoint, data).pipe(
+      switchMap((response) => {
+        this.errorService.showSuccess("Record updated successfully");
+        return of(response);
+      }),
+    );
+  }
+
+  // Actualizar registro (con respuesta completa)
+  updateFull<T>(
+    endPoint: string,
+    data: any,
+  ): Observable<ApiResponse<T>> {
+    return this.putFull<T>(endPoint, data).pipe(
       switchMap((response) => {
         this.errorService.showSuccess("Record updated successfully");
         return of(response);
@@ -328,8 +591,8 @@ export class ApiService {
   }
 
   // Eliminar registro
-  remove<T>(endPoint: string, parser?: (data: any) => T): Observable<T> {
-    return this.delete<T>(endPoint, undefined, parser).pipe(
+  remove(endPoint: string): Observable<ApiEmptyResponse> {
+    return this.deleteEmpty(endPoint).pipe(
       switchMap((response) => {
         this.errorService.showSuccess("Record deleted successfully");
         return of(response);
@@ -340,8 +603,8 @@ export class ApiService {
   /**
    * Método para peticiones con manejo específico de errores de login
    */
-  loginRequest<T>(request: any, parser: (data: any) => T): Observable<T> {
-    return this.post<T>("auth/login", request, undefined, parser).pipe(
+  loginRequest<T>(request: any): Observable<T> {
+    return this.post<T>("auth/login", request).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
           this.errorService.showModal(
@@ -358,16 +621,22 @@ export class ApiService {
   }
 
   /**
-   * Método genérico para cualquier tipo de petición con cualquier request
-   * Similar al patrón de Dart que mostraste
+   * Login con respuesta completa (por si necesitas tokens en meta, etc)
    */
-  staticRequest<T>(
-    endPoint: string,
-    method: HttpMethodType,
-    request: any,
-    parser?: (data: any, status?: number) => T,
-    extraKeys?: ExtraKeys,
-  ): Observable<T> {
-    return this.request<T>(endPoint, method, request, extraKeys, parser);
+  loginFullRequest<T>(request: any): Observable<ApiResponse<T>> {
+    return this.postFull<T>("auth/login", request).pipe(
+      catchError((error) => {
+        if (error instanceof HttpErrorResponse && error.status === 401) {
+          this.errorService.showModal(
+            "Invalid email or password",
+            "error",
+            "LOGIN_ERROR",
+            "Login Failed",
+            5000,
+          );
+        }
+        return throwError(() => error);
+      }),
+    );
   }
 }

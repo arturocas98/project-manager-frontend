@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import {map, Observable, tap} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { formatISO } from 'date-fns';
 import { Constants, LOCAL_STORAGE_KEYS } from 'src/app/shared/constants/constants';
 import { User } from 'src/app/shared/models/user';
 import {ApiSingleResponse} from "../../shared/models/api-response.model";
@@ -16,6 +15,13 @@ export interface LoginData {
 interface LoginResponseData {
   access_token: string;
 }
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+}
+
 
 // auth.service.ts
 @Injectable({
@@ -39,6 +45,13 @@ export class AuthService {
     return this.http.post<ApiSingleResponse<LoginResponseData>>(
       `${environment.apiUrl}/auth/login`,
       data
+    );
+  }
+  register(data: RegisterData): Observable<HttpResponse<any>> {
+    return this.http.post<any>(
+      `${environment.apiUrl}/auth/register`,
+      data,
+      { observe: 'response' }
     );
   }
 

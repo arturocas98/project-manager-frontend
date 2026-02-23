@@ -9,19 +9,21 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AppConfigModule } from "src/app/layout/config/app.config.module";
 import { TranslateModule } from "@ngx-translate/core";
 import { AppConfigComponent } from "src/app/layout/config/app.config.component";
+import {RippleModule} from "primeng/ripple";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    LoginRoutingModule,
-    ButtonModule,
-    InputTextModule,
-    CheckboxModule,
-    FormsModule,
-    AppConfigComponent,
-    ReactiveFormsModule,
-    TranslateModule,
-  ],
+    imports: [
+        CommonModule,
+        LoginRoutingModule,
+        ButtonModule,
+        InputTextModule,
+        CheckboxModule,
+        FormsModule,
+        AppConfigComponent,
+        ReactiveFormsModule,
+        TranslateModule,
+        RippleModule,
+    ],
   declarations: [LoginComponent],
 })
 export class LoginModule {}

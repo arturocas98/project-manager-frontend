@@ -19,7 +19,7 @@ const routes: Routes = [
       ),
   },
   {
-    path: "kanban",
+    path: "kanban/:id",
     data: { breadcrumb: "Create" },
     loadComponent: () =>
       import("./pages/view-project/view-project.component").then(
