@@ -52,10 +52,16 @@
 
   <div class="topbar-end flex align-items-center justify-center relative">
     <button type="button" class="p-link" (click)="onProfileButtonClick()">
-      <img
-        src="assets/layout/images/avatar.png"
-        alt="Profile"
-        class="w-3rem h-3rem relative" />
+      <div class="topbar-end flex align-items-center justify-center relative">
+        <button type="button" class="p-link" (click)="onProfileButtonClick()">
+          <p-avatar
+            [label]="userInitials()"
+            shape="circle"
+            size="large"
+            styleClass="bg-primary text-white w-3rem h-3rem relative text-lg"
+          ></p-avatar>
+        </button>
+      </div>
     </button>
   </div>
 </div>
