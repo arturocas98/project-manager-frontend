@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Role } from 'src/app/shared/models/role';
 import { environment } from 'src/environments/environment';
 import {ParamJson} from "../../../../shared/models/params.model";
-import {MetaData} from "../../../../core/service/apiResponse.model";
+import {MetaData} from "../../../../shared/models/api-response.model";
 
 export interface RoleCollectionResponse {
     data: Role[];

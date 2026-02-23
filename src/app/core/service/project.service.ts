@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import {Project, RawProjectResponse} from "src/app/shared/models/project";
 import { Role } from "src/app/shared/models/role";
 import { environment } from "src/environments/environment";
-import {ApiListResponse, ApiResponse, ApiSingleResponse} from "./apiResponse.model";
+import {ApiListResponse, ApiResponse, ApiSingleResponse} from "../../shared/models/api-response.model";
 import {map, Observable} from "rxjs";
 
 export interface RoleCollectionResponse {

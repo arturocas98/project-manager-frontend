@@ -21,7 +21,7 @@ import {
   subMonths,
 } from "date-fns";
 import { es } from "date-fns/locale";
-import {MetaData} from "../../core/service/apiResponse.model";
+import {MetaData} from "../models/api-response.model";
 
 export function markAllAsTouched(form: FormGroup): void {
   for (const inner in form.controls) {

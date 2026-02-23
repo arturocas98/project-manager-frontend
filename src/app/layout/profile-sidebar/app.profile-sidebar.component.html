@@ -2,14 +2,14 @@
   [(visible)]="visible"
   position="right"
   [transitionOptions]="'.3s cubic-bezier(0, 0, 0.2, 1)'"
-  styleClass="layout-profile-sidebar w-full sm:w-25rem">
+  styleClass="layout-profile-sidebar w-full sm:w-30rem">
 
-  <div class="flex flex-col justify-between h-full">
+  <div class="flex flex-column justify-content-between h-full">
     <div class="flex flex-column mx-auto md:mx-0">
 
       <!-- Mostrar solo si hay profile -->
       @if (profile(); as userProfile) {
-        <div class="flex flex-col items-center mb-7 gap-2">
+        <div class="flex flex-column align-items-center mb-7 gap-2">
           <p-avatar
             [label]="userInitials()"
             shape="circle"
@@ -35,14 +35,14 @@
         </div>
       } @else {
         <!-- Estado de carga o sin perfil -->
-        <div class="flex flex-col items-center mb-7 gap-2 p-4">
+        <div class="flex flex-column align-items-center mb-7 gap-2 p-4">
           <p-skeleton shape="circle" size="80px" styleClass="mb-2"></p-skeleton>
           <p-skeleton width="150px" height="24px"></p-skeleton>
           <p-skeleton width="200px" height="20px"></p-skeleton>
         </div>
       }
 
-      <ul class="list-none m-0 p-0 flex flex-col items-center mb-5 gap-3">
+      <ul class="list-none m-0 p-0 flex flex-column align-items-center mb-5 gap-3">
         <li class="w-full md:!w-4/5">
           <a
             class="w-full cursor-pointer flex surface-border p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150"
@@ -69,7 +69,7 @@
         </li>
       </ul>
 
-      <div class="flex flex-col gap-1 items-center">
+      <div class="flex flex-column gap-1 align-items-center">
         <span class="text-color-secondary text-sm font-light">
           {{ "general.version" | translate }}: {{ version }}
         </span>

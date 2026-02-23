@@ -12,7 +12,7 @@ import { Project } from 'src/app/shared/models/project';
 import { CardModule } from 'primeng/card';
 import { ProjectService } from 'src/app/core/service/project.service';
 import {ProgressSpinnerModule} from "primeng/progressspinner";
-import {ApiListResponse} from "../../../../../core/service/apiResponse.model";
+import {ApiListResponse} from "../../../../../shared/models/api-response.model";
 import {Route, Router} from "@angular/router";
 
 @Component({

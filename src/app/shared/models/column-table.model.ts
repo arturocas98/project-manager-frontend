@@ -1,6 +1,6 @@
 // src/app/shared/models/column-table.model.ts
 import { TABLE_KEY_FIELDS } from '../constants/constants';
-import {ApiPaginatedResponse, ApiResponse} from "../../core/service/apiResponse.model";
+import {ApiPaginatedResponse, ApiResponse} from "./api-response.model";
 
 export interface ColumnSort {
   show: boolean;

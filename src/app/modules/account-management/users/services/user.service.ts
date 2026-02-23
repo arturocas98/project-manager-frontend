@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { User } from "src/app/shared/models/user";
 import { environment } from "src/environments/environment";
 import {ParamJson} from "../../../../shared/models/params.model";
-import {MetaData} from "../../../../core/service/apiResponse.model";
+import {MetaData} from "../../../../shared/models/api-response.model";
 
 export interface UserCollectionResponse {
   data: User[];

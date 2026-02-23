@@ -5,7 +5,7 @@ import {ChartModule} from "primeng/chart";
 import {AvatarModule} from "primeng/avatar";
 import {TagModule} from "primeng/tag";
 import {TableModule} from "primeng/table";
-import {NgClass, NgForOf} from "@angular/common";
+import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {ButtonModule} from "primeng/button";
 import {CalendarModule} from "primeng/calendar";
 import {FormsModule} from "@angular/forms";
@@ -23,7 +23,8 @@ import {FormsModule} from "@angular/forms";
     NgForOf,
     ButtonModule,
     CalendarModule,
-    FormsModule
+    FormsModule,
+    NgIf
   ],
   templateUrl: './project-summary.component.html',
 })
@@ -255,7 +256,7 @@ export class ProjectSummaryComponent {
 
     // TENDENCIA - Con dos datasets mejorados
     this.trendData = {
-      labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
       datasets: [
         {
           label: 'Creadas',
@@ -270,7 +271,7 @@ export class ProjectSummaryComponent {
           pointRadius: 4
         },
         {
-          label: 'Cerradas',
+          label : 'Cerradas',
           data: [1, 3, 4, 2, 5, 4, 3],
           borderColor: '#10b981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',

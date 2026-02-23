@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import { formatISO } from 'date-fns';
 import { Constants, LOCAL_STORAGE_KEYS } from 'src/app/shared/constants/constants';
 import { User } from 'src/app/shared/models/user';
-import {ApiSingleResponse} from "./apiResponse.model";
+import {ApiSingleResponse} from "../../shared/models/api-response.model";
 
 export interface LoginData {
   email: string;
@@ -44,10 +44,12 @@ export class AuthService {
    * Obtener perfil - usando ApiResponse
    */
   getProfile(): Observable<ApiSingleResponse<User>> {
+    console.log("Getting user");
     return this.http.get<ApiSingleResponse<User>>(`${environment.apiUrl}/user/profile`).pipe(
       tap((response) => {
         this._profile.set(response.data);
         localStorage.setItem(LOCAL_STORAGE_KEYS.profile, JSON.stringify(response.data));
+        console.log(response.data);
       })
     );
   }

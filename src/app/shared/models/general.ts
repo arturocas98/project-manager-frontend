@@ -1,7 +1,7 @@
 
 
 // Tipos originales que se mantienen igual
-import {ApiResponse} from "../../core/service/apiResponse.model";
+import {ApiResponse} from "./api-response.model";
 
 export type Severity = 'success' | 'secondary' | 'info' | 'warning' | 'danger' | 'contrast' | undefined;
 
