@@ -212,20 +212,21 @@ export const windowToTop = (): void => {
 };
 
 export const getUserInitials = (name: string): string => {
-  if (!name) return Constants.emptyString;
+  if (!name) return '';
 
-  if (name.includes(" ")) {
-    const names = name.split(" ");
-    if (names.length === 1) {
-      return names[0].charAt(0).toUpperCase();
-    }
+  const cleanName = name.trim().replace(/\s+/g, ' ');
+  const parts = cleanName.split(' ').filter(Boolean);
 
-    const initials = names.map((n) => n.charAt(0).toUpperCase()).join("");
-    return initials;
-  } else {
-    const initials = name.match(/[A-Z]/g);
-    return initials ? initials[0] + initials[1] : name.charAt(0).toUpperCase();
+  // Si solo hay una palabra
+  if (parts.length === 1) {
+    return parts[0].charAt(0).toUpperCase();
   }
+
+  // Si hay varias palabras → primera letra del primero y del último
+  const firstInitial = parts[0].charAt(0).toUpperCase();
+  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
+
+  return firstInitial + lastInitial;
 };
 
 export function defaultPaginator(array: any[]): MetaData {

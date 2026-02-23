@@ -28,7 +28,9 @@ export class AuthService {
   constructor(
     private readonly http: HttpClient,
     private readonly router: Router
-  ) {}
+  ) {
+    this.loadProfileFromStorage();
+  }
 
   /**
    * Login - usando ApiResponse
@@ -109,5 +111,17 @@ export class AuthService {
         this.updateProfileState(response.data);
       })
     );
+  }
+  private loadProfileFromStorage(): void {
+    const profileStr = localStorage.getItem(LOCAL_STORAGE_KEYS.profile);
+
+    if (!profileStr) return;
+
+    try {
+      const user = JSON.parse(profileStr) as User;
+      this._profile.set(user);
+    } catch (error) {
+      console.error('Error parsing profile', error);
+    }
   }
 }
