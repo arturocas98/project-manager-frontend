@@ -55,7 +55,12 @@
     "register": "Registrarse",
     "securityTitle": "Autenticación Segura",
     "securityDescription": "Tus datos están protegidos con encriptación de nivel industrial",
-    "logOut": "Cerrar sesión"
+    "logOut": "Cerrar sesión",
+    "emailPlaceholder": "ejemplo@correo.com",
+    "passwordPlaceholder": "••••••••",
+    "passwordRequired": "La contraseña es requerida",
+    "emailInvalid": "Por favor ingresa un email válido",
+    "dividerOr": "o"
   },
   "sideBar": {
     "forYou": "Para ti",

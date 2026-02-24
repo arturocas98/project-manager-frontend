@@ -1,6 +1,6 @@
-<div class="p-6 min-h-screen space-y-6">
+<div class="min-h-screen space-y-6">
   <!-- CONTENEDOR PRINCIPAL FLEX COLUMN -->
-  <div class="p-6 surface-ground min-h-screen flex flex-column gap-6">
+  <div class="p-3 surface-ground min-h-screen flex flex-column gap-6">
 
     <!-- HEADER CON TÍTULO Y FILTROS -->
     <div class="flex flex-column md:flex-row md:align-items-center md:justify-content-between gap-4">
@@ -41,9 +41,9 @@
     </div>
 
     <!-- ================= GRÁFICOS SUPERIORES FLEX ================= -->
-    <div class="flex flex-wrap gap-6">
+    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
       <!-- ESTADO CON DONUT CHART -->
-      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
         <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
           <div>
             <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Estado</h2>
@@ -64,7 +64,7 @@
       </div>
 
       <!-- PRIORIDAD CON BARRAS HORIZONTALES -->
-      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
         <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
           <div>
             <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Prioridad</h2>
@@ -85,9 +85,9 @@
               src="assets/General/Cartoon_Projects.png"
               alt="Crear Proyecto"
               class="w-15rem z-1 h-20rem sm:w-25rem sm:h-30rem object-fit-cover mt-8 sm:mt-0">
-            <div class="relative rotate-45">
+            <div class="relative rotate-45 hidden sm:block">
               <div class="absolute opacity-80 z-0 w-20rem h-20rem bg-green-600" style="top: 0; right: 0; border-radius: 100%">
-                <div class="absolute opacity-80 z-1 w-19rem h-19rem bg-green-500" style="top: 0; right: 0; border-radius: 100%"></div>
+                <div class="absolute opacity-80 z-1 w-19rem h-19rem bg-green-200" style="top: 0; right: 0; border-radius: 100%"></div>
               </div>
             </div>
           </div>
@@ -96,14 +96,14 @@
     </div>
 
     <!-- ================= GRÁFICOS INFERIORES FLEX ================= -->
-    <div class="flex flex-wrap gap-6">
+    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
       <!-- CARGA POR USUARIO -->
-      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border">
+      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-3 py-4 border-bottom-1 surface-border">
           <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Carga por Usuario</h2>
           <p class="text-xs text-color-secondary mt-0.5">Distribución de tareas asignadas</p>
         </div>
-        <div class="p-5">
+        <div class="p-3">
           <p-chart type="bar"
                    [data]="userLoadData"
                    [options]="verticalBarOptions"
@@ -113,8 +113,8 @@
       </div>
 
       <!-- TENDENCIA -->
-      <div class="flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
           <div>
             <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Tendencia de Actividad</h2>
             <p class="text-xs text-color-secondary mt-0.5">Últimos 7 días</p>
@@ -130,7 +130,7 @@
           </span>
           </div>
         </div>
-        <div class="p-5">
+        <div class="p-3">
           <p-chart type="line"
                    [data]="trendData"
                    [options]="lineOptions"
@@ -141,10 +141,10 @@
     </div>
 
     <!-- ================= SECCIÓN INFERIOR FLEX ================= -->
-    <div class="flex flex-wrap gap-6">
+    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
       <!-- TABLA DE ISSUES CRÍTICAS (FLEX GROW 2) -->
       <div class="flex-2 min-w-500px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
           <div>
             <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Issues Críticas</h2>
             <p class="text-xs text-color-secondary mt-0.5">Tareas bloqueadas o de alta prioridad</p>
@@ -158,7 +158,7 @@
           </div>
         </div>
 
-        <div class="p-5">
+        <div class="p-3">
           <p-table
             [value]="criticalIssues"
             sortField="priority"
@@ -214,7 +214,7 @@
 
       <!-- ACTIVIDAD RECIENTE (FLEX 1) -->
       <div class="flex-1 min-w-300px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
           <div>
             <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Actividad Reciente</h2>
             <p class="text-xs text-color-secondary mt-0.5">Últimas actualizaciones</p>
@@ -222,7 +222,7 @@
           <span class="w-2 h-2 bg-green-500 border-circle animate-pulse"></span>
         </div>
 
-        <div class="p-4 flex flex-column gap-3 max-h-320px overflow-y-auto">
+        <div class="p-2 flex flex-column gap-3 max-h-320px overflow-y-auto">
           <div *ngFor="let act of activity"
                class="flex align-items-start gap-3 p-3 hover:surface-ground border-round transition border-1 border-transparent hover:surface-border">
             <p-avatar
@@ -248,7 +248,7 @@
         </div>
 
         <!-- PIE DE ACTIVIDAD -->
-        <div class="px-6 py-3 surface-ground border-top-1 surface-border">
+        <div class="px-3 py-3 surface-ground border-top-1 surface-border">
           <p-button
             label="Ver toda la actividad"
             icon="pi pi-arrow-right"
