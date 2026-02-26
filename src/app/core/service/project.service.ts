@@ -57,7 +57,7 @@ export class ProjectService {
   }
 
   getOneTask(projectId: number, taskId:number): Observable<IncidenceModel> {
-    return this.apiService.get<IncidenceModel>(`projects/${projectId}`);
+    return this.apiService.get<IncidenceModel>(`projects/${projectId}/incidences/${taskId}`);
   }
 
 
@@ -66,7 +66,7 @@ export class ProjectService {
   }
 
   UpdateTask(projectData: TaskUpdateModelRequest, projectId: number, taskId: number): Observable<IncidenceModel> {
-    return this.apiService.post<IncidenceModel>(`projects/${projectId}/incidences/${taskId}`, projectData);
+    return this.apiService.put<IncidenceModel>(`projects/${projectId}/incidences/${taskId}/update`, projectData);
   }
 
   updateProject(projectData: UpdateProjectRequest, projectId: number): Observable<ProjectResponse> {

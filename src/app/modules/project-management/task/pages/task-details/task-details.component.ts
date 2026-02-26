@@ -11,6 +11,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {MessageService} from 'primeng/api';
 import {ToastModule} from 'primeng/toast';
 import {Subscription} from 'rxjs';
+import {ProjectService} from "../../../../../core/service/project.service";
 import {IncidenceModel} from "../../../../../shared/models/task-models/task-create-model";
 
 @Component({
@@ -41,30 +42,21 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   // Mapeo de prioridades a colores y etiquetas
-  readonly priorityMap: Record<number, { label: string; severity: string; icon: string }> = {
-    1: { label: 'Baja', severity: 'info', icon: 'pi-arrow-down' },
-    2: { label: 'Media', severity: 'warning', icon: 'pi-minus' },
-    3: { label: 'Alta', severity: 'danger', icon: 'pi-arrow-up' },
-    4: { label: 'Crítica', severity: 'danger', icon: 'pi-exclamation-triangle' }
+  readonly priorityMap: Record<string, { label: string; severity: string; icon: string }> = {
+    'low': { label: 'Baja', severity: 'info', icon: 'pi-arrow-down' },
+    'medium': { label: 'Media', severity: 'warning', icon: 'pi-minus' },
+    'high': { label: 'Alta', severity: 'danger', icon: 'pi-arrow-up' },
+    'critical': { label: 'Crítica', severity: 'danger', icon: 'pi-exclamation-triangle' }
   };
 
-  // Mapeo de estados a colores
-  readonly stateMap: Record<number, { label: string; severity: string }> = {
-    1: { label: 'Abierto', severity: 'info' },
-    2: { label: 'En Progreso', severity: 'warning' },
-    3: { label: 'Revisión', severity: 'help' },
-    4: { label: 'Cerrado', severity: 'success' },
-    5: { label: 'Bloqueado', severity: 'danger' },
-    6: { label: 'Finalizado', severity: 'success' }
-  };
-
-  // Mapeo de tipos
-  readonly typeMap: Record<number, { label: string; icon: string }> = {
-    1: { label: 'Epic', icon: 'pi-star' },
-    2: { label: 'History', icon: 'pi-book' },
-    3: { label: 'Task', icon: 'pi-check-square' },
-    4: { label: 'Bug', icon: 'pi-bug' },
-    5: { label: 'Subtask', icon: 'pi-list' }
+  // Mapeo de estados a colores (basado en el estado string)
+  readonly stateSeverityMap: Record<string, string> = {
+    'Open': 'info',
+    'In Progress': 'warning',
+    'Review': 'help',
+    'Closed': 'success',
+    'Locked': 'danger',
+    'Finished': 'success'
   };
 
   constructor(
@@ -78,8 +70,10 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
 
     // Obtener taskId de los query params
-    this.route.queryParams.subscribe(params => {
-      this.taskId = Number(params['taskId']);
+
+    const taskSub = this.route.paramMap.subscribe(params => {
+      this.taskId = Number(params.get('IncidenceId'));
+      console.log(this.taskId);
 
       if (this.taskId) {
         this.loadTaskDetails();
@@ -89,6 +83,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
         this.showError('Error', 'ID de tarea no válido');
       }
     });
+
+    this.subscriptions.push(taskSub);
   }
 
   ngOnDestroy() {
@@ -98,7 +94,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   /**
    * Carga los detalles de la tarea
    */
-  private loadTaskDetails() {
+  loadTaskDetails() {
     this.loading = true;
     this.error = null;
 
@@ -135,22 +131,16 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   /**
    * Obtiene la información de prioridad
    */
-  getPriorityInfo(priorityId: number) {
-    return this.priorityMap[priorityId] || { label: 'No definida', severity: 'secondary', icon: 'pi-question' };
+  getPriorityInfo(priority: string | null) {
+    if (!priority) return { label: 'No definida', severity: 'secondary', icon: 'pi-question' };
+    return this.priorityMap[priority.toLowerCase()] || { label: priority, severity: 'secondary', icon: 'pi-tag' };
   }
 
   /**
-   * Obtiene la información del estado
+   * Obtiene la severidad del estado
    */
-  getStateInfo(stateId: number) {
-    return this.stateMap[stateId] || { label: 'Desconocido', severity: 'secondary' };
-  }
-
-  /**
-   * Obtiene la información del tipo
-   */
-  getTypeInfo(typeId: number) {
-    return this.typeMap[typeId] || { label: 'Desconocido', icon: 'pi-question' };
+  getStateSeverity(state: string): string {
+    return this.stateSeverityMap[state] || 'secondary';
   }
 
   /**
@@ -164,11 +154,22 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    * Abre el modal de edición
    */
   editTask() {
-    // Aquí implementarías la lógica para editar
-    // Podrías abrir un modal o navegar a una página de edición
     this.router.navigate(['/projects', this.projectId, 'tasks', 'edit'], {
       queryParams: { taskId: this.taskId }
     });
+  }
+
+  /**
+   * Navega a la tarea padre
+   */
+  goToParentTask() {
+    if (this.task?.parent) {
+      this.router.navigate([], {
+        queryParams: { taskId: this.task.parent.id },
+        queryParamsHandling: 'merge',
+        relativeTo: this.route
+      });
+    }
   }
 
   /**

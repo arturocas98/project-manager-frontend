@@ -65,19 +65,19 @@
       <p-card class="mb-4">
         <div class="flex flex-wrap align-items-center gap-3 mb-4">
           <p-tag
-            [value]="getTypeInfo(task.incidence_type_id).label"
-            [icon]="getTypeInfo(task.incidence_type_id).icon"
+            [value]="task.type.type"
             severity="info">
           </p-tag>
 
           <p-tag
-            [value]="getPriorityInfo(task.incidence_priority_id).label"
-            [severity]="getPriorityInfo(task.incidence_priority_id).severity">
+            [value]="getPriorityInfo(task.priority).label"
+            [severity]="getPriorityInfo(task.priority).severity"
+            [icon]="getPriorityInfo(task.priority).icon">
           </p-tag>
 
           <p-tag
-            [value]="getStateInfo(task.incidence_state_id).label"
-            [severity]="getStateInfo(task.incidence_state_id).severity">
+            [value]="task.state.state"
+            [severity]="getStateSeverity(task.state.state)">
           </p-tag>
 
           <span class="text-color-secondary text-sm ml-auto">
@@ -118,52 +118,39 @@
             </p>
           </div>
         </div>
-      </p-card>
 
-      <!-- Subtareas / Hijas -->
-      <p-card header="Subtareas" *ngIf="task.child_incidences?.length">
-        <div class="flex flex-column gap-2">
-          <div *ngFor="let child of task.child_incidences"
-               class="flex align-items-center justify-content-between p-3 border-1 surface-border border-round hover:surface-hover cursor-pointer"
-               (click)="router.navigate([], { queryParams: { taskId: child.id }, queryParamsHandling: 'merge' })">
-            <div class="flex align-items-center gap-3">
-              <i class="pi pi-list text-primary"></i>
-              <span class="font-medium">{{ child.title }}</span>
-            </div>
-            <div class="flex align-items-center gap-2">
-              <p-tag
-                [value]="getStateInfo(child.incidence_state_id).label"
-                [severity]="getStateInfo(child.incidence_state_id).severity"
-                styleClass="text-xs">
-              </p-tag>
-              <i class="pi pi-chevron-right text-color-secondary"></i>
-            </div>
+        <!-- Fecha de creación/actualización -->
+        <div class="grid mt-2">
+          <div class="col-12 md:col-6">
+            <span class="text-color-secondary text-sm">Creado: {{ task.created_at | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="col-12 md:col-6">
+            <span class="text-color-secondary text-sm">Actualizado: {{ task.updated_at | date:'dd/MM/yyyy' }}</span>
           </div>
         </div>
       </p-card>
+
+      <!-- Nota: El modelo no incluye child_incidences, así que omitimos esa sección -->
     </div>
 
     <!-- Columna lateral -->
     <div class="col-12 lg:col-4">
       <!-- Asignado a -->
       <p-card header="Asignado a" class="mb-4">
-        <div *ngIf="task.assigned_user" class="flex align-items-center gap-3">
+        <div *ngIf="task.assigned_to" class="flex align-items-center gap-3">
           <p-avatar
-            [label]="getUserInitials(task.assigned_user.name)"
+            [label]="getUserInitials(task.assigned_to.name)"
             styleClass="mr-2"
             size="large"
             shape="circle"
             [style]="{'background-color': '#4f46e5', 'color': '#ffffff'}">
           </p-avatar>
           <div>
-            <p class="font-medium text-color m-0">{{ task.assigned_user.name }}</p>
-            <p class="text-color-secondary text-sm m-0">{{ task.assigned_user.email }}</p>
-            <p class="text-color-secondary text-xs mt-1">
-              <i class="pi pi-briefcase mr-1"></i>Rol: {{ task.assigned_user.role_name || 'No definido' }}
-            </p>
+            <p class="font-medium text-color m-0">{{ task.assigned_to.name }}</p>
+            <p class="text-color-secondary text-sm m-0">{{ task.assigned_to.email }}</p>
           </div>
         </div>
-        <div *ngIf="!task.assigned_user" class="text-center py-3">
+        <div *ngIf="!task.assigned_to" class="text-center py-3">
           <i class="pi pi-user-minus text-4xl text-color-secondary mb-2"></i>
           <p class="text-color-secondary">Sin asignar</p>
         </div>
@@ -183,34 +170,30 @@
             <p class="text-color-secondary text-sm m-0">{{ task.created_by.email }}</p>
           </div>
         </div>
-        <div class="mt-2 text-color-secondary text-sm">
-          <i class="pi pi-clock mr-1"></i>
-          Creado: {{ task.created_at | date:'dd/MM/yyyy' }}
-        </div>
       </p-card>
 
       <!-- Tarea padre -->
-      <p-card header="Tarea padre" *ngIf="task.parent_incidence" class="mb-4">
+      <p-card header="Tarea padre" *ngIf="task.parent" class="mb-4">
         <div class="flex align-items-center justify-content-between cursor-pointer hover:surface-hover p-2 border-round"
-             (click)="router.navigate([], { queryParams: { taskId: task.parent_incidence.id }, queryParamsHandling: 'merge' })">
+             (click)="goToParentTask()">
           <div class="flex align-items-center gap-2">
             <i class="pi pi-level-up-alt text-primary"></i>
-            <span class="font-medium">{{ task.parent_incidence.title }}</span>
+            <span class="font-medium">{{ task.parent.title }}</span>
           </div>
           <i class="pi pi-chevron-right text-color-secondary"></i>
         </div>
       </p-card>
 
-      <!-- Metadata adicional -->
+      <!-- Información adicional -->
       <p-card header="Información adicional">
         <div class="flex flex-column gap-3">
           <div>
-            <span class="text-color-secondary text-sm block">Proyecto</span>
-            <span class="font-medium text-color">{{ task.project?.name || 'No especificado' }}</span>
+            <span class="text-color-secondary text-sm block">ID del Proyecto</span>
+            <span class="font-medium text-color">{{ task.project_id }}</span>
           </div>
           <div>
-            <span class="text-color-secondary text-sm block">Última actualización</span>
-            <span class="font-medium text-color">{{ task.updated_at | date:'dd/MM/yyyy' }}</span>
+            <span class="text-color-secondary text-sm block">Fecha de registro</span>
+            <span class="font-medium text-color">{{ task.date || 'No especificada' }}</span>
           </div>
         </div>
       </p-card>
