@@ -1,5 +1,5 @@
   <p-card
-    class="project-card group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 surface-card border-1 surface-border"
+    class="project-card group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 surface-card"
     [style]="{ overflow: 'hidden' }">
 
     <!-- Header -->
@@ -15,7 +15,7 @@
         <div class="relative flex justify-content-center">
           <div class="transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
             <p-avatar
-              label="{{ project.name?.charAt(0) || '?' }}"
+              label="{{ project.name.charAt(0) || '?' }}"
               shape="circle"
               [style]="{
                 backgroundColor: 'var(--surface-card)',

@@ -1,6 +1,6 @@
 <div class="flex align-items-center justify-content-center px-4">
 
-  <div class="w-full max-w-6xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl overflow-hidden">
+  <div class="w-full max-w-6xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl">
 
     <!-- Imagen / Panel Decorativo -->
     <div class="w-full md:w-6 flex flex-column p-5 align-items-center justify-content-center relative">
@@ -9,11 +9,7 @@
         <img
           src="assets/General/Cartoon-project-create.png"
           alt="Crear Proyecto"
-          class="w-24rem z-1 h-22rem sm:w-30rem sm:h-26rem object-fit-cover mt-8 sm:mt-0">
-        <div class="absolute w-full h-full rotate-45">
-          <div class="absolute opacity-60 z-0 w-16rem h-16rem bg-indigo-600" style="top: 45%; left: 30% "></div>
-          <div class="absolute opacity-60 z-0 w-16rem h-16rem bg-indigo-400" style="right: 30%; bottom: 45%"></div>
-        </div>
+          class="w-22rem z-1 h-22rem sm:w-25rem sm:h-25rem object-fit-cover mt-8 sm:mt-0">
       </div>
 
       <!-- Texto decorativo opcional -->
@@ -34,6 +30,30 @@
         <p class="text-color-secondary">
           Completa la información para registrar un nuevo proyecto
         </p>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="flex justify-content-center my-4">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--indigo-600)"></i>
+      </div>
+
+      <!-- Available Roles (se muestran después de crear) -->
+      <div *ngIf="availableRoles.length > 0 && !loading" class="mb-4">
+        <h3 class="text-lg font-semibold text-color mb-3">Roles Disponibles</h3>
+        <div class="grid">
+          <div *ngFor="let role of availableRoles" class="col-12">
+            <div class="surface-ground border-round p-3">
+              <p-tag [value]="role.type" severity="info" class="mb-2"></p-tag>
+              <p class="text-sm text-color-secondary mt-2">{{ role.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="bg-red-50 border-round p-3 flex align-items-center gap-2 mb-4">
+        <i class="pi pi-exclamation-circle text-red-500"></i>
+        <span class="text-red-700">{{ errorMessage }}</span>
       </div>
 
       <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
@@ -83,23 +103,6 @@
           </small>
         </div>
 
-        <!-- Miembros -->
-        <div>
-          <label class="block text-color font-medium mb-2">
-            Miembros del Proyecto
-          </label>
-
-          <p-multiSelect
-            formControlName="members"
-            [options]="users"
-            optionLabel="name"
-            display="chip"
-            class="w-full"
-            placeholder="Seleccionar miembros"
-            [filter]="true">
-          </p-multiSelect>
-        </div>
-
         <!-- Botones -->
         <div class="flex justify-content-end gap-3 mt-3">
           <button
@@ -108,7 +111,7 @@
             label="Crear Proyecto"
             icon="pi pi-check"
             class="p-button-raised"
-            [disabled]="projectForm.invalid"
+            [disabled]="projectForm.invalid || loading"
             [loading]="loading">
           </button>
         </div>
@@ -118,4 +121,32 @@
     </div>
 
   </div>
+
+
+  <!-- Diálogo de confirmación (se muestra automáticamente al llamar confirmationService.confirm) -->
+  <p-confirmDialog
+    [baseZIndex]="10000"
+    rejectButtonStyleClass="p-button-text"
+    acceptButtonStyleClass="p-button-success">
+
+    <!-- Personalización del header (opcional) -->
+    <ng-template pTemplate="header">
+      <div class="flex align-items-center gap-2 text-green-700">
+        <i class="pi pi-check-circle" style="font-size: 1.5rem"></i>
+        <span class="font-bold text-xl">Operación Exitosa</span>
+      </div>
+    </ng-template>
+
+    <!-- Personalización del footer (opcional) -->
+    <ng-template pTemplate="footer">
+      <button
+        type="button"
+        pButton
+        label="Cerrar"
+        icon="pi pi-times"
+        (click)="confirmationService.close()"
+        class="p-button-text">
+      </button>
+    </ng-template>
+  </p-confirmDialog>
 </div>

@@ -38,6 +38,7 @@ import {
   templateUrl: './project-summary.component.html',
 })
 export class ProjectSummaryComponent implements OnInit {
+  Math = Math;
   projectId!: number;
   selectedMonth: Date = new Date();
 
@@ -187,7 +188,7 @@ export class ProjectSummaryComponent implements OnInit {
         label: 'Total Tareas',
         value: this.summaryData.kpis.total_tasks.value,
         icon: 'pi pi-briefcase',
-        bgClass: 'bg-blue-50',
+        bgClass: 'surfarce-card',
         iconClass: 'text-blue-500',
         trend: this.extractTrendValue(this.summaryData.kpis.total_tasks.comparison)
       },
@@ -195,7 +196,7 @@ export class ProjectSummaryComponent implements OnInit {
         label: 'En Progreso',
         value: this.summaryData.kpis.in_progress_tasks.value,
         icon: 'pi pi-clock',
-        bgClass: 'bg-gray-100',
+        bgClass: 'surfarce-card',
         iconClass: 'text-gray-900',
         trend: this.extractTrendValue(this.summaryData.kpis.in_progress_tasks.comparison)
       },
@@ -203,7 +204,7 @@ export class ProjectSummaryComponent implements OnInit {
         label: 'Finalizadas',
         value: this.summaryData.kpis.finished_tasks.value,
         icon: 'pi pi-check-circle',
-        bgClass: 'bg-green-50',
+        bgClass: 'surfarce-card',
         iconClass: 'text-green-500',
         trend: this.extractTrendValue(this.summaryData.kpis.finished_tasks.comparison)
       },
@@ -211,7 +212,7 @@ export class ProjectSummaryComponent implements OnInit {
         label: 'Por vencer esta semana',
         value: this.summaryData.kpis.expiring_this_week,
         icon: 'pi pi-calendar-times',
-        bgClass: 'bg-yellow-50',
+        bgClass: 'surfarce-card',
         iconClass: 'text-yellow-500',
         trend: null
       },
@@ -219,7 +220,7 @@ export class ProjectSummaryComponent implements OnInit {
         label: 'Críticas activas',
         value: this.summaryData.kpis.critical_priority_tasks.value,
         icon: 'pi pi-exclamation-triangle',
-        bgClass: 'bg-red-50',
+        bgClass: 'surfarce-card',
         iconClass: 'text-red-600',
         trend: this.extractTrendValue(this.summaryData.kpis.critical_priority_tasks.comparison)
       }

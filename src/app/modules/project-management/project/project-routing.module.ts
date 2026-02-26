@@ -35,15 +35,55 @@ const routes: Routes = [
             (m) => m.ProjectSummaryComponent,
           ),
       },
+      {
+        path: "project-schedule",
+        data: { breadcrumb: "schedule" },
+        loadComponent: () =>
+          import("./pages/project-schedule/project-schedule.component").then(
+            (m) => m.ProjectScheduleComponent,
+          ),
+      },
+      {
+        path: "project-kanban",
+        data: { breadcrumb: "kanban" },
+        loadComponent: () =>
+          import("./pages/kanban-project/kanban-project.component").then(
+            (m) => m.KanbanProjectComponent,
+          ),
+      },
+      {
+        path: "project-settings",
+        data: { breadcrumb: "schedule" },
+        loadComponent: () =>
+          import("./pages/project-settings/project-settings.component").then(
+            (m) => m.ProjectSettingsComponent,
+          ),
+      },
+      {
+        path: "create-task/:stateId",
+        data: { breadcrumb: "create" },
+        loadComponent: () =>
+          import("../task/pages/create/task-create.component").then(
+            (m) => m.TaskCreateComponent,
+          ),
+      },
+      {
+        path: "task-update/:IncidenceId",
+        data: { breadcrumb: "update" },
+        loadComponent: () =>
+          import("../task/pages/task-update/task-update.component").then(
+            (m) => m.TaskUpdateComponent,
+          ),
+      },
+      {
+        path: "task-details/:IncidenceId",
+        data: { breadcrumb: "details" },
+        loadComponent: () =>
+          import("../task/pages/task-details/task-details.component").then(
+            (m) => m.TaskDetailsComponent,
+          ),
+      },
     ]
-  },
-  {
-    path: "create-task",
-    data: { breadcrumb: "Create" },
-    loadComponent: () =>
-      import("../task/pages/create/task-create.component").then(
-        (m) => m.TaskCreateComponent,
-      ),
   },
   { path: "", redirectTo: "list", pathMatch: "full" },
   { path: "**", redirectTo: "/notfound" },

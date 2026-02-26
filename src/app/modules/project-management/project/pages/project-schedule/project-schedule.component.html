@@ -1,0 +1,104 @@
+<div class="p-4">
+  <!-- Barra de filtros -->
+  <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+    <div class="flex flex-wrap gap-3 items-center justify-between">
+      <!-- Searchbar con avatar a la izquierda -->
+      <div class="flex items-center gap-2 flex-1 min-w-[300px]">
+        <div class="flex -space-x-2">
+          <img src="https://i.pravatar.cc/32?img=1" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-white">
+          <img src="https://i.pravatar.cc/32?img=2" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-white">
+          <img src="https://i.pravatar.cc/32?img=3" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-white">
+          <div class="w-8 h-8 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-white text-xs font-medium">+3</div>
+        </div>
+        <span class="p-input-icon-left flex-1">
+          <i class="pi pi-search"></i>
+          <input
+            type="text"
+            pInputText
+            placeholder="Buscar actividades..."
+            class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+        </span>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex gap-2">
+        <p-dropdown
+          [options]="epicOptions"
+          placeholder="Filtrar por Epic"
+          optionLabel="label"
+          class="w-48"
+        ></p-dropdown>
+
+        <p-dropdown
+          [options]="categoriaOptions"
+          placeholder="Filtrar por Categoría"
+          optionLabel="label"
+          class="w-48"
+        ></p-dropdown>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de actividades -->
+  <p-table
+    [value]="actividades"
+    [tableStyle]="{'min-width': '60rem'}"
+    styleClass="p-datatable-sm p-datatable-striped"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr class="bg-gray-50">
+        <th class="text-left p-4 font-semibold text-gray-700">Actividad</th>
+        <th class="text-left p-4 font-semibold text-gray-700" colspan="12">Meses del año</th>
+      </tr>
+      <tr class="bg-gray-50 border-t">
+        <th class="p-4"></th>
+        <th *ngFor="let mes of meses" class="p-2 text-center text-sm font-medium text-gray-600">
+          {{ mes }}
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-actividad>
+      <tr class="hover:bg-gray-50 transition-colors">
+        <!-- Columna Actividad con icono y nombre -->
+        <td class="p-4">
+          <div class="flex items-center gap-3">
+            <div [class]="'w-10 h-10 rounded-lg flex items-center justify-center ' + actividad.colorClass">
+              <i [class]="actividad.icono + ' text-white text-lg'"></i>
+            </div>
+            <div>
+              <div class="font-medium text-gray-800">{{ actividad.nombre }}</div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-xs px-2 py-1 rounded-full" [class]="getEpicClass(actividad.epic)">
+                  {{ actividad.epic }}
+                </span>
+                <span class="text-xs px-2 py-1 rounded-full" [class]="getCategoriaClass(actividad.categoria)">
+                  {{ actividad.categoria }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <!-- Columnas de meses -->
+        <td *ngFor="let mes of meses; let i = index" class="p-2 text-center">
+          <div *ngIf="actividad.planificacion[mes]" class="flex justify-center">
+            <div
+              class="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition-all hover:scale-110"
+              [class]="getEstadoClass(actividad.planificacion[mes])"
+              [pTooltip]="getTooltip(actividad, mes)"
+              tooltipPosition="top"
+            >
+              <i [class]="getEstadoIcono(actividad.planificacion[mes])" class="text-xs"></i>
+            </div>
+          </div>
+          <div *ngIf="!actividad.planificacion[mes]" class="text-gray-300 text-xs">
+            -
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -1,0 +1,399 @@
+<div class="kanban-container p-4 surface-ground min-h-screen">
+
+  <!-- Barra de herramientas superior -->
+  <div class="flex flex-column md:flex-row gap-3 align-items-center justify-content-between mb-4">
+
+    <!-- Título y contadores -->
+    <div class="flex align-items-center gap-3">
+      <h1 class="text-2xl font-bold text-color m-0">Kanban Board</h1>
+      <span class="text-color-secondary text-sm">
+        {{ columns | totalTasks }} tareas
+      </span>
+    </div>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="flex flex-wrap gap-2 align-items-center">
+      <!-- Búsqueda -->
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          [formControl]="searchControl"
+          placeholder="Buscar tarea..."
+          class="p-inputtext-sm"
+          style="width: 250px;">
+      </span>
+
+      <!-- Botón de filtros con contador -->
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-filter"
+        class="p-button-outlined p-button-sm"
+        [class.p-button-info]="filtersActive"
+        (click)="showFilters()"
+        *ngIf="getActiveFiltersCount() > 0">
+      </button>
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-filter"
+        class="p-button-outlined p-button-sm"
+        [class.p-button-info]="filtersActive"
+        (click)="showFilters()"
+        *ngIf="getActiveFiltersCount() === 0">
+      </button>
+
+      <!-- Botón limpiar filtros -->
+      <button
+        *ngIf="filtersActive"
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-filter-slash"
+        class="p-button-text p-button-sm"
+        (click)="clearFilters()"
+        pTooltip="Limpiar filtros">
+      </button>
+
+      <!-- Separador -->
+      <span class="text-color-secondary mx-2">|</span>
+
+      <!-- Avatares de miembros -->
+      <div class="flex align-items-center gap-1">
+        <span class="text-color-secondary text-sm mr-2">Miembros:</span>
+        <div class="flex -space-x-2">
+          <p-avatar
+            *ngFor="let member of members | slice:0:5"
+            [label]="member.user.name[0]"
+            shape="circle"
+            size="normal"
+            class="border-circle border-2 border-white cursor-pointer"
+            [pTooltip]="member.user.name + ' (' + member.role.type + ')'"
+            tooltipPosition="top">
+          </p-avatar>
+          <p-avatar
+            *ngIf="members.length > 5"
+            label="+{{ members.length - 5 }}"
+            shape="circle"
+            size="normal"
+            styleClass="bg-gray-300 text-gray-700 border-circle border-2 border-white"
+            [pTooltip]="'Y ' + (members.length - 5) + ' miembros más'">
+          </p-avatar>
+        </div>
+      </div>
+
+      <!-- Menú de ordenamiento -->
+      <p-menu #menu [model]="sortMenuItems" [popup]="true"></p-menu>
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-sort"
+        class="p-button-text p-button-sm"
+        (click)="openSortMenu($event)"
+        pTooltip="Ordenar tareas">
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-content-center align-items-center" style="height: 400px;">
+    <i class="pi pi-spin pi-spinner" style="font-size: 3rem; color: var(--indigo-600)"></i>
+  </div>
+
+  <!-- Kanban Board -->
+  <div *ngIf="!loading" cdkDropListGroup class="kanban-board grid flex-nowrap overflow-x-auto pb-4" style="gap: 1.5rem;">
+
+    <!-- Columnas -->
+    <div *ngFor="let column of columns" class="col-12 md:col-6 lg:col-4 xl:col-2 min-w-300px">
+
+      <!-- Header de columna -->
+      <div class="flex align-items-center justify-content-between mb-3">
+        <div class="flex align-items-center gap-2">
+          <div class="w-3 h-3 border-round" [style.background]="column.color"></div>
+          <span class="font-medium text-color">{{ column.title }}</span>
+          <span class="bg-gray-200 text-gray-700 border-circle px-2 py-1 text-xs font-medium">
+            {{ column.tasks.length }}
+          </span>
+        </div>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-plus"
+          class="p-button-text p-button-rounded p-button-sm"
+          (click)="createTask(column.id)"
+          pTooltip="Crear tarea en {{ column.title }}">
+        </button>
+      </div>
+
+      <!-- Contenedor de tareas (drop zone) -->
+      <div
+        cdkDropList
+        [cdkDropListData]="column.tasks"
+        [cdkDropListConnectedTo]="getConnectedLists(column.id)"
+        class="column-tasks p-2 border-round surface-ground"
+        style="min-height: 400px;"
+        (cdkDropListDropped)="onTaskDrop($event, column.id)">
+
+        <!-- Task Cards -->
+        <div
+          *ngFor="let task of column.tasks"
+          cdkDrag
+          [cdkDragData]="task"
+          class="task-card surface-card border-round shadow-2 p-3 mb-3 cursor-move hover:shadow-4 transition-all transition-duration-200">
+
+          <!-- Preview personalizado durante el drag -->
+          <div *cdkDragPreview class="task-card surface-card border-round shadow-8 p-3" style="width: 300px; transform: rotate(2deg);">
+            <div class="flex align-items-center justify-content-between mb-2">
+              <div class="flex align-items-center gap-2">
+                <i [class]="getTypeIcon(task.type?.type || 'task')" class="text-sm"></i>
+                <span class="text-xs">#{{ task.id }}</span>
+              </div>
+              <p-tag [value]="task.priority || 'Sin prioridad'" [severity]="getPrioritySeverity(task.priority)" styleClass="text-xs"></p-tag>
+            </div>
+            <h3 class="font-medium text-sm mb-2">{{ task.title }}</h3>
+            <p *ngIf="task.description" class="text-xs mb-3">{{ task.description | slice:0:80 }}...</p>
+            <div class="flex align-items-center gap-2 mt-2">
+              <i class="pi pi-user text-xs"></i>
+              <span class="text-xs">{{ task.assigned_to?.name || 'Sin asignar' }}</span>
+            </div>
+          </div>
+
+          <!-- Placeholder durante el drag -->
+          <div *cdkDragPlaceholder class="task-card surface-200 border-round p-3 mb-3 border-dashed border-2" style="opacity: 0.5;">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-arrows-alt"></i>
+              <span>Soltar para mover</span>
+            </div>
+          </div>
+
+          <!-- Contenido normal de la tarjeta -->
+          <div class="flex align-items-center justify-content-between mb-2">
+            <div class="flex align-items-center gap-2">
+              <i [class]="getTypeIcon(task.type?.type || 'task')" class="text-sm text-color-secondary"></i>
+              <span class="text-xs text-color-secondary">#{{ task.id }}</span>
+              <span class="text-xs text-color-secondary" *ngIf="task.type?.type">· {{ task.type.type }}</span>
+            </div>
+            <p-tag
+              [value]="task.priority || 'Sin prioridad'"
+              [severity]="getPrioritySeverity(task.priority)"
+              styleClass="text-xs">
+            </p-tag>
+          </div>
+
+          <!-- Título de la tarea -->
+          <h3 class="font-medium text-color text-sm mb-2 line-height-2">
+            {{ task.title }}
+          </h3>
+
+          <!-- Descripción (truncada) -->
+          <p *ngIf="task.description" class="text-xs text-color-secondary mb-3 line-height-2">
+            {{ task.description | slice:0:80 }}{{ task.description.length > 80 ? '...' : '' }}
+          </p>
+
+          <!-- Footer con asignado y metadatos -->
+          <div class="flex align-items-center justify-content-between mt-2">
+            <div class="flex align-items-center gap-2">
+              <!-- Avatar del asignado -->
+              <p-avatar
+                *ngIf="task.assigned_to"
+                [label]="task.assigned_to.name[0]"
+                shape="circle"
+                size="normal"
+                class="text-white"
+                [pTooltip]="'Asignado a: ' + task.assigned_to.name + (task.assigned_to.role? ' (' + task.assigned_to.role + ')' : '')">
+              </p-avatar>
+              <p-avatar
+                *ngIf="!task.assigned_to"
+                label="?"
+                shape="circle"
+                size="normal"
+                styleClass="bg-gray-200 text-gray-600"
+                pTooltip="Sin asignar">
+              </p-avatar>
+
+              <!-- Fecha de creación -->
+              <span class="text-xs text-color-secondary flex align-items-center gap-1">
+                <i class="pi pi-calendar text-xs"></i>
+                {{ task.created_at | date:'dd/MM' }}
+              </span>
+
+              <!-- Badge de due date si existe -->
+              <span *ngIf="task.due_date"
+                    class="text-xs flex align-items-center gap-1 px-2 py-1 border-round"
+                    [class.bg-orange-100]="isNearDueDate(task.due_date) && !isOverdue(task.due_date)"
+                    [class.bg-red-100]="isOverdue(task.due_date)"
+                    [class.text-orange-700]="isNearDueDate(task.due_date) && !isOverdue(task.due_date)"
+                    [class.text-red-700]="isOverdue(task.due_date)"
+                    [pTooltip]="'Vence: ' + (task.due_date | date:'dd/MM/yyyy')">
+                <i class="pi pi-clock"></i>
+                {{ task.due_date | date:'dd/MM' }}
+              </span>
+            </div>
+
+            <!-- Acciones -->
+            <div class="flex gap-1">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-eye"
+                class="p-button-text p-button-rounded p-button-sm"
+                (click)="viewTask(task.id)"
+                pTooltip="Ver detalles">
+              </button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-text p-button-rounded p-button-sm"
+                (click)="editTask(task.id)"
+                pTooltip="Editar">
+              </button>
+            </div>
+          </div>
+
+          <!-- Badge de tarea padre (si es subtarea) -->
+          <div *ngIf="task.parent" class="mt-2 pt-2 border-top-1 surface-border">
+            <span class="text-xs text-color-secondary flex align-items-center gap-1">
+              <i class="pi pi-sitemap text-xs"></i>
+              Subtarea de: {{ task.parent.title }}
+            </span>
+          </div>
+
+          <!-- Badge de creador (opcional) -->
+          <div *ngIf="task.created_by" class="mt-1">
+            <span class="text-xs text-color-secondary flex align-items-center gap-1">
+              <i class="pi pi-user text-xs"></i>
+              Creado por: {{ task.created_by.name }}
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="column.tasks.length === 0" class="flex flex-column align-items-center justify-content-center p-4 surface-ground border-round" style="height: 200px;">
+          <i class="pi pi-inbox text-3xl text-color-secondary mb-2"></i>
+          <p class="text-color-secondary text-sm">No hay tareas</p>
+          <button
+            pButton
+            type="button"
+            label="Crear tarea"
+            icon="pi pi-plus"
+            class="p-button-text p-button-sm"
+            (click)="createTask(column.id)">
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Panel de filtros (Sidebar) -->
+<p-sidebar [(visible)]="showFiltersPanel" position="right" styleClass="w-25rem">
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-filter"></i>
+      <span class="font-bold">Filtros</span>
+      <span *ngIf="getActiveFiltersCount() > 0" class="bg-red-500 text-white border-circle px-2 py-1 text-xs ml-2">
+        {{ getActiveFiltersCount() }}
+      </span>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-column gap-4">
+
+    <!-- Filtro por prioridad -->
+    <div>
+      <label class="block font-medium mb-2">Prioridad</label>
+      <div class="flex flex-column gap-2">
+        <div *ngFor="let priority of priorityOptions" class="flex align-items-center">
+          <p-checkbox
+            [inputId]="'priority_' + priority.value"
+            [value]="priority.value"
+            [(ngModel)]="selectedPriorities"
+            (onChange)="applyPriorityFilter(priority.value)">
+          </p-checkbox>
+          <label [for]="'priority_' + priority.value" class="ml-2 flex align-items-center gap-1">
+            <i [class]="priority.icon + ' mr-1'" [class.text-red-500]="priority.value === 'critical'"
+               [class.text-orange-500]="priority.value === 'high'"
+               [class.text-yellow-500]="priority.value === 'medium'"
+               [class.text-green-500]="priority.value === 'low'"></i>
+            {{ priority.label }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtro por tipo -->
+    <div>
+      <label class="block font-medium mb-2">Tipo</label>
+      <div class="flex flex-column gap-2">
+        <div *ngFor="let type of typeOptions" class="flex align-items-center">
+          <p-checkbox
+            [inputId]="'type_' + type.value"
+            [value]="type.value"
+            [(ngModel)]="selectedTypes"
+            (onChange)="applyTypeFilter(type.value)">
+          </p-checkbox>
+          <label [for]="'type_' + type.value" class="ml-2 flex align-items-center gap-1">
+            <i [class]="type.icon + ' mr-1'"></i>
+            {{ type.label }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtro por asignado -->
+    <div>
+      <label class="block font-medium mb-2">Asignado a</label>
+      <div class="flex flex-column gap-2 max-h-300px overflow-y-auto">
+        <div *ngFor="let member of members" class="flex align-items-center">
+          <p-checkbox
+            [inputId]="'assignee_' + member.user.id"
+            [value]="member.user.id"
+            [(ngModel)]="selectedAssignees"
+            (onChange)="applyAssigneeFilter(member.user.id)">
+          </p-checkbox>
+          <label [for]="'assignee_' + member.user.id" class="ml-2 flex align-items-center gap-2 cursor-pointer">
+            <p-avatar
+              [label]="member.user.name[0]"
+              shape="circle"
+              size="normal"
+              [style.background]="getAssigneeColor(member.user.name)"
+              class="text-white">
+            </p-avatar>
+            <span>{{ member.user.name }}</span>
+            <span class="text-xs text-color-secondary ml-1">({{ member.role.type }})</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="flex gap-2 mt-4">
+      <button
+        pButton
+        label="Limpiar filtros"
+        icon="pi pi-filter-slash"
+        class="p-button-outlined p-button-sm flex-1"
+        (click)="clearFilters()">
+      </button>
+      <button
+        pButton
+        label="Aplicar"
+        icon="pi pi-check"
+        class="p-button-sm flex-1"
+        (click)="applyFilters()">
+      </button>
+    </div>
+
+  </div>
+</p-sidebar>

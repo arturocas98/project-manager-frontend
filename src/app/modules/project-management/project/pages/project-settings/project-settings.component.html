@@ -1,0 +1,292 @@
+<div class="flex align-items-center justify-content-center px-4 py-6">
+
+  <div class="w-full max-w-4xl surface-card surface-border border-1 border-round-3xl shadow-2xl overflow-hidden">
+
+    <!-- Header con pestañas o título -->
+    <div class="surface-card px-6 py-4 border-bottom-1 surface-border">
+      <div class="flex align-items-center gap-3">
+        <i class="pi pi-cog text-3xl text-indigo-600"></i>
+        <div>
+          <h1 class="text-2xl font-bold text-color m-0">Configuración del Proyecto</h1>
+          <p class="text-color-secondary text-sm mt-1 m-0">Administra los detalles y configuración general</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="p-6">
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="flex justify-content-center my-6">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2.5rem; color: var(--indigo-600)"></i>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="bg-red-50 border-round p-3 flex align-items-center gap-2 mb-4">
+        <i class="pi pi-exclamation-circle text-red-500"></i>
+        <span class="text-red-700">{{ errorMessage }}</span>
+      </div>
+
+      <!-- Success Message -->
+      <div *ngIf="successMessage" class="bg-green-50 border-round p-3 flex align-items-center gap-2 mb-4">
+        <i class="pi pi-check-circle text-green-500"></i>
+        <span class="text-green-700">{{ successMessage }}</span>
+      </div>
+
+      <!-- Formulario de actualización -->
+      <form [formGroup]="projectForm" (ngSubmit)="onUpdate()" class="flex flex-column gap-5" *ngIf="!loading">
+
+        <!-- Sección: Información General -->
+        <div>
+          <h3 class="text-lg font-semibold text-color mb-4 flex align-items-center gap-2">
+            <i class="pi pi-info-circle text-indigo-500"></i>
+            Información General
+          </h3>
+
+          <!-- Nombre -->
+          <div class="mb-4">
+            <label class="block text-color font-medium mb-2">
+              Nombre del Proyecto
+            </label>
+
+            <div class="p-inputgroup">
+              <span class="p-inputgroup-addon">
+                <i class="pi pi-folder"></i>
+              </span>
+              <input
+                pInputText
+                formControlName="name"
+                class="w-full"
+                placeholder="Ej: Sistema de Gestión Interna"
+                [ngClass]="{'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched}">
+            </div>
+
+            <small *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
+                   class="p-error block mt-2">
+              El nombre es obligatorio
+            </small>
+          </div>
+
+          <!-- Descripción -->
+          <div class="mb-4">
+            <label class="block text-color font-medium mb-2">
+              Descripción
+            </label>
+
+            <textarea
+              pInputTextarea
+              rows="4"
+              formControlName="description"
+              class="w-full"
+              placeholder="Describe el propósito del proyecto"
+              [ngClass]="{'p-invalid': projectForm.get('description')?.invalid && projectForm.get('description')?.touched}">
+            </textarea>
+
+            <small *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"
+                   class="p-error block mt-2">
+              La descripción es obligatoria
+            </small>
+          </div>
+
+          <!-- Key (solo lectura) -->
+          <div class="mb-4">
+            <label class="block text-color font-medium mb-2">
+              Key del Proyecto
+            </label>
+            <div class="p-inputgroup">
+              <span class="p-inputgroup-addon">
+                <i class="pi pi-tag"></i>
+              </span>
+              <input
+                pInputText
+                [value]="projectKey"
+                class="w-full surface-card"
+                readonly
+                disabled>
+            </div>
+            <small class="text-color-secondary block mt-2">
+              * El key se genera automáticamente y no puede modificarse
+            </small>
+          </div>
+        </div>
+
+        <!-- Separador -->
+        <div class="border-top-1 surface-border my-2"></div>
+
+        <!-- Sección: Fechas (solo lectura) -->
+        <div>
+          <h3 class="text-lg font-semibold text-color mb-4 flex align-items-center gap-2">
+            <i class="pi pi-calendar text-indigo-500"></i>
+            Información de Creación
+          </h3>
+
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <label class="block text-color font-medium mb-2">Fecha de Creación</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-calendar-plus"></i>
+                </span>
+                <input
+                  pInputText
+                  [value]="createdAt | date:'dd/MM/yyyy HH:mm'"
+                  class="w-full surface-card"
+                  readonly
+                  disabled>
+              </div>
+            </div>
+            <div class="col-12 md:col-6">
+              <label class="block text-color font-medium mb-2">Última Actualización</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-calendar-clock"></i>
+                </span>
+                <input
+                  pInputText
+                  [value]="updatedAt | date:'dd/MM/yyyy HH:mm'"
+                  class="w-full surface-card"
+                  readonly
+                  disabled>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Separador -->
+        <div class="border-top-1 surface-border my-2"></div>
+
+        <!-- Sección: Acciones -->
+        <div>
+          <h3 class="text-lg font-semibold text-color mb-4 flex align-items-center gap-2">
+            <i class="pi pi-shield text-indigo-500"></i>
+            Acciones
+          </h3>
+
+          <div class="flex flex-wrap gap-3 justify-content-between align-items-center">
+            <!-- Botones de actualización -->
+            <div class="flex gap-2">
+              <button
+                pButton
+                type="submit"
+                label="Guardar Cambios"
+                icon="pi pi-save"
+                class="p-button-raised p-button-primary"
+                [disabled]="projectForm.invalid || !projectForm.dirty || updateLoading"
+                [loading]="updateLoading">
+              </button>
+              <button
+                pButton
+                type="button"
+                label="Cancelar"
+                icon="pi pi-times"
+                class="p-button-text"
+                (click)="resetForm()"
+                [disabled]="!projectForm.dirty">
+              </button>
+            </div>
+
+            <!-- Botón de eliminar (separado a la derecha) -->
+            <button
+              pButton
+              type="button"
+              label="Eliminar Proyecto"
+              icon="pi pi-trash"
+              class="p-button-raised p-button-danger"
+              (click)="confirmDelete()">
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Toast para notificaciones -->
+<p-toast position="top-right" />
+
+<!-- ConfirmDialog para Eliminación -->
+<p-confirmDialog #cd [key]="'deleteDialog'">
+  <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+    @if (message) {
+      <div class="flex flex-col items-center p-8 surface-card border-round-2xl shadow-8" style="min-width: 350px; max-width: 450px;">
+
+        <!-- Círculo con icono de advertencia rojo -->
+        <div class="rounded-full bg-red-100 inline-flex justify-center items-center h-24 w-24 -mt-20 border-4 border-white shadow-lg">
+          <i class="pi pi-exclamation-triangle !text-5xl text-red-600"></i>
+        </div>
+
+        <!-- Título -->
+        <span class="font-bold text-2xl block mb-2 mt-6 text-red-800">
+          {{ message.header || '¿Eliminar Proyecto?' }}
+        </span>
+
+        <!-- Mensaje -->
+        <p class="mb-0 text-red-700 text-center">{{ message.message || 'Esta acción no se puede deshacer' }}</p>
+
+        <!-- Subtítulo de advertencia -->
+        <p class="text-sm text-gray-500 mt-2 text-center">
+          Se eliminarán todas las incidencias, comentarios y datos asociados.
+        </p>
+
+        <!-- Botones -->
+        <div class="flex items-center gap-3 mt-6">
+          <p-button
+            label="Eliminar"
+            (onClick)="onAccept()"
+            styleClass="p-button-danger p-button-raised px-5"
+            icon="pi pi-trash">
+          </p-button>
+          <p-button
+            label="Cancelar"
+            [outlined]="true"
+            (onClick)="onReject()"
+            styleClass="p-button-secondary px-5"
+            icon="pi pi-times">
+          </p-button>
+        </div>
+      </div>
+    }
+  </ng-template>
+</p-confirmDialog>
+
+<!-- ConfirmDialog para Éxito (opcional) -->
+<p-confirmDialog
+  [key]="'successDialog'"
+  [rejectVisible]="false"
+  [acceptVisible]="true"
+  [closable]="false">
+
+  <ng-template let-message let-onAccept="onAccept">
+    @if (message) {
+      <div class="flex flex-col items-center p-8 surface-card border-round-2xl shadow-8"
+           style="min-width: 350px; max-width: 450px;">
+
+        <div class="rounded-full bg-green-100 inline-flex justify-center items-center h-24 w-24 -mt-20 border-4 border-white shadow-lg">
+          <i class="pi pi-check-circle !text-5xl text-green-600"></i>
+        </div>
+
+        <span class="font-bold text-2xl block mb-2 mt-6 text-green-800">
+          {{ message.header || '¡Actualizado!' }}
+        </span>
+
+        <p class="mb-0 text-green-700 text-center">
+          {{ message.message }}
+        </p>
+
+        <div class="flex items-center gap-3 mt-6">
+          <p-button
+            label="Aceptar"
+            (onClick)="onAccept()"
+            styleClass="p-button-success p-button-raised px-5"
+            icon="pi pi-check">
+          </p-button>
+        </div>
+      </div>
+    }
+  </ng-template>
+
+</p-confirmDialog>
