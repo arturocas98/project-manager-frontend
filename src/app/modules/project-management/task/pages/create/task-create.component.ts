@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgClass, NgIf} from "@angular/common";
 import {DropdownModule} from "primeng/dropdown";
@@ -11,7 +11,8 @@ import {ConfirmationService, MessageService} from "primeng/api";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {TaskCreateModelRequest} from "../../../../../shared/models/task-models/task-create-model";
 import {KanbanService} from "../../../../../core/service/kanban-service";
-import {Subscription} from "rxjs";
+import {Subject, Subscription, takeUntil} from "rxjs";
+import {ProjectMember} from "../../../../../shared/models/kanban.models";
 
 @Component({
   selector: 'app-task-create',
@@ -28,11 +29,15 @@ import {Subscription} from "rxjs";
   ],
   templateUrl: './task-create.component.html',
 })
-export class TaskCreateComponent implements OnInit {
+export class TaskCreateComponent implements OnInit, OnDestroy {
   loading = false;
   projectId!: number;
   stateId!: number;
   stateName: string = '';
+
+  // Lista de miembros del proyecto
+  members: ProjectMember[] = [];
+  memberOptions: { label: string, value: number, role: string }[] = [];
 
   // Lista de tareas para seleccionar padre
   parentOptions: { label: string, value: number }[] = [];
@@ -41,6 +46,7 @@ export class TaskCreateComponent implements OnInit {
 
   // Subscripciones
   private subscriptions: Subscription[] = [];
+  private destroy$ = new Subject<void>();
 
   priorities = [
     { label: 'Alta', value: 'high' },
@@ -53,7 +59,7 @@ export class TaskCreateComponent implements OnInit {
     { label: 'History', value: 'history_user' },
     { label: 'Task', value: 'task' },
     { label: 'Subtask', value: 'subtask' },
-    { label: 'bug', value: 'bug' }
+    { label: 'Bug', value: 'bug' }
   ];
 
   private readonly stateMap: Record<number, string> = {
@@ -65,13 +71,13 @@ export class TaskCreateComponent implements OnInit {
     6: 'Finished'
   };
 
-  // Mapeo de tipos a IDs (asumiendo estos IDs según tu backend)
+  // Mapeo de tipos a IDs
   private readonly typeIdMap: Record<string, number> = {
     'epic': 1,
     'history_user': 2,
     'task': 3,
     'subtask': 5,
-    'bug': 5
+    'bug': 4
   };
 
   taskForm = this.fb.group({
@@ -79,7 +85,8 @@ export class TaskCreateComponent implements OnInit {
     description: ['', Validators.required],
     priority: ['', Validators.required],
     type: ['', Validators.required],
-    parent_id: [null], // Nuevo campo para el padre
+    assigned_user_id: [null], // Nuevo campo para usuario asignado
+    parent_id: [null],
     state_id: [{value: this.stateId, disabled: true}, Validators.required]
   });
 
@@ -105,12 +112,44 @@ export class TaskCreateComponent implements OnInit {
       state_id: this.stateId
     });
 
+    // Cargar miembros del proyecto
+    this.loadMembers();
+
     // Escuchar cambios en el tipo para actualizar el selector de padre
     this.setupTypeListener();
   }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Carga los miembros del proyecto
+   */
+  private loadMembers(): void {
+    this.kanbanService.getProjectMembers(this.projectId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (members) => {
+          this.members = members;
+          this.memberOptions = members.map(member => ({
+            label: `${member.user.name} (${member.role.type})`,
+            value: member.user.id,
+            role: member.role.type
+          }));
+        },
+        error: (error) => {
+          console.error('Error loading members:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudieron cargar los miembros del proyecto',
+            life: 5000
+          });
+        }
+      });
   }
 
   /**
@@ -119,6 +158,7 @@ export class TaskCreateComponent implements OnInit {
   private setupTypeListener() {
     const typeSub = this.taskForm.get('type')?.valueChanges.subscribe(type => {
       this.updateParentSelector(type as string);
+      this.updateAssignedUserValidator(type as string);
     });
 
     if (typeSub) {
@@ -174,6 +214,20 @@ export class TaskCreateComponent implements OnInit {
   }
 
   /**
+   * Actualiza los validadores del usuario asignado según el tipo
+   */
+  private updateAssignedUserValidator(type: string) {
+    // Para Epic y History, el usuario asignado es obligatorio
+    if (type === 'epic' || type === 'history_user') {
+      this.taskForm.get('assigned_user_id')?.setValidators([Validators.required]);
+    } else {
+      // Para Task, Subtask, Bug, es opcional
+      this.taskForm.get('assigned_user_id')?.clearValidators();
+    }
+    this.taskForm.get('assigned_user_id')?.updateValueAndValidity();
+  }
+
+  /**
    * Carga las opciones de padre según el tipo
    */
   private loadParentOptions(type: string) {
@@ -183,10 +237,7 @@ export class TaskCreateComponent implements OnInit {
       next: (tasks) => {
         // Filtrar tareas por tipo
         const filteredTasks = tasks.filter(task => {
-          // Asumiendo que incidence_type tiene el nombre del tipo
-          // Ajusta según la estructura real de tu KanbanTask
-          const taskType = task.type;
-          return taskType.type === type;
+          return task.type?.type === type;
         });
 
         // Mapear a opciones del dropdown
@@ -231,10 +282,26 @@ export class TaskCreateComponent implements OnInit {
   }
 
   /**
+   * Obtiene la etiqueta del miembro seleccionado
+   */
+  getSelectedMemberLabel(): string {
+    const selectedId = this.taskForm.get('assigned_user_id')?.value;
+
+    if (selectedId == null) {
+      return '';
+    }
+
+    const selectedMember = this.memberOptions.find(
+      m => m.value === selectedId
+    );
+
+    return selectedMember ? selectedMember.label : '';
+  }
+  /**
    * Prepara los datos para enviar al backend
    */
   private prepareTaskData(): TaskCreateModelRequest {
-    const formValue = this.taskForm.getRawValue(); // getRawValue incluye campos disabled
+    const formValue = this.taskForm.getRawValue();
 
     return {
       title: formValue.title || '',
@@ -242,9 +309,10 @@ export class TaskCreateComponent implements OnInit {
       incidence_priority_id: this.getPriorityId(formValue.priority || 'medium'),
       incidence_type_id: this.getTypeId(formValue.type || 'task'),
       incidence_state_id: this.stateId,
+      assigned_user_id: formValue.assigned_user_id || null,
       start_date: new Date().toISOString().split('T')[0],
       due_date: this.calculateDueDate(formValue.priority || 'medium'),
-      parent_incidence_id: formValue.parent_id || null // Incluir el padre seleccionado
+      parent_incidence_id: formValue.parent_id || null
     };
   }
 
@@ -312,7 +380,7 @@ export class TaskCreateComponent implements OnInit {
           '/project-management/projects/kanban',
           this.projectId,
           'project-kanban'
-        ])
+        ]);
       },
       reject: () => {
         console.log('Diálogo cerrado');

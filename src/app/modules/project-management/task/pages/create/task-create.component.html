@@ -125,6 +125,49 @@
         </small>
       </div>
 
+      <!-- Usuario Asignado -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Asignar a
+          <span *ngIf="taskForm.get('type')?.value === 'epic' || taskForm.get('type')?.value === 'history_user'"
+                class="text-red-500">*</span>
+          <span *ngIf="taskForm.get('type')?.value !== 'epic' && taskForm.get('type')?.value !== 'history_user'"
+                class="text-sm text-color-secondary">(opcional)</span>
+        </label>
+
+        <p-dropdown
+          formControlName="assigned_user_id"
+          [options]="memberOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar usuario"
+          class="w-full"
+          [showClear]="true"
+          [filter]="true"
+          [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
+          <ng-template pTemplate="selectedItem">
+            <div *ngIf="taskForm.get('assigned_user_id')?.value">
+              <span>{{ getSelectedMemberLabel() }}</span>
+            </div>
+          </ng-template>
+          <ng-template let-member pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <span class="font-medium">{{ member.label }}</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+
+        <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
+               class="p-error block mt-2">
+          Debes seleccionar un usuario asignado
+        </small>
+
+        <small *ngIf="memberOptions.length === 0" class="p-warning block mt-2 text-orange-500">
+          <i class="pi pi-exclamation-triangle mr-1"></i>
+          No hay miembros disponibles en el proyecto
+        </small>
+      </div>
+
       <!-- Selector de Padre (condicional) -->
       <div *ngIf="showParentSelector">
         <label class="block text-color font-medium mb-2">
@@ -140,6 +183,7 @@
           class="w-full"
           [disabled]="loading"
           [showClear]="true"
+          [filter]="true"
           [ngClass]="{'p-invalid': taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched}">
         </p-dropdown>
 
