@@ -4,9 +4,10 @@ export interface TaskCreateModelRequest {
   incidence_priority_id: number;
   incidence_type_id: number;
   incidence_state_id: number | null;
+  assigned_user_id: number | null;
+  parent_incidence_id: number | null;
   due_date: string | null;
   start_date: string | null;
-  parent_incidence_id: number | null;
 }
 
 export interface TaskUpdateModelRequest {
@@ -16,6 +17,7 @@ export interface TaskUpdateModelRequest {
   incidence_type_id: number | null;
   parent_incidence_id: number | null;
   incidence_state_id: number | null;
+  assigned_user_id: number | null;
   due_date: string | null;
   start_date: string | null;
 }
