@@ -80,7 +80,7 @@
     "teams": "Equipos",
     "projects": "Proyectos",
     "customizeSidebar": "Personalizar barra lateral",
-    "users": "Usuarios"
+    "users": "Colaboradores"
   },
   "validation": {
     "usernameRequired": "El nombre de usuario es requerido",
@@ -103,7 +103,11 @@
     "passwordConfirmation": "Confirmar Contraseña",
     "id": "ID",
     "name": "Nombre",
-    "createdAt": "Creado el"
+    "createdAt": "Creado el",
+    "role": "Rol",
+    "modality": "Modalidad",
+    "telephone": "Celular",
+    "address": "Direccion domiciliaria"
   },
   "role": {
     "create": "Crear Rol",
@@ -112,7 +116,8 @@
     "id": "ID",
     "name": "Nombre",
     "createdAt": "Creado el",
-    "title": "Rol"
+    "title": "Rol",
+    "rolePlaceholder": "Elige un rol para el usuario..."
   },
   "forgotPassword": {
     "resetYourPassword": "Restablecer tu Contraseña",

@@ -1,7 +1,5 @@
-
-
 // Tipos originales que se mantienen igual
-import {ApiResponse} from "./api-response.model";
+import { ApiResponse } from './api-response.model';
 
 export type Severity = 'success' | 'secondary' | 'info' | 'warning' | 'danger' | 'contrast' | undefined;
 
@@ -147,21 +145,15 @@ export interface UploadEvent {
 // NUEVOS TIPOS UTILIZANDO ApiResponse
 // ============================================
 
-
 export type DashboardResponse = ApiResponse<Dashboard>;
-
 
 export type DashboardListResponse = ApiResponse<Dashboard[]>;
 
-
 export type DashboardCardResponse = ApiResponse<DashboardCard>;
-
 
 export type ChartDataResponse = ApiResponse<ChartData>;
 
-
 export type ActivitiesResponse = ApiResponse<Activity[]>;
-
 
 export type StatisticsResponse = ApiResponse<DashboardStatistics>;
 
@@ -169,16 +161,13 @@ export type StatisticsResponse = ApiResponse<DashboardStatistics>;
 // UTILIDADES PARA TRABAJAR CON RESPUESTAS
 // ============================================
 
-
 export function isSuccessfulResponse<T>(response: ApiResponse<T>): response is ApiResponse<T> & { success: true } {
   return response.success !== false;
 }
 
-
 export function isErrorResponse(response: any): response is ErrorResponse {
   return response && response.message !== undefined && (response.errors !== undefined || response.success === false);
 }
-
 
 export function toDefaultPaginator(meta: any): DefaultPaginatorI {
   return {
@@ -186,7 +175,13 @@ export function toDefaultPaginator(meta: any): DefaultPaginatorI {
     to: meta?.to || 0,
     total: meta?.total || 0,
     current_page: meta?.current_page || 1,
-    last_page: meta?.last_page || 1
+    last_page: meta?.last_page || 1,
   };
 }
-
+export interface Option {
+  id: number | string;
+  name: string;
+  description?: string;
+  data?: { [key: string]: string };
+  created_at?: string;
+}

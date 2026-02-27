@@ -1,44 +1,108 @@
 <div class="card">
-    <p-table #dt [value]="users" [loading]="loadingTable()" [lazy]="true" [paginator]="true" [rows]="10" [showCurrentPageReport]="true" responsiveLayout="scroll"
-        currentPageReportTemplate="{{'paginator.showing' | translate}} {first} {{'paginator.to' | translate}} {last} {{'paginator.of' | translate}} {totalRecords} {{'paginator.entries' | translate}}"
-        (onLazyLoad)="loadUsersLazy($event)"
-        [totalRecords]="totalRecords"
-    >
-        <ng-template pTemplate="caption">
-            <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                <div>
-                    <button pButton class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1 p-button-secondary mr-4" icon="pi pi-arrow-left" label="{{'general.back' | translate}}" (click)="navigateToDashboard()"></button>
-                    <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
-                        <i class="pi pi-search"></i>
-                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="{{'paginator.search' | translate}}" class="w-full" />
-                    </span>
-                </div>
-                <button (click)="navigateToCreateUser()" pButton class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1" icon="pi pi-user-plus" label="{{'general.addNew' | translate}}"></button>
-            </div>
-        </ng-template>
-        <ng-template pTemplate="header">
-            <tr>
-                <th pSortableColumn="id" class="white-space-nowrap" style="width:25%">{{'user.id' | translate}} <p-sortIcon field="id"></p-sortIcon></th>
-                <th pSortableColumn="name" class="white-space-nowrap" style="width:25%">{{'user.name' | translate}} <p-sortIcon field="name"></p-sortIcon></th>
-                <th pSortableColumn="date" class="white-space-nowrap" style="width:25%">{{'user.createdAt' | translate}}<p-sortIcon field="date"></p-sortIcon></th>
-                <th class="white-space-nowrap" style="width:25%">{{'general.activity' | translate}}</th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-user>
-            <tr>
-                <td>{{user.id}}</td>
-                <td>{{user.name}}</td>
-                <td>{{user.created_at | date: 'MM/dd/yyyy'}}</td>
-                <td>
-                    <a (click)="navigateToEditUser(user.id)" class="p-button-outlined p-button-rounded p-button-text p-button-sm cursor-pointer">
-                        <i class="pi pi-pencil"></i>
-                    </a>
-                    <p-confirmDialog header="Confirmation" [key]="user.id" icon="pi pi-exclamation-triangle" message="{{'general.messageToAction' | translate}}" [style]="{width: '350px'}" acceptButtonStyleClass="p-button-text" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
-                    <a (click)="confirmDelete(user.id)" class="p-button-outlined p-button-rounded p-button-text p-button-sm cursor-pointer ml-4">
-                        <i class="pi pi-trash text-red-500"></i>
-                    </a>
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
+  <p-table
+    #dt
+    [value]="users"
+    [loading]="loadingTable()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    responsiveLayout="scroll"
+    currentPageReportTemplate="{{ 'paginator.showing' | translate }} {first} {{ 'paginator.to' | translate }} {last} {{
+      'paginator.of' | translate
+    }} {totalRecords} {{ 'paginator.entries' | translate }}"
+    (onLazyLoad)="loadUsersLazy($event)"
+    [totalRecords]="totalRecords"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
+        <div>
+          <button
+            pButton
+            class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1 p-button-secondary mr-4"
+            icon="pi pi-arrow-left"
+            label="{{ 'general.back' | translate }}"
+            (click)="navigateToDashboard()"
+          ></button>
+          <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="onGlobalFilter(dt, $event)"
+              placeholder="{{ 'paginator.search' | translate }}"
+              class="w-full"
+            />
+          </span>
+        </div>
+        <button
+          (click)="navigateToCreateUser()"
+          pButton
+          class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1"
+          icon="pi pi-user-plus"
+          label="{{ 'general.addNew' | translate }}"
+        ></button>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id" class="white-space-nowrap" style="width: 25%">
+          {{ 'user.id' | translate }} <p-sortIcon field="id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="name" class="white-space-nowrap" style="width: 25%">
+          {{ 'user.name' | translate }} <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th class="white-space-nowrap" style="width: 25%">
+          {{ 'user.email' | translate }}
+        </th>
+        <th class="white-space-nowrap" style="width: 25%">
+          {{ 'user.role' | translate }}
+        </th>
+        <th class="white-space-nowrap" style="width: 25%">
+          {{ 'user.modality' | translate }}
+        </th>
+        <th class="white-space-nowrap" style="width: 25%">
+          {{ 'user.telephone' | translate }}
+        </th>
+        <th pSortableColumn="date" class="white-space-nowrap" style="width: 25%">
+          {{ 'user.createdAt' | translate }}<p-sortIcon field="date"></p-sortIcon>
+        </th>
+        <th class="white-space-nowrap" style="width: 25%">{{ 'general.activity' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ getRoleName(user.rols) }}</td>
+        <td>{{ user.modality_id == 1 ? 'Presencial' : 'Teletrabajo' }}</td>
+        <td>{{ user.telephone }}</td>
+        <td>{{ user.created_at | date: 'MM/dd/yyyy' }}</td>
+        <td>
+          <a
+            (click)="navigateToEditUser(user.id)"
+            class="p-button-outlined p-button-rounded p-button-text p-button-sm cursor-pointer"
+          >
+            <i class="pi pi-pencil"></i>
+          </a>
+          <p-confirmDialog
+            header="Confirmation"
+            [key]="user.id"
+            icon="pi pi-exclamation-triangle"
+            message="{{ 'general.messageToAction' | translate }}"
+            [style]="{ width: '350px' }"
+            acceptButtonStyleClass="p-button-text"
+            rejectButtonStyleClass="p-button-text"
+          ></p-confirmDialog>
+          <a
+            (click)="confirmDelete(user.id)"
+            class="p-button-outlined p-button-rounded p-button-text p-button-sm cursor-pointer ml-4"
+          >
+            <i class="pi pi-trash text-red-500"></i>
+          </a>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>

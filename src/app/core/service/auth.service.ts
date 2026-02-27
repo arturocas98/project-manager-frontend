@@ -1,12 +1,13 @@
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import {Observable, tap} from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { Constants, LOCAL_STORAGE_KEYS } from 'src/app/shared/constants/constants';
+import { Constants, LOCAL_STORAGE_KEYS, ROLE } from 'src/app/shared/constants/constants';
 import { User } from 'src/app/shared/models/user';
-import {ApiSingleResponse} from "../../shared/models/api-response.model";
-import {ProjectSummaryData} from "../../shared/models/summary-response";
+import { ApiSingleResponse } from '../../shared/models/api-response.model';
+import { ProjectSummaryData } from '../../shared/models/summary-response';
+import { Profile } from 'src/app/shared/models/auth';
 
 export interface LoginData {
   email: string;
@@ -23,14 +24,14 @@ export interface RegisterData {
   password: string;
 }
 
-
 // auth.service.ts
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private _profile = signal<User | null>(null);
   readonly profile = this._profile.asReadonly();
+  roles$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 
   constructor(
     private readonly http: HttpClient,
@@ -43,27 +44,21 @@ export class AuthService {
    * Login - usando ApiResponse
    */
   login(data: LoginData): Observable<ApiSingleResponse<LoginResponseData>> {
-    return this.http.post<ApiSingleResponse<LoginResponseData>>(
-      `${environment.apiUrl}/auth/login`,
-      data
-    );
+    return this.http.post<ApiSingleResponse<LoginResponseData>>(`${environment.apiUrl}/auth/login`, data);
   }
   register(data: RegisterData): Observable<HttpResponse<any>> {
-    return this.http.post<any>(
-      `${environment.apiUrl}/auth/register`,
-      data,
-      { observe: 'response' }
-    );
+    return this.http.post<any>(`${environment.apiUrl}/auth/register`, data, { observe: 'response' });
   }
 
   /**
    * Obtener perfil - usando ApiResponse
    */
   getProfile(): Observable<ApiSingleResponse<User>> {
-    console.log("Getting user");
+    console.log('Getting user');
     return this.http.get<ApiSingleResponse<User>>(`${environment.apiUrl}/user/profile`).pipe(
-      tap((response) => {
+      tap(response => {
         this._profile.set(response.data);
+        this.setRoles(response.data);
         localStorage.setItem(LOCAL_STORAGE_KEYS.profile, JSON.stringify(response.data));
         console.log(response.data);
       })
@@ -121,7 +116,7 @@ export class AuthService {
 
   refreshProfile(): Observable<ApiSingleResponse<User>> {
     return this.getProfile().pipe(
-      tap((response) => {
+      tap(response => {
         this.updateProfileState(response.data);
       })
     );
@@ -137,5 +132,27 @@ export class AuthService {
     } catch (error) {
       console.error('Error parsing profile', error);
     }
+  }
+
+  setRoles(user: User): void {
+    const roles: string[] = [];
+    if (!!user && Array.isArray(user.roles)) {
+      user.roles.forEach(rol => {
+        console.log('rol', rol);
+
+        roles.push(rol);
+      });
+    }
+    console.log(roles);
+
+    this.roles$.next(roles);
+  }
+
+  get isAdmin(): boolean {
+    return this.roles$.value.join().includes(ROLE.ADMIN);
+  }
+
+  get rolesObservable$(): Observable<string[]> {
+    return this.roles$.asObservable();
   }
 }

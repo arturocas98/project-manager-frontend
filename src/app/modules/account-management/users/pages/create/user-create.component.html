@@ -1,37 +1,79 @@
 <div class="card">
-    <div class="flex justify-center align-items-center mb-4">
-        <button pButton class="p-button-outlined w-full sm:w-auto flex-order-0 p-button-secondary mr-4" icon="pi pi-arrow-left" label="{{'general.back' | translate}}" (click)="navigateToUserList()"></button>
-        <span class="text-900 text-xl font-bold block">{{'user.create' | translate}}</span>
+  <div class="flex justify-center align-items-center mb-4">
+    <button
+      pButton
+      class="p-button-outlined w-full sm:w-auto flex-order-0 p-button-secondary mr-4"
+      icon="pi pi-arrow-left"
+      label="{{ 'general.back' | translate }}"
+      (click)="navigateToUserList()"
+    ></button>
+    <span class="text-900 text-xl font-bold block">{{ 'user.create' | translate }}</span>
+  </div>
+  <div class="grid">
+    <div class="col-12 lg:col-2">
+      <div class="text-900 font-medium text-xl mb-3">{{ 'user.profile' | translate }}</div>
     </div>
-    <div class="grid">
-        <div class="col-12 lg:col-2">
-            <div class="text-900 font-medium text-xl mb-3">{{'user.profile' | translate}}</div>
-        </div>
-        <div class="col-12 lg:col-10">
-            <form [formGroup]="ngForm" (ngSubmit)="onSubmit()">
-                <div class="grid formgrid p-fluid">
-                    <div class="field mb-4 col-12">
-                        <label for="name" class="font-medium text-900">{{'user.username' | translate}}</label>
-                        <input formControlName="name" id="name" type="text" pInputText>
-                    </div>
-                    <div class="field mb-4 col-12">
-                        <label for="email" class="font-medium text-900">{{'user.email' | translate}}</label>
-                        <input formControlName="email" id="email" type="email" pInputText>
-                    </div>
-                    <div class="field mb-4 col-12">
-                        <label for="password" class="font-medium text-900">{{'user.password' | translate}}</label>
-                        <input formControlName="password" id="password" type="password" pInputText>
-                    </div>
-                    <div class="field mb-4 col-12">
-                        <label for="password_confirmation" class="font-medium text-900">{{'user.passwordConfirmation' | translate}}</label>
-                        <input formControlName="password_confirmation" id="password_confirmation" type="password" pInputText>
-                    </div>
+    <div class="col-12 lg:col-10">
+      <form [formGroup]="ngForm" (ngSubmit)="onSubmit()">
+        <div class="grid formgrid p-fluid">
+          <div class="field mb-4 col-12">
+            <label for="name" class="font-medium text-900">{{ 'user.username' | translate }}</label>
+            <input formControlName="name" id="name" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-12">
+            <label for="email" class="font-medium text-900">{{ 'user.email' | translate }}</label>
+            <input formControlName="email" id="email" type="email" pInputText />
+          </div>
+          <div class="field mb-4 col-12">
+            <label for="password" class="font-medium text-900">{{ 'user.password' | translate }}</label>
+            <input formControlName="password" id="password" type="password" pInputText />
+          </div>
+          <div class="field mb-4 col-12">
+            <label for="password_confirmation" class="font-medium text-900">{{
+              'user.passwordConfirmation' | translate
+            }}</label>
+            <input formControlName="password_confirmation" id="password_confirmation" type="password" pInputText />
+          </div>
 
-                    <div class="col-12">
-                        <button pButton pRipple label="{{'user.create' | translate}}" class="w-auto mt-3"></button>
-                    </div>
-                </div>
-            </form>
+          <div class="field mb-4 col-12">
+            <label for="telephone" class="font-medium text-900">{{ 'user.telephone' | translate }}</label>
+            <input pKeyFilter="int" formControlName="telephone" id="telephone" type="text" pInputText maxlength="12" />
+          </div>
+
+          <div class="field mb-4 col-12">
+            <label for="address" class="font-medium text-900">{{ 'user.address' | translate }}</label>
+            <input formControlName="address" id="address" type="text" pInputText />
+          </div>
+
+          <div class="field mb-4 col-6">
+            <label for="modality" class="font-medium text-900">{{ 'user.modality' | translate }}</label>
+            <p-dropdown
+              [options]="modalities"
+              optionLabel="name"
+              id="modality"
+              formControlName="modality_id"
+              [placeholder]="'modality.rolePlaceholder' | translate"
+            >
+            </p-dropdown>
+          </div>
+
+          <div class="field mb-4 col-6">
+            <label for="role" class="font-medium text-900">{{ 'user.role' | translate }}</label>
+            <p-dropdown
+              [options]="roles"
+              optionLabel="name"
+              id="role"
+              formControlName="rols"
+              [placeholder]="'role.rolePlaceholder' | translate"
+            >
+            </p-dropdown>
+          </div>
+
+          <div class="col-12">
+            <button pButton pRipple label="{{ 'user.create' | translate }}" class="w-auto mt-3"></button>
+          </div>
         </div>
+      </form>
     </div>
+  </div>
 </div>

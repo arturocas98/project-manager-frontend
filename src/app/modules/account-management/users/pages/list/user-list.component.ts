@@ -1,23 +1,22 @@
-import { CommonModule } from "@angular/common";
-import { Component, signal } from "@angular/core";
-import { Router } from "@angular/router";
-import { TranslateModule } from "@ngx-translate/core";
-import { ConfirmationService } from "primeng/api";
-import { ButtonModule } from "primeng/button";
-import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { InputTextModule } from "primeng/inputtext";
-import { RippleModule } from "primeng/ripple";
-import { Table, TableLazyLoadEvent, TableModule } from "primeng/table";
-import { Constants, NUMBERS } from "src/app/shared/constants/constants";
-import { User } from "src/app/shared/models/user";
-import {
-  UserCollectionResponse,
-  UserService,
-} from "../../services/user.service";
-import {ParamJson} from "../../../../../shared/models/params.model";
+import { CommonModule } from '@angular/common';
+import { Component, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { ConfirmationService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { RippleModule } from 'primeng/ripple';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { Constants, NUMBERS } from 'src/app/shared/constants/constants';
+import { User } from 'src/app/shared/models/user';
+import { UserCollectionResponse, UserService } from '../../services/user.service';
+import { ParamJson } from '../../../../../shared/models/params.model';
+import { getRoleName } from 'src/app/shared/helpers/functions.helper';
+import { AuthService } from 'src/app/core/service/auth.service';
 
 @Component({
-  templateUrl: "./user-list.component.html",
+  templateUrl: './user-list.component.html',
   providers: [ConfirmationService],
   standalone: true,
   imports: [
@@ -35,12 +34,16 @@ export class UserListComponent {
   users: User[] = [];
   totalRecords: number = 0;
   tableLazyLoadEvent?: TableLazyLoadEvent;
+  isAdmin: boolean = false;
 
   constructor(
     private userService: UserService,
     private router: Router,
     private confirmationService: ConfirmationService,
-  ) {}
+    private authService: AuthService
+  ) {
+    this.isAdmin = this.authService.isAdmin;
+  }
 
   onLazy(): void {
     this.loadingTable.set(true);
@@ -57,19 +60,19 @@ export class UserListComponent {
   }
 
   getParams(): ParamJson {
-    let globalFilter: string | null | undefined = "";
+    let globalFilter: string | null | undefined = '';
     if (Array.isArray(this.tableLazyLoadEvent?.globalFilter)) {
-      globalFilter = globalFilter[NUMBERS.ZERO] || "";
+      globalFilter = globalFilter[NUMBERS.ZERO] || '';
     } else {
       globalFilter = this.tableLazyLoadEvent?.globalFilter;
     }
     return {
-      "filter[search]": globalFilter || "",
+      'filter[search]': globalFilter || '',
     };
   }
 
   onGlobalFilter(table: Table, event: Event): void {
-    table.filterGlobal((event.target as HTMLInputElement).value, "contains");
+    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
   navigateToCreateUser(): void {
@@ -89,7 +92,7 @@ export class UserListComponent {
   confirmDelete(key: string): void {
     this.confirmationService.confirm({
       key,
-      message: "Are you sure to perform this action?",
+      message: 'Are you sure to perform this action?',
       accept: () => {
         this.deleteUser(Number.parseInt(key));
       },
@@ -104,4 +107,6 @@ export class UserListComponent {
     this.tableLazyLoadEvent = event;
     this.onLazy();
   }
+
+  protected readonly getRoleName = getRoleName;
 }

@@ -79,9 +79,7 @@ export class LoginComponent {
   getProfile(): void {
     this.authService.getProfile().subscribe({
       next: profile => {
-        this.authService.getProfile().subscribe(() => {
-          this.router.navigate([Constants.routes.root]);
-        });
+        this.router.navigate([Constants.routes.root]);
         this.isLoading = false;
       },
       error: ({ error }) => {

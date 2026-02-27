@@ -2,17 +2,17 @@ import { Injectable } from '@angular/core';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { ApiService } from './api.service';
-import {KanbanColumn, KanbanFilters, KanbanTask, ProjectMember} from "../../shared/models/kanban.models";
+import { KanbanColumn, KanbanFilters, KanbanTask, ProjectMember } from '../../shared/models/kanban.models';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class KanbanService {
   private filtersSubject = new BehaviorSubject<KanbanFilters>({
     search: '',
     priority: [],
     type: [],
-    assignee: []
+    assignee: [],
   });
 
   filters$ = this.filtersSubject.asObservable();
@@ -24,7 +24,7 @@ export class KanbanService {
     review: 3,
     closed: 4,
     locked: 5,
-    finished: 6
+    finished: 6,
   } as const;
 
   constructor(private apiService: ApiService) {}
@@ -33,9 +33,7 @@ export class KanbanService {
    * Obtiene todas las tareas del proyecto
    */
   getProjectTasks(projectId: number): Observable<KanbanTask[]> {
-    return this.apiService.get<KanbanTask[]>(`projects/${projectId}/incidences`).pipe(
-      shareReplay(1)
-    );
+    return this.apiService.get<KanbanTask[]>(`projects/${projectId}/incidences`).pipe(shareReplay(1));
   }
 
   /**
@@ -49,10 +47,7 @@ export class KanbanService {
    * Obtiene el tablero Kanban con tareas organizadas y filtradas
    */
   getKanbanBoard(projectId: number): Observable<KanbanColumn[]> {
-    return combineLatest([
-      this.getProjectTasks(projectId),
-      this.filters$
-    ]).pipe(
+    return combineLatest([this.getProjectTasks(projectId), this.filters$]).pipe(
       map(([tasks, filters]) => this.organizeTasksByStatus(this.applyFilters(tasks, filters)))
     );
   }
@@ -63,35 +58,22 @@ export class KanbanService {
   private applyFilters(tasks: KanbanTask[], filters: KanbanFilters): KanbanTask[] {
     return tasks.filter(task => {
       // 🔍 Filtro por búsqueda
-      if (
-        filters.search &&
-        !task.title.toLowerCase().includes(filters.search.toLowerCase())
-      ) {
+      if (filters.search && !task.title.toLowerCase().includes(filters.search.toLowerCase())) {
         return false;
       }
 
       // 🔥 Filtro por prioridad
-      if (
-        filters.priority.length > 0 &&
-        (!task.priority || !filters.priority.includes(task.priority))
-      ) {
+      if (filters.priority.length > 0 && (!task.priority || !filters.priority.includes(task.priority))) {
         return false;
       }
 
       // 🏷 Filtro por tipo
-      if (
-        filters.type.length > 0 &&
-        (!task.type || !filters.type.includes(task.type.type))
-      ) {
+      if (filters.type.length > 0 && (!task.type || !filters.type.includes(task.type.type))) {
         return false;
       }
 
       // 👤 Filtro por asignado
-      if (
-        filters.assignee.length > 0 &&
-        (!task.assigned_to ||
-          !filters.assignee.includes(task.assigned_to.id))
-      ) {
+      if (filters.assignee.length > 0 && (!task.assigned_to || !filters.assignee.includes(task.assigned_to.id))) {
         return false;
       }
 
@@ -104,54 +86,52 @@ export class KanbanService {
    */
   private organizeTasksByStatus(tasks: KanbanTask[]): KanbanColumn[] {
     // Ordenar tareas por fecha de creación (más recientes primero)
-    const sortedTasks = [...tasks].sort((a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+    const sortedTasks = [...tasks].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     // Columnas con IDs numéricos
     const columns: KanbanColumn[] = [
       {
-        id: this.STATE_IDS.open,  // 1
-        title: 'Open',
+        id: this.STATE_IDS.open, // 1
+        title: 'Por hacer',
         icon: 'pi pi-folder-open',
         color: '#94a3b8',
-        tasks: []
+        tasks: [],
       },
       {
-        id: this.STATE_IDS.progress,  // 2
-        title: 'In Progress',
+        id: this.STATE_IDS.progress, // 2
+        title: 'En progreso',
         icon: 'pi pi-spinner',
         color: '#f59e0b',
-        tasks: []
+        tasks: [],
       },
       {
-        id: this.STATE_IDS.review,  // 3
-        title: 'Review',
+        id: this.STATE_IDS.review, // 3
+        title: 'En revision',
         icon: 'pi pi-eye',
         color: '#3b82f6',
-        tasks: []
+        tasks: [],
       },
+      // {
+      //   id: this.STATE_IDS.closed, // 4
+      //   title: 'Closed',
+      //   icon: 'pi pi-times-circle',
+      //   color: '#6b7280',
+      //   tasks: [],
+      // },
+      // {
+      //   id: this.STATE_IDS.locked, // 5
+      //   title: 'Locked',
+      //   icon: 'pi pi-lock',
+      //   color: '#ef4444',
+      //   tasks: [],
+      // },
       {
-        id: this.STATE_IDS.closed,  // 4
-        title: 'Closed',
-        icon: 'pi pi-times-circle',
-        color: '#6b7280',
-        tasks: []
-      },
-      {
-        id: this.STATE_IDS.locked,  // 5
-        title: 'Locked',
-        icon: 'pi pi-lock',
-        color: '#ef4444',
-        tasks: []
-      },
-      {
-        id: this.STATE_IDS.finished,  // 6
-        title: 'Finished',
+        id: this.STATE_IDS.finished, // 6
+        title: 'Finalizada',
         icon: 'pi pi-check-circle',
         color: '#10b981',
-        tasks: []
-      }
+        tasks: [],
+      },
     ];
 
     // Asignar tareas a las columnas correspondientes usando el ID numérico
@@ -228,7 +208,7 @@ export class KanbanService {
     const currentFilters = this.filtersSubject.value;
     this.filtersSubject.next({
       ...currentFilters,
-      ...filters
+      ...filters,
     });
   }
 
@@ -240,22 +220,15 @@ export class KanbanService {
       search: '',
       priority: [],
       type: [],
-      assignee: []
+      assignee: [],
     });
   }
 
   /**
    * Actualiza el estado de una tarea (drag & drop)
    */
-  updateTaskStatus(
-    projectId: number,
-    taskId: number,
-    newStateId: number
-  ): Observable<any> {
-    return this.apiService.put(
-      `projects/${projectId}/incidences/${taskId}/update`,
-      { incidence_state_id: newStateId }
-    );
+  updateTaskStatus(projectId: number, taskId: number, newStateId: number): Observable<any> {
+    return this.apiService.put(`projects/${projectId}/incidences/${taskId}/update`, { incidence_state_id: newStateId });
   }
 
   /**
@@ -268,43 +241,43 @@ export class KanbanService {
         title: 'Open',
         icon: 'pi pi-folder-open',
         color: '#94a3b8',
-        tasks: []
+        tasks: [],
       },
       {
         id: this.STATE_IDS.progress,
         title: 'In Progress',
         icon: 'pi pi-spinner',
         color: '#f59e0b',
-        tasks: []
+        tasks: [],
       },
       {
         id: this.STATE_IDS.review,
         title: 'Review',
         icon: 'pi pi-eye',
         color: '#3b82f6',
-        tasks: []
+        tasks: [],
       },
       {
         id: this.STATE_IDS.closed,
         title: 'Closed',
         icon: 'pi pi-times-circle',
         color: '#6b7280',
-        tasks: []
+        tasks: [],
       },
       {
         id: this.STATE_IDS.locked,
         title: 'Locked',
         icon: 'pi pi-lock',
         color: '#ef4444',
-        tasks: []
+        tasks: [],
       },
       {
         id: this.STATE_IDS.finished,
         title: 'Finished',
         icon: 'pi pi-check-circle',
         color: '#10b981',
-        tasks: []
-      }
+        tasks: [],
+      },
     ];
   }
 }

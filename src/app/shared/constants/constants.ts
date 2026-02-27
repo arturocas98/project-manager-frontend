@@ -40,6 +40,12 @@ export const Constants = {
 
   defaultPaginator: { current_page: 1, total: 0, from: 0, to: 0 },
   emptyString: '',
+  pageParams: {
+    all: { perPage: 'all' },
+    defaultPerPage: { perPage: '10' },
+    fiftyPerPage: { perPage: '50' },
+    thousandPerPage: { perPage: '1000' },
+  },
 };
 
 export const NUMBERS = {
@@ -170,3 +176,9 @@ export const STATUS_CODE = {
   notFound: 404 as number,
   unauthorized: 401 as number,
 };
+
+export enum ROLE {
+  ADMIN = 'Admin',
+  DEVELOPER = 'Desarrollador',
+  ADMINISTRATIVE = 'Administrativo',
+}

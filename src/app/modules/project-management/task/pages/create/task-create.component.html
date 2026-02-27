@@ -1,28 +1,16 @@
 <div class="min-h-screen flex align-items-center justify-content-center px-4 py-6">
-
   <div class="w-full max-w-3xl surface-card surface-border border-1 border-round-3xl shadow-2xl p-6 md:p-8">
-
     <div class="w-full flex align-items-center justify-content-center">
-      <img
-        src="assets/General/Cartoon_task.png"
-        alt="Crear Tarea"
-        class="w-25rem h-24rem mb-4 object-fit-cover">
+      <img src="assets/General/Cartoon_task.png" alt="Crear Tarea" class="w-10rem h-10rem mb-4 object-fit-cover" />
     </div>
 
     <!-- Header -->
     <div class="mb-6 text-center">
-      <h2 class="text-3xl font-bold text-color mb-2">
-        Crear Tarea
-      </h2>
-      <p class="text-color-secondary">
-        Completa la información para registrar una nueva tarea
-      </p>
+      <h2 class="text-3xl font-bold text-color mb-2">Crear Tarea</h2>
+      <p class="text-color-secondary">Completa la información para registrar una nueva tarea</p>
     </div>
 
-    <form [formGroup]="taskForm"
-          (ngSubmit)="onSubmit()"
-          class="flex flex-column gap-4">
-
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
       <!-- Estado (campo no editable) -->
       <div>
         <label class="block text-color font-medium mb-2">
@@ -34,7 +22,8 @@
           [value]="stateName"
           class="w-full surface-card"
           readonly
-          [ngClass]="{'bg-gray-100': true}">
+          [ngClass]="{ 'bg-gray-100': true }"
+        />
 
         <small class="block mt-2 text-color-secondary">
           La tarea se creará en el estado seleccionado desde el tablero
@@ -43,28 +32,24 @@
 
       <!-- Título -->
       <div>
-        <label class="block text-color font-medium mb-2">
-          Título <span class="text-red-500">*</span>
-        </label>
+        <label class="block text-color font-medium mb-2"> Título <span class="text-red-500">*</span> </label>
 
         <input
           pInputText
           formControlName="title"
           class="w-full"
           placeholder="Ej: Crear endpoint para tareas"
-          [ngClass]="{'p-invalid': taskForm.get('title')?.invalid && taskForm.get('title')?.touched}">
+          [ngClass]="{ 'p-invalid': taskForm.get('title')?.invalid && taskForm.get('title')?.touched }"
+        />
 
-        <small *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
-               class="p-error block mt-2">
+        <small *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched" class="p-error block mt-2">
           El título es obligatorio
         </small>
       </div>
 
       <!-- Descripción -->
       <div>
-        <label class="block text-color font-medium mb-2">
-          Descripción <span class="text-red-500">*</span>
-        </label>
+        <label class="block text-color font-medium mb-2"> Descripción <span class="text-red-500">*</span> </label>
 
         <textarea
           pInputTextarea
@@ -72,20 +57,21 @@
           formControlName="description"
           class="w-full"
           placeholder="Describe el objetivo de la tarea"
-          [ngClass]="{'p-invalid': taskForm.get('description')?.invalid && taskForm.get('description')?.touched}">
+          [ngClass]="{ 'p-invalid': taskForm.get('description')?.invalid && taskForm.get('description')?.touched }"
+        >
         </textarea>
 
-        <small *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
-               class="p-error block mt-2">
+        <small
+          *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
+          class="p-error block mt-2"
+        >
           La descripción es obligatoria
         </small>
       </div>
 
       <!-- Prioridad -->
       <div>
-        <label class="block text-color font-medium mb-2">
-          Prioridad <span class="text-red-500">*</span>
-        </label>
+        <label class="block text-color font-medium mb-2"> Prioridad <span class="text-red-500">*</span> </label>
 
         <p-dropdown
           formControlName="priority"
@@ -94,20 +80,21 @@
           optionValue="value"
           placeholder="Seleccionar prioridad"
           class="w-full"
-          [ngClass]="{'p-invalid': taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched}">
+          [ngClass]="{ 'p-invalid': taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched }"
+        >
         </p-dropdown>
 
-        <small *ngIf="taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched"
-               class="p-error block mt-2">
+        <small
+          *ngIf="taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched"
+          class="p-error block mt-2"
+        >
           La prioridad es obligatoria
         </small>
       </div>
 
       <!-- Tipo -->
       <div>
-        <label class="block text-color font-medium mb-2">
-          Tipo <span class="text-red-500">*</span>
-        </label>
+        <label class="block text-color font-medium mb-2"> Tipo <span class="text-red-500">*</span> </label>
 
         <p-dropdown
           formControlName="type"
@@ -116,11 +103,11 @@
           optionValue="value"
           placeholder="Seleccionar tipo"
           class="w-full"
-          [ngClass]="{'p-invalid': taskForm.get('type')?.invalid && taskForm.get('type')?.touched}">
+          [ngClass]="{ 'p-invalid': taskForm.get('type')?.invalid && taskForm.get('type')?.touched }"
+        >
         </p-dropdown>
 
-        <small *ngIf="taskForm.get('type')?.invalid && taskForm.get('type')?.touched"
-               class="p-error block mt-2">
+        <small *ngIf="taskForm.get('type')?.invalid && taskForm.get('type')?.touched" class="p-error block mt-2">
           El tipo es obligatorio
         </small>
       </div>
@@ -129,10 +116,16 @@
       <div>
         <label class="block text-color font-medium mb-2">
           Asignar a
-          <span *ngIf="taskForm.get('type')?.value === 'epic' || taskForm.get('type')?.value === 'history_user'"
-                class="text-red-500">*</span>
-          <span *ngIf="taskForm.get('type')?.value !== 'epic' && taskForm.get('type')?.value !== 'history_user'"
-                class="text-sm text-color-secondary">(opcional)</span>
+          <span
+            *ngIf="taskForm.get('type')?.value === 'epic' || taskForm.get('type')?.value === 'history_user'"
+            class="text-red-500"
+            >*</span
+          >
+          <span
+            *ngIf="taskForm.get('type')?.value !== 'epic' && taskForm.get('type')?.value !== 'history_user'"
+            class="text-sm text-color-secondary"
+            >(opcional)</span
+          >
         </label>
 
         <p-dropdown
@@ -144,7 +137,10 @@
           class="w-full"
           [showClear]="true"
           [filter]="true"
-          [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
+          [ngClass]="{
+            'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched,
+          }"
+        >
           <ng-template pTemplate="selectedItem">
             <div *ngIf="taskForm.get('assigned_user_id')?.value">
               <span>{{ getSelectedMemberLabel() }}</span>
@@ -157,8 +153,10 @@
           </ng-template>
         </p-dropdown>
 
-        <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
-               class="p-error block mt-2">
+        <small
+          *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
+          class="p-error block mt-2"
+        >
           Debes seleccionar un usuario asignado
         </small>
 
@@ -170,9 +168,7 @@
 
       <!-- Selector de Padre (condicional) -->
       <div *ngIf="showParentSelector">
-        <label class="block text-color font-medium mb-2">
-          {{ parentLabel }} <span class="text-red-500">*</span>
-        </label>
+        <label class="block text-color font-medium mb-2"> {{ parentLabel }} <span class="text-red-500">*</span> </label>
 
         <p-dropdown
           formControlName="parent_id"
@@ -184,16 +180,21 @@
           [disabled]="loading"
           [showClear]="true"
           [filter]="true"
-          [ngClass]="{'p-invalid': taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched}">
+          [ngClass]="{ 'p-invalid': taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched }"
+        >
         </p-dropdown>
 
-        <small *ngIf="taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched"
-               class="p-error block mt-2">
+        <small
+          *ngIf="taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched"
+          class="p-error block mt-2"
+        >
           Debes seleccionar un {{ parentLabel.toLowerCase() }}
         </small>
 
-        <small *ngIf="parentOptions.length === 0 && showParentSelector && !loading"
-               class="p-warning block mt-2 text-orange-500">
+        <small
+          *ngIf="parentOptions.length === 0 && showParentSelector && !loading"
+          class="p-warning block mt-2 text-orange-500"
+        >
           <i class="pi pi-exclamation-triangle mr-1"></i>
           No hay {{ parentLabel.toLowerCase() }}s disponibles. Debes crear uno primero.
         </small>
@@ -201,14 +202,7 @@
 
       <!-- Botones -->
       <div class="flex justify-content-end gap-3 mt-3">
-
-        <button
-          pButton
-          type="button"
-          label="Cancelar"
-          class="p-button-text"
-          (click)="onCancel()">
-        </button>
+        <button pButton type="button" label="Cancelar" class="p-button-text" (click)="onCancel()"></button>
 
         <button
           pButton
@@ -217,15 +211,11 @@
           icon="pi pi-check"
           class="p-button-raised"
           [disabled]="taskForm.invalid || loading"
-          [loading]="loading">
-        </button>
-
+          [loading]="loading"
+        ></button>
       </div>
-
     </form>
-
   </div>
-
 </div>
 
 <!-- Diálogo de confirmación simplificado -->

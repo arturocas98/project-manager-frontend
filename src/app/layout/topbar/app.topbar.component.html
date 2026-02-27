@@ -4,13 +4,13 @@
       #menubutton
       type="button"
       class="topbar-menubutton p-link w-3rem h-3rem p-trigger"
-      (click)="onMenuButtonClick()">
+      (click)="onMenuButtonClick()"
+    >
       <i class="ph ph-sidebar-simple text-3xl"></i>
     </button>
   </div>
   <div>
-    <ul
-      class="flex mt-4 sm:gap-4 font-medium flex-row align-items-center space-x-2 list-none p-0 m-0">
+    <ul class="flex mt-4 sm:gap-4 font-medium flex-row align-items-center space-x-2 list-none p-0 m-0">
       <li class="hidden sm:flex">
         <a
           [routerLink]="['/pages/dashboard']"
@@ -18,19 +18,16 @@
           [routerLinkActiveOptions]="{ exact: true }"
           class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-indigo-500 hover:text-white transition-all duration-300 group"
           style="border-radius: 20px"
-          role="menuitem">
+          role="menuitem"
+        >
           <i class="ph ph-house text-xl"></i>
           <span class="text-xl">Inicio</span>
         </a>
       </li>
       <li>
         <div class="p-inputgroup h-4rem">
-          <input
-            pInputText
-            class="w-full p-3 border-round-left-2xl"
-            placeholder="Buscar" />
-          <span
-            class="p-inputgroup-addon cursor-pointer border-round-right-2xl">
+          <input pInputText class="w-full p-3 border-round-left-2xl" placeholder="Buscar" />
+          <span class="p-inputgroup-addon cursor-pointer border-round-right-2xl">
             <i [class]="'ph ph-magnifying-glass'" class="text-xl"></i>
           </span>
         </div>
@@ -42,9 +39,10 @@
           [routerLinkActiveOptions]="{ exact: true }"
           class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-green-700 hover:text-white transition-all duration-300 group"
           style="border-radius: 20px"
-          role="menuitem">
-          <i class="ph ph-stack-plus text-xl"></i>
-          <span class="text-xl">Agregar</span>
+          role="menuitem"
+        >
+          <i class="ph ph-bell text-xl"></i>
+          <span class="text-xl">Notificaciones</span>
         </a>
       </li>
     </ul>

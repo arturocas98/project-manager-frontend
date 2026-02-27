@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
-import {AvatarModule} from "primeng/avatar";
-import {MultiSelectModule} from "primeng/multiselect";
-import {NgClass, NgForOf, NgIf} from "@angular/common";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
-import {ButtonModule} from "primeng/button";
-import {InputTextareaModule} from "primeng/inputtextarea";
-import {ChipsModule} from "primeng/chips";
-import {AvailableRole} from "../../../../../shared/models/projects-models/project-create-response";
-import {Router} from "@angular/router";
-import {ProjectService} from "../../../../../core/service/project.service";
-import {ProjectRequest} from "../../../../../shared/models/projects-models/project-request";
-import {TagModule} from "primeng/tag";
-import {ConfirmationService} from "primeng/api";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
+import { AvatarModule } from 'primeng/avatar';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { NgClass, NgForOf, NgIf } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ChipsModule } from 'primeng/chips';
+import { AvailableRole } from '../../../../../shared/models/projects-models/project-create-response';
+import { Router } from '@angular/router';
+import { ProjectService } from '../../../../../core/service/project.service';
+import { ProjectRequest } from '../../../../../shared/models/projects-models/project-request';
+import { TagModule } from 'primeng/tag';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-project-create',
@@ -28,7 +28,7 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
     TagModule,
     ConfirmDialogModule,
     NgIf,
-    NgForOf
+    NgForOf,
   ],
   templateUrl: './project-create.component.html',
 })
@@ -36,6 +36,7 @@ export class ProjectCreateComponent {
   projectForm = this.fb.group({
     name: ['', Validators.required],
     description: ['', Validators.required],
+    contract_admin: [''],
   });
 
   loading = false;
@@ -58,14 +59,14 @@ export class ProjectCreateComponent {
 
       const projectData: ProjectRequest = {
         name: this.projectForm.value.name!,
-        description: this.projectForm.value.description!
+        description: this.projectForm.value.description!,
       };
 
       console.log('Enviando datos:', projectData);
 
       // Usar el servicio createProject
       this.projectService.createProject(projectData).subscribe({
-        next: (response) => {
+        next: response => {
           console.log('Respuesta del servidor:', response);
 
           this.createdProject = response.project;
@@ -77,11 +78,11 @@ export class ProjectCreateComponent {
           // Mostrar diálogo de éxito
           this.showSuccessDialog(response.project.name);
         },
-        error: (error) => {
+        error: error => {
           console.error('Error creando proyecto:', error);
           this.errorMessage = error.error?.message || 'Error al crear el proyecto';
           this.loading = false;
-        }
+        },
       });
     } else {
       // Marcar todos los campos como tocados para mostrar errores
@@ -111,7 +112,7 @@ export class ProjectCreateComponent {
       reject: () => {
         // Solo cerrar el diálogo
         console.log('Diálogo cerrado');
-      }
+      },
     });
   }
 }

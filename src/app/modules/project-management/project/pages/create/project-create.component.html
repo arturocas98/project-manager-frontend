@@ -1,7 +1,17 @@
 <div class="flex align-items-center justify-content-center px-4">
-
-  <div class="w-full max-w-6xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl">
-
+  <div
+    class="w-full max-w-6xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl"
+  >
+    <!-- <a
+          [routerLink]="['/project-management/projects/create']"
+          routerLinkActive="text-white bg-green-700 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-green-700 hover:text-white transition-all duration-300 group"
+          style="border-radius: 20px"
+          role="menuitem">
+          <i class="ph ph-stack-plus text-xl"></i>
+          <span class="text-xl">Agregar</span>
+        </a> -->
     <!-- Imagen / Panel Decorativo -->
     <div class="w-full md:w-6 flex flex-column p-5 align-items-center justify-content-center relative">
       <!-- Imagen -->
@@ -9,7 +19,8 @@
         <img
           src="assets/General/Cartoon-project-create.png"
           alt="Crear Proyecto"
-          class="w-22rem z-1 h-22rem sm:w-25rem sm:h-25rem object-fit-cover mt-8 sm:mt-0">
+          class="w-22rem z-1 h-22rem sm:w-25rem sm:h-25rem object-fit-cover mt-8 sm:mt-0"
+        />
       </div>
 
       <!-- Texto decorativo opcional -->
@@ -21,15 +32,10 @@
 
     <!-- Formulario -->
     <div class="w-full md:w-6 p-6 md:p-8">
-
       <!-- Header -->
       <div class="mb-6 text-center">
-        <h2 class="text-3xl font-bold text-color mb-2">
-          Crear Proyecto
-        </h2>
-        <p class="text-color-secondary">
-          Completa la información para registrar un nuevo proyecto
-        </p>
+        <h2 class="text-3xl font-bold text-color mb-2">Crear Proyecto</h2>
+        <p class="text-color-secondary">Completa la información para registrar un nuevo proyecto</p>
       </div>
 
       <!-- Loading State -->
@@ -57,12 +63,9 @@
       </div>
 
       <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
-
         <!-- Nombre -->
         <div>
-          <label class="block text-color font-medium mb-2">
-            Nombre del Proyecto
-          </label>
+          <label class="block text-color font-medium mb-2"> Nombre del Proyecto </label>
 
           <div class="p-inputgroup">
             <span class="p-inputgroup-addon">
@@ -73,20 +76,21 @@
               formControlName="name"
               class="w-full"
               placeholder="Ej: Sistema de Gestión Interna"
-              [ngClass]="{'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched}">
+              [ngClass]="{ 'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched }"
+            />
           </div>
 
-          <small *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
-                 class="p-error block mt-2">
+          <small
+            *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
+            class="p-error block mt-2"
+          >
             El nombre es obligatorio
           </small>
         </div>
 
         <!-- Descripción -->
         <div>
-          <label class="block text-color font-medium mb-2">
-            Descripción
-          </label>
+          <label class="block text-color font-medium mb-2"> Descripción </label>
 
           <textarea
             pInputTextarea
@@ -94,12 +98,41 @@
             formControlName="description"
             class="w-full"
             placeholder="Describe brevemente el propósito del proyecto"
-            [ngClass]="{'p-invalid': projectForm.get('description')?.invalid && projectForm.get('description')?.touched}">
+            [ngClass]="{
+              'p-invalid': projectForm.get('description')?.invalid && projectForm.get('description')?.touched,
+            }"
+          >
           </textarea>
 
-          <small *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"
-                 class="p-error block mt-2">
+          <small
+            *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"
+            class="p-error block mt-2"
+          >
             La descripción es obligatoria
+          </small>
+        </div>
+
+        <div>
+          <label class="block text-color font-medium mb-2"> Administrador del contrato del proyecto </label>
+
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-folder"></i>
+            </span>
+            <input
+              pInputText
+              formControlName="contract_admin"
+              class="w-full"
+              placeholder="Ej: Ing. Admin"
+              [ngClass]="{ 'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched }"
+            />
+          </div>
+
+          <small
+            *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
+            class="p-error block mt-2"
+          >
+            El administrador del contrato es obligatorio
           </small>
         </div>
 
@@ -112,23 +145,19 @@
             icon="pi pi-check"
             class="p-button-raised"
             [disabled]="projectForm.invalid || loading"
-            [loading]="loading">
-          </button>
+            [loading]="loading"
+          ></button>
         </div>
-
       </form>
-
     </div>
-
   </div>
-
 
   <!-- Diálogo de confirmación (se muestra automáticamente al llamar confirmationService.confirm) -->
   <p-confirmDialog
     [baseZIndex]="10000"
     rejectButtonStyleClass="p-button-text"
-    acceptButtonStyleClass="p-button-success">
-
+    acceptButtonStyleClass="p-button-success"
+  >
     <!-- Personalización del header (opcional) -->
     <ng-template pTemplate="header">
       <div class="flex align-items-center gap-2 text-green-700">
@@ -145,8 +174,8 @@
         label="Cerrar"
         icon="pi pi-times"
         (click)="confirmationService.close()"
-        class="p-button-text">
-      </button>
+        class="p-button-text"
+      ></button>
     </ng-template>
   </p-confirmDialog>
 </div>

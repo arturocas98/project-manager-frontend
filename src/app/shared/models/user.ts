@@ -1,4 +1,4 @@
-import {Permission, Role} from "./role";
+import { Permission, Role } from './role';
 
 export interface User {
   id: number;
@@ -7,8 +7,12 @@ export interface User {
   last_login_at?: string;
   created_at?: string;
   updated_at?: string;
-  roles?: Role[];
+  roles?: string[];
+  rols: Role[];
   permissions?: Permission[];
+  modality_id: string;
+  address: string;
+  telephone: string;
 }
 
 export interface LoginData {
