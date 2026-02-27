@@ -1,4 +1,4 @@
 export const environment = {
-    production: true,
-    apiUrl: 'https://api.teamq.biz/api',
+  production: true,
+  apiUrl: 'http://192.168.10.136:8001/api',
 };
