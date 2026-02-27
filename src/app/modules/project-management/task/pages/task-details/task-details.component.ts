@@ -153,10 +153,13 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   /**
    * Abre el modal de edición
    */
-  editTask() {
-    this.router.navigate(['/projects', this.projectId, 'tasks', 'edit'], {
-      queryParams: { taskId: this.taskId }
-    });
+  editTask(taskId: number): void {
+    this.router.navigate([
+      '/project-management/projects/kanban',
+      this.projectId,
+      'task-update',
+      taskId
+    ])
   }
 
   /**
@@ -185,4 +188,6 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       .toUpperCase()
       .substring(0, 2);
   }
+
+  protected readonly Number = Number;
 }

@@ -4,9 +4,10 @@ import { Router } from '@angular/router';
 import {Observable, tap} from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Constants, LOCAL_STORAGE_KEYS } from 'src/app/shared/constants/constants';
-import { User } from 'src/app/shared/models/user';
-import {ApiSingleResponse} from "../../shared/models/api-response.model";
+import {Profile, User} from 'src/app/shared/models/user';
+import {ApiCollectionResponse, ApiSingleResponse} from "../../shared/models/api-response.model";
 import {ProjectSummaryData} from "../../shared/models/summary-response";
+import {ApiService} from "./api.service";
 
 export interface LoginData {
   email: string;
@@ -34,7 +35,8 @@ export class AuthService {
 
   constructor(
     private readonly http: HttpClient,
-    private readonly router: Router
+    private readonly router: Router,
+    private apiService: ApiService
   ) {
     this.loadProfileFromStorage();
   }
@@ -69,6 +71,12 @@ export class AuthService {
       })
     );
   }
+
+  getProfiles(): Observable<Profile[]> {
+    return this.apiService.get<Profile[]>('user/profiles');
+  }
+
+
 
   /**
    * Actualizar estado del perfil (signal + localStorage)

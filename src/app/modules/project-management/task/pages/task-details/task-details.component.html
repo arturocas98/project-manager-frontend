@@ -22,7 +22,7 @@
       label="Editar"
       icon="pi pi-pencil"
       class="p-button-raised p-button-primary"
-      (click)="editTask()"
+      (click)="editTask(Number(task?.id))"
       [disabled]="!task || loading">
     </button>
   </div>

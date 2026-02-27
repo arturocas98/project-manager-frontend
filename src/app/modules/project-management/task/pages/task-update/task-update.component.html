@@ -1,1 +1,339 @@
-<p>task-update works!</p>
+<div class="min-h-screen flex align-items-center justify-content-center px-4 py-6">
+
+  <div class="w-full max-w-3xl surface-card surface-border border-1 border-round-3xl shadow-2xl p-6 md:p-8">
+
+    <!-- Toast para mensajes -->
+    <p-toast position="top-right"></p-toast>
+
+    <div class="w-full flex align-items-center justify-content-center">
+      <img
+        src="assets/General/Cartoon_task_edit.png"
+        alt="Editar Tarea"
+        class="w-25rem h-24rem mb-4 object-fit-cover">
+    </div>
+
+    <!-- Header -->
+    <div class="mb-6 text-center">
+      <h2 class="text-3xl font-bold text-color mb-2">
+        Editar Tarea #{{ taskId }}
+      </h2>
+      <p class="text-color-secondary">
+        Modifica la información de la tarea
+      </p>
+    </div>
+
+    <!-- Loader -->
+    <div *ngIf="loading" class="flex justify-content-center align-items-center py-6">
+      <div class="text-center">
+        <p-progressSpinner
+          styleClass="w-4rem h-4rem"
+          strokeWidth="4"
+          fill="var(--surface-ground)"
+          animationDuration=".8s">
+        </p-progressSpinner>
+        <p class="mt-3 text-color-secondary">Cargando información de la tarea...</p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error && !loading" class="flex justify-content-center align-items-center py-6">
+      <div class="text-center">
+        <i class="pi pi-exclamation-circle text-6xl text-red-500 mb-3"></i>
+        <h3 class="text-xl font-medium text-color mb-2">Error al cargar la tarea</h3>
+        <p class="text-color-secondary mb-4">{{ error }}</p>
+        <button
+          pButton
+          label="Reintentar"
+          icon="pi pi-refresh"
+          class="p-button-raised"
+          (click)="loadTaskDetails()">
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario de edición -->
+    <form *ngIf="!loading && task" [formGroup]="taskForm"
+          (ngSubmit)="onSubmit()"
+          class="flex flex-column gap-4">
+
+      <!-- ID de referencia y estado actual -->
+      <div class="grid">
+        <div class="col-6">
+          <div class="flex align-items-center gap-2 p-2 surface-ground border-round">
+            <i class="pi pi-hashtag text-primary"></i>
+            <span class="text-color-secondary">ID:</span>
+            <span class="font-bold text-color">{{ task.id }}</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="flex align-items-center gap-2 p-2 surface-ground border-round">
+            <i class="pi pi-tag text-primary"></i>
+            <span class="text-color-secondary">Estado:</span>
+            <span class="font-bold text-color">{{ stateName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Título -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Título <span class="text-red-500">*</span>
+        </label>
+
+        <input
+          pInputText
+          formControlName="title"
+          class="w-full"
+          placeholder="Ej: Crear endpoint para tareas"
+          [ngClass]="{'p-invalid': taskForm.get('title')?.invalid && taskForm.get('title')?.touched}">
+
+        <small *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
+               class="p-error block mt-2">
+          El título es obligatorio (mínimo 3 caracteres)
+        </small>
+      </div>
+
+      <!-- Descripción -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Descripción <span class="text-red-500">*</span>
+        </label>
+
+        <textarea
+          pInputTextarea
+          rows="4"
+          formControlName="description"
+          class="w-full"
+          placeholder="Describe el objetivo de la tarea"
+          [ngClass]="{'p-invalid': taskForm.get('description')?.invalid && taskForm.get('description')?.touched}">
+        </textarea>
+
+        <small *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
+               class="p-error block mt-2">
+          La descripción es obligatoria
+        </small>
+      </div>
+
+      <!-- Grid de 2 columnas -->
+      <div class="grid">
+        <!-- Prioridad -->
+        <div class="col-12 md:col-6">
+          <label class="block text-color font-medium mb-2">
+            Prioridad <span class="text-red-500">*</span>
+          </label>
+
+          <p-dropdown
+            formControlName="priority"
+            [options]="priorities"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar prioridad"
+            class="w-full"
+            [ngClass]="{'p-invalid': taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched}">
+          </p-dropdown>
+
+          <small *ngIf="taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched"
+                 class="p-error block mt-2">
+            La prioridad es obligatoria
+          </small>
+        </div>
+
+        <!-- Tipo (no editable) -->
+        <div class="col-12 md:col-6">
+          <label class="block text-color font-medium mb-2">
+            Tipo <span class="text-red-500">*</span>
+          </label>
+
+          <input
+            pInputText
+            [value]="task?.type?.type"
+            class="w-full surface-card"
+            readonly
+            [ngClass]="{'bg-gray-100': true}">
+
+          <small class="block mt-2 text-color-secondary">
+            El tipo de tarea no se puede modificar
+          </small>
+        </div>
+      </div>
+
+      <!-- Usuario Asignado -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Asignar a
+          <span *ngIf="taskType === EPIC_TYPE || taskType === HISTORY_USER_TYPE"
+                class="text-red-500">*</span>
+          <span *ngIf="taskType !== EPIC_TYPE && taskType !== HISTORY_USER_TYPE"
+                class="text-sm text-color-secondary">(opcional)</span>
+        </label>
+
+        <p-dropdown
+          formControlName="assigned_user_id"
+          [options]="memberOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar usuario"
+          class="w-full"
+          [showClear]="true"
+          [filter]="true"
+          [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
+          <ng-template pTemplate="selectedItem">
+            <div *ngIf="taskForm.get('assigned_user_id')?.value">
+              <span>{{ getSelectedMemberLabel() }}</span>
+            </div>
+          </ng-template>
+          <ng-template let-member pTemplate="item">
+            <div class="flex align-items-center gap-2">
+              <span class="font-medium">{{ member.label }}</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+
+        <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
+               class="p-error block mt-2">
+          Debes seleccionar un usuario asignado
+        </small>
+
+        <small *ngIf="memberOptions.length === 0" class="p-warning block mt-2 text-orange-500">
+          <i class="pi pi-exclamation-triangle mr-1"></i>
+          No hay miembros disponibles en el proyecto
+        </small>
+      </div>
+
+      <!-- Fechas -->
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <label class="block text-color font-medium mb-2">
+            Fecha de inicio
+          </label>
+          <p-calendar
+            formControlName="start_date"
+            [showIcon]="true"
+            [showButtonBar]="true"
+            dateFormat="yy-mm-dd"
+            placeholder="yyyy-mm-dd"
+            class="w-full"
+            inputStyleClass="w-full">
+          </p-calendar>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <label class="block text-color font-medium mb-2">
+            Fecha de vencimiento
+          </label>
+          <p-calendar
+            formControlName="due_date"
+            [showIcon]="true"
+            [showButtonBar]="true"
+            dateFormat="yy-mm-dd"
+            placeholder="yyyy-mm-dd"
+            class="w-full"
+            inputStyleClass="w-full">
+          </p-calendar>
+        </div>
+      </div>
+
+      <!-- Selector de Padre (condicional) -->
+      <div *ngIf="showParentSelector">
+        <label class="block text-color font-medium mb-2">
+          {{ parentLabel }} <span class="text-red-500">*</span>
+        </label>
+
+        <p-dropdown
+          formControlName="parent_id"
+          [options]="parentOptions"
+          optionLabel="label"
+          optionValue="value"
+          [placeholder]="'Seleccionar ' + parentLabel"
+          class="w-full"
+          [showClear]="true"
+          [filter]="true"
+          [ngClass]="{'p-invalid': taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched}">
+        </p-dropdown>
+
+        <small *ngIf="taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched"
+               class="p-error block mt-2">
+          Debes seleccionar un {{ parentLabel.toLowerCase() }}
+        </small>
+
+        <small *ngIf="parentOptions.length === 0 && showParentSelector"
+               class="p-warning block mt-2 text-orange-500">
+          <i class="pi pi-exclamation-triangle mr-1"></i>
+          No hay {{ parentLabel.toLowerCase() }}s disponibles para seleccionar como padre.
+        </small>
+      </div>
+
+      <!-- Información adicional de la tarea actual -->
+      <p-accordion>
+        <p-accordionTab header="Información adicional">
+          <div class="grid">
+            <div class="col-6">
+              <p><span class="font-medium">Creado por:</span> {{ task.created_by.name }}</p>
+              <p><span class="font-medium">Creado el:</span> {{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+            <div class="col-6">
+              <p *ngIf="task.parent">
+                <span class="font-medium">Tarea padre:</span> {{ task.parent.title }}
+              </p>
+              <p><span class="font-medium">Última actualización:</span> {{ task.updated_at | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+        </p-accordionTab>
+      </p-accordion>
+
+      <!-- Botones -->
+      <div class="flex justify-content-end gap-3 mt-3">
+
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          class="p-button-text"
+          (click)="onCancel()"
+          [disabled]="saving">
+        </button>
+
+        <button
+          pButton
+          type="submit"
+          label="Actualizar Tarea"
+          icon="pi pi-save"
+          class="p-button-raised"
+          [disabled]="taskForm.invalid || saving"
+          [loading]="saving">
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- Diálogo de confirmación -->
+<p-confirmDialog
+  [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-text p-button-secondary"
+  acceptButtonStyleClass="p-button-success p-button-raised"
+>
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2"
+         [ngClass]="{
+           'text-primary': currentDialogHeader === 'Confirmar Actualización'
+         }">
+
+      <i
+        [class]="currentDialogHeader === '¡Tarea Actualizada!'
+          ? 'pi pi-check-circle'
+          : 'pi pi-question-circle'"
+        style="font-size: 1.5rem">
+      </i>
+
+      <span class="font-bold text-xl">
+        {{ currentDialogHeader }}
+      </span>
+
+    </div>
+  </ng-template>
+</p-confirmDialog>
