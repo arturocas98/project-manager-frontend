@@ -79,7 +79,8 @@
     "goals": "Metas",
     "teams": "Equipos",
     "projects": "Proyectos",
-    "customizeSidebar": "Personalizar barra lateral"
+    "customizeSidebar": "Personalizar barra lateral",
+    "users": "Usuarios"
   },
   "validation": {
     "usernameRequired": "El nombre de usuario es requerido",

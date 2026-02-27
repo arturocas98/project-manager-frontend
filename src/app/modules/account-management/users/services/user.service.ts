@@ -1,10 +1,10 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { User } from "src/app/shared/models/user";
-import { environment } from "src/environments/environment";
-import {ParamJson} from "../../../../shared/models/params.model";
-import {MetaData} from "../../../../shared/models/api-response.model";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { User } from 'src/app/shared/models/user';
+import { environment } from 'src/environments/environment';
+import { ParamJson } from '../../../../shared/models/params.model';
+import { MetaData } from '../../../../shared/models/api-response.model';
 
 export interface UserCollectionResponse {
   data: User[];
@@ -16,39 +16,29 @@ export interface UserResponse {
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class UserService {
   constructor(private http: HttpClient) {}
 
   getUsers(params: ParamJson = {}): Observable<UserCollectionResponse> {
-    const url = `${environment.apiUrl}/security/users`;
+    const url = `${environment.apiUrl}/auth/users`;
     return this.http.get<UserCollectionResponse>(url, { params });
   }
 
   getUser(id: number): Observable<UserResponse> {
-    return this.http.get<UserResponse>(
-      `${environment.apiUrl}/security/users/${id}`,
-    );
+    return this.http.get<UserResponse>(`${environment.apiUrl}/auth/users/${id}`);
   }
 
   deleteUser(id: number): Observable<boolean> {
-    return this.http.delete<boolean>(
-      `${environment.apiUrl}/security/users/${id}`,
-    );
+    return this.http.delete<boolean>(`${environment.apiUrl}/auth/users/${id}`);
   }
 
   createUser(user: User): Observable<boolean> {
-    return this.http.post<boolean>(
-      `${environment.apiUrl}/security/users`,
-      user,
-    );
+    return this.http.post<boolean>(`${environment.apiUrl}/auth/users`, user);
   }
 
   updateUser(user: User, userId: number): Observable<boolean> {
-    return this.http.put<boolean>(
-      `${environment.apiUrl}/security/users/${userId}`,
-      user,
-    );
+    return this.http.put<boolean>(`${environment.apiUrl}/auth/users/${userId}`, user);
   }
 }

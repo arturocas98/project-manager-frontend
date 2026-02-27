@@ -1,13 +1,13 @@
 export const Constants = {
   zero: 0,
   routes: {
-    userList: 'user/list',
-    userCreate: 'user/create',
-    userEdit: 'user/edit',
-    roleList: 'role/list',
+    userList: 'account-management/users/list',
+    userCreate: 'account-management/users/create',
+    userEdit: 'account-management/users/edit',
+    roleList: 'account-management/roles/list',
     projectList: 'project-management/projects/list',
-    roleCreate: 'role/create',
-    roleEdit: 'role/edit',
+    roleCreate: 'account-management/roles/create',
+    roleEdit: 'account-management/roles/edit',
     login: 'auth/login',
     newpassword: 'auth/newpassword',
     forgotpassword: 'auth/forgotpassword',
@@ -30,6 +30,7 @@ export const Constants = {
 
     goals: 'ph ph-person-simple-run',
     teams: 'ph ph-users-three',
+    users: 'ph ph-users',
     projects: 'ph ph-rocket-launch',
     settings: 'ph ph-gear-six',
 
