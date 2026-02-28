@@ -9,7 +9,7 @@ import { Constants, ROLE } from 'src/app/shared/constants/constants';
   selector: 'app-menu',
   templateUrl: './app.menu.component.html',
 })
-export class AppMenuComponent implements OnInit {
+  export class AppMenuComponent implements OnInit {
   model: MenuItem[] = [];
   isAdmin: boolean = false;
 
@@ -20,35 +20,47 @@ export class AppMenuComponent implements OnInit {
     this.isAdmin = this.authService.isAdmin;
     console.log(this.isAdmin);
   }
-
   ngOnInit(): void {
-    this.authService.rolesObservable$.subscribe(roles => {
-      console.log('roles:', roles);
+    // Cargar perfil desde storage
+    this.authService.loadProfileFromStorage();
 
-      this.buildMenu(roles);
+    // Suscribirse al rol actual para actualizar el menú
+    this.authService.roleObservable$.subscribe(role => {
+      console.log('role:', role);
+      this.buildMenu(role);
+    });
+
+    // Suscribirse a cambios de idioma
+    this.subscribeToLanguageChanges();
+  }
+
+  private subscribeToLanguageChanges(): void {
+    this.translateService.onLangChange.subscribe(() => {
+      const role = this.authService.role$.value; // obtener rol actual
+      this.buildMenu(role);
     });
   }
 
-  private buildMenu(roles: string[]): void {
+  private buildMenu(role: string | null): void {
     this.model = [];
 
-    const isAdmin = roles.includes(ROLE.ADMIN);
-    let items = [];
+    const isAdmin = role === ROLE.ADMIN; // comparar directamente
+    let items: any[] = [];
 
     if (isAdmin) {
       items = [
         {
-          label: this.translateService.instant('dashboard'),
+          labelKey: 'dashboard',
           icon: Constants.icons.dashboard,
           routerLink: [Constants.routes.dashboard],
         },
         {
-          label: this.translateService.instant('sideBar.users'),
+          labelKey: 'sideBar.users',
           icon: Constants.icons.users,
           routerLink: [Constants.routes.userList],
         },
         {
-          label: this.translateService.instant('sideBar.projects'),
+          labelKey: 'sideBar.projects',
           icon: Constants.icons.projects,
           routerLink: [Constants.routes.projectList],
         },
@@ -56,7 +68,7 @@ export class AppMenuComponent implements OnInit {
     } else {
       items = [
         {
-          label: this.translateService.instant('dashboard'),
+          labelKey: 'dashboard',
           icon: Constants.icons.dashboard,
           routerLink: [Constants.routes.dashboard],
         },
@@ -68,7 +80,6 @@ export class AppMenuComponent implements OnInit {
       items: items,
     });
   }
-
   // ngAfterViewChecked(): void {
   //   if (
   //     Object.keys(this.translateService.store.translations).length > Constants.zero &&

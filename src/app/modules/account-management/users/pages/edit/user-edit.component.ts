@@ -14,6 +14,7 @@ import { UserResponse, UserService } from '../../services/user.service';
 import { Option } from 'src/app/shared/models/general';
 import { RoleService } from '../../../roles/services/role.service';
 import { ParamJson } from 'src/app/shared/models/params.model';
+import {AuthService} from "../../../../../core/service/auth.service";
 
 @Component({
   templateUrl: './user-edit.component.html',
@@ -48,6 +49,7 @@ export class UserEditComponent implements OnInit {
   ];
 
   constructor(
+    private authService: AuthService,
     private userService: UserService,
     private fb: FormBuilder,
     private router: Router,
@@ -59,39 +61,46 @@ export class UserEditComponent implements OnInit {
       this.userId = +userId;
     }
 
+    // Inicializar el formulario
     this.ngForm = this.fb.group({
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', []],
-      password_confirmation: ['', []],
-      rols: [null],
+      password: [''],
+      password_confirmation: [''],
+      role: [null],
       modality_id: [''],
       telephone: [''],
       address: [''],
     });
 
-    const params: ParamJson = {
-      ...Constants.pageParams.all,
-    };
-
-    this.roleService.getRoles(params).subscribe(rols => {
-      this.roles = rols.data;
+    // Cargar opciones de roles desde el backend
+    const params: ParamJson = { ...Constants.pageParams.all };
+    this.roleService.getRoles(params).subscribe(res => {
+      this.roles = res.data;
     });
   }
 
+
   ngOnInit(): void {
     if (this.userId) {
-      this.userService.getUser(this.userId).subscribe((response: UserResponse) => {
-        const user = response.data;
+      this.authService.getProfile().subscribe({
+        next: response => {
+          const user = response.data;
 
-        this.ngForm.patchValue({
-          name: user.name,
-          email: user.email,
-          telephone: user.telephone,
-          address: user.address,
-          modality_id: user.modality_id,
-          rols: user.rols?.length ? user.rols[0] : null,
-        });
+          // Encontrar la opción de rol que coincida con el role del usuario
+          const selectedRole = this.roles.find(r => r.name === user.role) || null;
+
+          // Patch del formulario
+          this.ngForm.patchValue({
+            name: user.name,
+            email: user.email,
+            telephone: user.telephone,
+            address: user.address,
+            modality_id: user.modality_id,
+            role: selectedRole,
+          });
+        },
+        error: err => console.error('Error al cargar perfil', err)
       });
     }
   }

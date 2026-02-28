@@ -25,11 +25,6 @@ export class UserService {
     const url = `${environment.apiUrl}/auth/users`;
     return this.http.get<UserCollectionResponse>(url, { params });
   }
-
-  getUser(id: number): Observable<UserResponse> {
-    return this.http.get<UserResponse>(`${environment.apiUrl}/auth/users/${id}`);
-  }
-
   deleteUser(id: number): Observable<boolean> {
     return this.http.delete<boolean>(`${environment.apiUrl}/auth/users/${id}`);
   }

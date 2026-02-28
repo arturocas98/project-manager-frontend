@@ -44,7 +44,7 @@
          style="cursor:pointer">
 
         <i *ngIf="child.icon" [class]="child.icon" class="text-3xl"></i>
-        <span style="font-size:1.3rem;">{{child.label}}</span>
+        <span style="font-size:1.3rem;">{{ child['labelKey'] | translate }}</span>
       </a>
 
 

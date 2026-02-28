@@ -31,7 +31,7 @@ export interface RegisterData {
 export class AuthService {
   private _profile = signal<User | null>(null);
   readonly profile = this._profile.asReadonly();
-  roles$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  role$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 
   constructor(
     private readonly http: HttpClient,
@@ -58,7 +58,7 @@ export class AuthService {
     return this.http.get<ApiSingleResponse<User>>(`${environment.apiUrl}/user/profile`).pipe(
       tap(response => {
         this._profile.set(response.data);
-        this.setRoles(response.data);
+        this.setRole(response.data);
         localStorage.setItem(LOCAL_STORAGE_KEYS.profile, JSON.stringify(response.data));
         console.log(response.data);
       })
@@ -121,7 +121,7 @@ export class AuthService {
       })
     );
   }
-  private loadProfileFromStorage(): void {
+  loadProfileFromStorage(): void {
     const profileStr = localStorage.getItem(LOCAL_STORAGE_KEYS.profile);
 
     if (!profileStr) return;
@@ -129,30 +129,22 @@ export class AuthService {
     try {
       const user = JSON.parse(profileStr) as User;
       this._profile.set(user);
+      this.setRole(user); // ahora setRole
     } catch (error) {
       console.error('Error parsing profile', error);
     }
   }
-
-  setRoles(user: User): void {
-    const roles: string[] = [];
-    if (!!user && Array.isArray(user.roles)) {
-      user.roles.forEach(rol => {
-        console.log('rol', rol);
-
-        roles.push(rol);
-      });
-    }
-    console.log(roles);
-
-    this.roles$.next(roles);
+  setRole(user: User): void {
+    const role = user.role ?? null; // tomar el rol único
+    console.log('role', role);
+    this.role$.next(role);
   }
 
   get isAdmin(): boolean {
-    return this.roles$.value.join().includes(ROLE.ADMIN);
+    return this.role$.value === ROLE.ADMIN;
   }
 
-  get rolesObservable$(): Observable<string[]> {
-    return this.roles$.asObservable();
+  get roleObservable$(): Observable<string | null> {
+    return this.role$.asObservable();
   }
 }
