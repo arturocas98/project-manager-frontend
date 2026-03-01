@@ -8,7 +8,11 @@ import {map, Observable} from "rxjs";
 import {ApiService} from "./api.service";
 import {ProjectSummaryData} from "../../shared/models/summary-response";
 import {UserUnassigned} from "../../shared/models/projects-models/userunassigned-model";
-import {ProjectRequest, UpdateProjectRequest} from "../../shared/models/projects-models/project-request";
+import {
+  ProjectMemberRequest, ProjectMemberUpdateRequest,
+  ProjectRequest,
+  UpdateProjectRequest
+} from "../../shared/models/projects-models/project-request";
 import {ProjectCreationData} from "../../shared/models/projects-models/project-create-response";
 import {ProjectResponse} from "../../shared/models/projects-models/ProjectResponse";
 import {
@@ -75,6 +79,14 @@ export class ProjectService {
 
   deletProject(projectId: number): Observable<any> {
     return this.apiService.delete<any>(`projects/${projectId}`);
+  }
+
+  addMember(projectId: number,projectMemberData: ProjectMemberRequest): Observable<any> {
+    return this.apiService.post<any>(`projects/${projectId}/members`, projectMemberData);
+  }
+
+  updateMember(projectId: number,memberId:number, projectMemberUpdateData: ProjectMemberUpdateRequest): Observable<any> {
+    return this.apiService.patch<any>(`projects/${projectId}/members/${memberId}/role`, projectMemberUpdateData);
   }
 
   getUnassignedUsers(projectId: number): Observable<UserUnassigned[]> {

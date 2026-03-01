@@ -75,6 +75,10 @@ export interface ApiSingleResponse<T = any> extends ApiResponse<T> {
   data: T;
 }
 
+export interface ApiCollectionResponse<T> {
+  data: T[];
+}
+
 /**
  * Para respuestas con paginación (cuando meta tiene info de paginación)
  */

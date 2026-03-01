@@ -6,8 +6,8 @@ import { environment } from 'src/environments/environment';
 import { Constants, LOCAL_STORAGE_KEYS, ROLE } from 'src/app/shared/constants/constants';
 import { User } from 'src/app/shared/models/user';
 import { ApiSingleResponse } from '../../shared/models/api-response.model';
-import { ProjectSummaryData } from '../../shared/models/summary-response';
 import { Profile } from 'src/app/shared/models/auth';
+import { ApiService } from './api.service';
 
 export interface LoginData {
   email: string;
@@ -35,7 +35,8 @@ export class AuthService {
 
   constructor(
     private readonly http: HttpClient,
-    private readonly router: Router
+    private readonly router: Router,
+    private apiService: ApiService
   ) {
     this.loadProfileFromStorage();
   }
@@ -63,6 +64,10 @@ export class AuthService {
         console.log(response.data);
       })
     );
+  }
+
+  getProfiles(): Observable<Profile[]> {
+    return this.apiService.get<Profile[]>('user/profiles');
   }
 
   /**

@@ -280,7 +280,6 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
   private getStateName(stateId: number): string {
     return this.stateMap[stateId] || 'Open';
   }
-
   /**
    * Obtiene la etiqueta del miembro seleccionado
    */

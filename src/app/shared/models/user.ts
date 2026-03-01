@@ -14,6 +14,12 @@ export interface User {
   telephone: string;
 }
 
+export interface Profile {
+  id: number;
+  name: string;
+  email: string;
+}
+
 export interface LoginData {
   email: string;
   password: string;
