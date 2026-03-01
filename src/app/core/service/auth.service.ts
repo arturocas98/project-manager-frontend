@@ -14,6 +14,10 @@ export interface LoginData {
   password: string;
 }
 
+export interface LoginResponse {
+  data: LoginResponseData;
+}
+
 interface LoginResponseData {
   access_token: string;
 }
@@ -44,12 +48,8 @@ export class AuthService {
   /**
    * Login - usando ApiResponse
    */
-  // login(data: LoginData): Observable<ApiSingleResponse<LoginResponseData>> {
-  //   return this.http.post<ApiSingleResponse<LoginResponseData>>(`${environment.apiUrl}/auth/login`, data);
-  // }
-
-  login(data: LoginData): Observable<ApiSingleResponse<LoginResponseData>> {
-    return this.apiService.post<ApiSingleResponse<LoginResponseData>>('auth/login', data);
+  login(data: LoginData): Observable<LoginResponse> {
+    return this.http.post(`${environment.apiUrl}/auth/login`, data) as Observable<LoginResponse>;
   }
 
   register(data: RegisterData): Observable<HttpResponse<any>> {
@@ -86,21 +86,8 @@ export class AuthService {
   /**
    * Obtener perfil desde localStorage
    */
-  getProfileLocal(): User | null {
-    const profileStr = localStorage.getItem(LOCAL_STORAGE_KEYS.profile);
-
-    if (!profileStr) {
-      return null;
-    }
-
-    try {
-      const user = JSON.parse(profileStr) as User;
-      this._profile.set(user);
-      return user;
-    } catch (error) {
-      console.error('Error parsing profile', error);
-      return null;
-    }
+  getProfileLocal(): Profile {
+    return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.profile)!) as Profile;
   }
 
   logout(): void {
@@ -146,7 +133,6 @@ export class AuthService {
   }
   setRole(user: User): void {
     const role = user.role ?? null; // tomar el rol único
-    console.log('role', role);
     this.role$.next(role);
   }
 

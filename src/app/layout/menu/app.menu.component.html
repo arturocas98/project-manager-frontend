@@ -1,76 +1,70 @@
 <ul class="layout-menu">
-  <ng-container *ngFor="let item of model; let i = index;">
-
+  <ng-container *ngFor="let item of model; let i = index">
     <li *ngFor="let child of item.items" class="menu-item-wrapper">
-
       <!-- Item con subitems -->
-      <a *ngIf="child.items && child.items.length > 0"
-         class="flex align-items-center gap-4 px-5 py-2 border-round-2xl text-color text-xl hover:surface-hover transition-colors"
-         style="cursor:pointer"
-         (click)="toggleSubmenu(child)"
-         [class.text-primary]="child['expanded']"
-         [class.surface-hover]="child['expanded']">
-
+      <a
+        *ngIf="child.items && child.items.length > 0"
+        class="flex align-items-center gap-4 px-5 py-2 border-round-2xl text-color text-xl hover:surface-hover transition-colors"
+        style="cursor: pointer"
+        (click)="toggleSubmenu(child)"
+        [class.text-primary]="child['expanded']"
+        [class.surface-hover]="child['expanded']"
+      >
         <i *ngIf="child.icon" [class]="child.icon"></i>
-        <span style="font-size:1.3rem;">{{child.label}}</span>
-        <i class="ph ph-caret-right ml-auto"
-           [ngClass]="{'rotate-90': child['expanded']}"></i>
+        <span style="font-size: 1.3rem">{{ child.label }}</span>
+        <i class="ph ph-caret-right ml-auto" [ngClass]="{ 'rotate-90': child['expanded'] }"></i>
       </a>
 
-
       <!-- Item tipo "more" -->
-      <a *ngIf="child['more']"
-         [routerLink]="child.routerLink"
-         routerLinkActive="surface-hover text-primary"
-         [routerLinkActiveOptions]="{exact: true}"
-         class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color hover:surface-hover transition-colors"
-         style="cursor:pointer">
-
-        <div class="w-3rem h-2rem border-round-2xl surface-card flex align-items-center justify-content-center text-primary">
+      <a
+        *ngIf="child['more']"
+        [routerLink]="child.routerLink"
+        routerLinkActive="surface-hover text-primary"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color hover:surface-hover transition-colors"
+        style="cursor: pointer"
+      >
+        <div
+          class="w-3rem h-2rem border-round-2xl surface-card flex align-items-center justify-content-center text-primary"
+        >
           <i [class]="child.icon || 'ph ph-person-simple-run'" class="text-2xl"></i>
         </div>
 
-        <span style="font-size:1.3rem;">{{child.label}}</span>
+        <span style="font-size: 1.3rem">{{ child.label }}</span>
         <i class="ph ph-arrow-circle-right ml-auto text-3xl text-color-secondary"></i>
       </a>
 
-
       <!-- Item simple -->
-      <a *ngIf="(!child.items || child.items.length === 0) && !child['more']"
-         [routerLink]="child.routerLink"
-         routerLinkActive="surface-hover text-primary"
-         [routerLinkActiveOptions]="{exact: true}"
-         class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color hover:surface-hover transition-colors"
-         style="cursor:pointer">
-
+      <a
+        *ngIf="(!child.items || child.items.length === 0) && !child['more']"
+        [routerLink]="child.routerLink"
+        routerLinkActive="surface-hover text-primary"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color hover:surface-hover transition-colors"
+        style="cursor: pointer"
+      >
         <i *ngIf="child.icon" [class]="child.icon" class="text-3xl"></i>
-        <span style="font-size:1.3rem;">{{ child['labelKey'] | translate }}</span>
+        <span style="font-size: 1.3rem">{{ child.label }}</span>
       </a>
 
-
       <!-- Submenu -->
-      <ul *ngIf="child.items && child.items.length > 0 && child.expanded"
-          class="submenu pl-4 mt-1">
-
+      <ul *ngIf="child.items && child.items.length > 0 && child.expanded" class="submenu pl-4 mt-1">
         <li *ngFor="let subItem of child.items">
-          <a [routerLink]="subItem.routerLink"
-             routerLinkActive="surface-hover text-primary"
-             [routerLinkActiveOptions]="{exact: true}"
-             class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color-secondary hover:surface-hover transition-colors"
-             style="cursor:pointer">
-
+          <a
+            [routerLink]="subItem.routerLink"
+            routerLinkActive="surface-hover text-primary"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color-secondary hover:surface-hover transition-colors"
+            style="cursor: pointer"
+          >
             <i *ngIf="subItem.icon" [class]="subItem.icon" class="text-3xl"></i>
-            <span style="font-size:1.3rem;">{{subItem.label}}</span>
+            <span style="font-size: 1.3rem">{{ subItem.label }}</span>
           </a>
         </li>
       </ul>
-
     </li>
 
     <!-- Separador -->
-    <li *ngIf="item.separator"
-        class="menu-separator my-2 border-top-1 surface-border">
-    </li>
-
+    <li *ngIf="item.separator" class="menu-separator my-2 border-top-1 surface-border"></li>
   </ng-container>
 </ul>

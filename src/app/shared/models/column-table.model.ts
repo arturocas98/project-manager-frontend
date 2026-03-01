@@ -1,6 +1,6 @@
 // src/app/shared/models/column-table.model.ts
 import { TABLE_KEY_FIELDS } from '../constants/constants';
-import {ApiPaginatedResponse, ApiResponse} from "./api-response.model";
+import { ApiPaginatedResponse, ApiResponse } from './api-response.model';
 
 export interface ColumnSort {
   show: boolean;
@@ -17,7 +17,9 @@ export interface ColumnTable {
   value: string[]; // Campos del objeto a mostrar
   action?: boolean; // Si es columna de acciones
   field?: string; // Campo alternativo para ordenamiento
-  header?: string; // Texto del header (si no se usa traducción)
+  header?: string; // Texto del header (si no se usa traducción),
+  index?: boolean;
+  toDate?: string;
 }
 
 /**

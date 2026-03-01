@@ -46,6 +46,16 @@ export const Constants = {
     fiftyPerPage: { perPage: '50' },
     thousandPerPage: { perPage: '1000' },
   },
+  alert: {
+    alertName: 'alert',
+    keyDialogDelete: 'confirmDelete',
+    keyDialogApprove: 'confirmApprove',
+    success: 'success',
+    info: 'info',
+    warning: 'warning',
+    error: 'error',
+    sticky: false,
+  },
 };
 
 export const NUMBERS = {

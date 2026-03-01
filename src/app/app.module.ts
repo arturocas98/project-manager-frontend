@@ -1,7 +1,4 @@
-import {
-    LocationStrategy,
-    PathLocationStrategy
-} from '@angular/common';
+import { LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -9,34 +6,36 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppLayoutModule } from './layout/app.layout.module';
-import {AuthModule} from "./shared/components/auth/auth.module";
-import {ModalModule} from "./shared/components/Modal/modal.module";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {BrowserModule} from "@angular/platform-browser";
+import { AuthModule } from './shared/components/auth/auth.module';
+import { ModalModule } from './shared/components/Modal/modal.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
+import { ToastModule } from 'primeng/toast';
 
 export function HttpLoaderFactory(http: HttpClient) {
-    return new TranslateHttpLoader(http);
+  return new TranslateHttpLoader(http);
 }
 
 @NgModule({
-    declarations: [AppComponent],
-    imports: [
-        AppRoutingModule,
-        AppLayoutModule,
-        BrowserAnimationsModule,
-        BrowserModule,
-        TranslateModule.forRoot({
-            defaultLanguage: 'es',
-            loader: {
-                provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [HttpClient],
-            },
-        }),
-        AuthModule,
-        ModalModule,
-    ],
-    providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
-    bootstrap: [AppComponent],
+  declarations: [AppComponent],
+  imports: [
+    ToastModule,
+    AppRoutingModule,
+    AppLayoutModule,
+    BrowserAnimationsModule,
+    BrowserModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'es',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
+    AuthModule,
+    ModalModule,
+  ],
+  providers: [{ provide: LocationStrategy, useClass: PathLocationStrategy }],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}
