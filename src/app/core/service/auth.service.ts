@@ -44,9 +44,14 @@ export class AuthService {
   /**
    * Login - usando ApiResponse
    */
+  // login(data: LoginData): Observable<ApiSingleResponse<LoginResponseData>> {
+  //   return this.http.post<ApiSingleResponse<LoginResponseData>>(`${environment.apiUrl}/auth/login`, data);
+  // }
+
   login(data: LoginData): Observable<ApiSingleResponse<LoginResponseData>> {
-    return this.http.post<ApiSingleResponse<LoginResponseData>>(`${environment.apiUrl}/auth/login`, data);
+    return this.apiService.post<ApiSingleResponse<LoginResponseData>>('auth/login', data);
   }
+
   register(data: RegisterData): Observable<HttpResponse<any>> {
     return this.http.post<any>(`${environment.apiUrl}/auth/register`, data, { observe: 'response' });
   }
