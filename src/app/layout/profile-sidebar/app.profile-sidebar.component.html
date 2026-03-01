@@ -2,11 +2,10 @@
   [(visible)]="visible"
   position="right"
   [transitionOptions]="'.3s cubic-bezier(0, 0, 0.2, 1)'"
-  styleClass="layout-profile-sidebar w-full sm:w-30rem">
-
+  styleClass="layout-profile-sidebar w-full sm:w-30rem"
+>
   <div class="flex flex-column justify-content-between h-full">
     <div class="flex flex-column mx-auto md:mx-0">
-
       <!-- Mostrar solo si hay profile -->
       @if (profile(); as userProfile) {
         <div class="flex flex-column align-items-center mb-7 gap-2">
@@ -14,10 +13,11 @@
             [label]="userInitials()"
             shape="circle"
             size="xlarge"
-            styleClass="bg-primary text-white mx-auto w-[80px] h-[80px] text-[38px]" />
+            styleClass="bg-primary text-white mx-auto w-[80px] h-[80px] text-[38px]"
+          />
 
           <span class="mb-1 text-[20px]">
-            {{ "profile.welcomeName" | translate: { name: userProfile.name } }}
+            {{ 'profile.welcomeName' | translate: { name: userProfile.name } }}
           </span>
 
           <span class="text-color-secondary text-sm font-light">
@@ -25,11 +25,9 @@
           </span>
 
           <!-- Manejo seguro de roles -->
-          @if (userProfile.roles) {
-            <span
-              aria-label="preferredRol"
-              class="text-color-secondary text-sm font-light">
-              {{ formatRoles(userProfile.roles) }}
+          @if (userProfile.role) {
+            <span aria-label="preferredRol" class="text-color-secondary text-sm font-light">
+              {{ formatRoles(userProfile.role) }}
             </span>
           }
         </div>
@@ -46,24 +44,26 @@
         <li class="w-full md:!w-4/5">
           <a
             class="w-full cursor-pointer flex surface-border p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150"
-            (click)="onConfigButtonClick()">
+            (click)="onConfigButtonClick()"
+          >
             <span>
               <i class="pi pi-cog text-xl text-primary"></i>
             </span>
             <div class="ml-3">
-              <span class="mb-2">{{ "general.customizeScreen" | translate }}</span>
+              <span class="mb-2">{{ 'general.customizeScreen' | translate }}</span>
             </div>
           </a>
         </li>
         <li class="w-full md:!w-4/5">
           <a
             (click)="signOut()"
-            class="cursor-pointer flex surface-border p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150">
+            class="cursor-pointer flex surface-border p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150"
+          >
             <span>
               <i class="pi pi-power-off text-xl text-primary"></i>
             </span>
             <div class="ml-3">
-              <span class="mb-2">{{ "login.logOut" | translate }}</span>
+              <span class="mb-2">{{ 'login.logOut' | translate }}</span>
             </div>
           </a>
         </li>
@@ -71,7 +71,7 @@
 
       <div class="flex flex-column gap-1 align-items-center">
         <span class="text-color-secondary text-sm font-light">
-          {{ "general.version" | translate }}: {{ version }}
+          {{ 'general.version' | translate }}: {{ version }}
         </span>
         <span class="text-color-secondary text-sm font-light">
           {{ dateBuild | date: BUILD_DATE_FORMAT_PIPE }}
@@ -80,7 +80,8 @@
           <img
             src="assets/General/Cartoon_profile.png"
             alt="Crear Proyecto"
-            class="w-25rem h-25rem mb-4 object-fit-cover">
+            class="w-25rem h-25rem mb-4 object-fit-cover"
+          />
         </div>
       </div>
     </div>
