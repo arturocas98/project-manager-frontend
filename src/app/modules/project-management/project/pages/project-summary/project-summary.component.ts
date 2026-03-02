@@ -14,10 +14,13 @@ import {ProjectService} from "../../../../../core/service/project.service";
 import {
   HighPriorityTask,
   ProjectSummaryData,
-  KpiItem,
-  RecentIncidence,
   WeeklyTrend
 } from "../../../../../shared/models/summary-response";
+import {ChipModule} from "primeng/chip";
+import {TimelineModule} from "primeng/timeline";
+import {BadgeModule} from "primeng/badge";
+import {TooltipModule} from "primeng/tooltip";
+import {SkeletonModule} from "primeng/skeleton";
 
 @Component({
   selector: 'app-project-summary',
@@ -33,12 +36,16 @@ import {
     ButtonModule,
     CalendarModule,
     FormsModule,
-    NgIf
+    NgIf,
+    ChipModule,
+    TimelineModule,
+    BadgeModule,
+    TooltipModule,
+    SkeletonModule
   ],
   templateUrl: './project-summary.component.html',
 })
 export class ProjectSummaryComponent implements OnInit {
-  Math = Math;
   projectId!: number;
   selectedMonth: Date = new Date();
 
@@ -56,31 +63,6 @@ export class ProjectSummaryComponent implements OnInit {
   // Actividad reciente
   activity: any[] = [];
 
-  // OPCIONES DE GRÁFICOS
-  barOptions: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      x: { grid: { display: false } },
-      y: { grid: { color: '#f3f4f6' }, beginAtZero: true }
-    }
-  };
-
-  horizontalOptions: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    indexAxis: 'y',
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      x: { grid: { display: false }, beginAtZero: true },
-      y: { grid: { display: false } }
-    }
-  };
 
   doughnutOptions: ChartOptions = {
     responsive: true,
@@ -141,19 +123,87 @@ export class ProjectSummaryComponent implements OnInit {
   userLoadData: any;
   trendData: any;
 
+  // Mapa de colores para estados
+  private stateColorMap: { [key: string]: string } = {
+    'pendiente': '#94a3b8',
+    'en progreso': '#f59e0b',
+    'revision': '#3b82f6',
+    'bloqueada': '#ef4444',
+    'completada': '#10b981',
+    'cerrada': '#10b981'
+  };
+
   constructor(
     private route: ActivatedRoute,
     private projectService: ProjectService
   ) {}
+
+  // ================= MÉTODOS DEL CICLO DE VIDA =================
 
   ngOnInit() {
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
     this.loadSummaryData();
   }
 
-  refresh(){
+  // ================= MÉTODOS PÚBLICOS =================
+
+  refresh() {
     this.loadSummaryData();
   }
+
+  /**
+   * Obtiene el color para un estado específico
+   */
+  getStateColor(state: string): string {
+    const normalizedState = state.toLowerCase();
+    return this.stateColorMap[normalizedState] || '#94a3b8';
+  }
+
+  /**
+   * Obtiene el color para una prioridad específica
+   */
+  getPriorityColor(priority: string): string {
+    const priorityLower = priority.toLowerCase();
+    const colorMap: { [key: string]: string } = {
+      'critical': '#ef4444',
+      'critica': '#ef4444',
+      'alta': '#f97316',
+      'high': '#f97316',
+      'media': '#eab308',
+      'medium': '#eab308',
+      'baja': '#22c55e',
+      'low': '#22c55e'
+    };
+    return colorMap[priorityLower] || '#94a3b8';
+  }
+
+  /**
+   * Calcula el promedio de un array de números
+   */
+  calculateAverage(values: number[] | undefined): number {
+    if (!values || values.length === 0) return 0;
+    const sum = values.reduce((acc, val) => acc + val, 0);
+    return Math.round((sum / values.length) * 10) / 10;
+  }
+
+  /**
+   * Calcula el total de un array de números
+   */
+  calculateTotal(values: number[] | undefined): number {
+    if (!values || values.length === 0) return 0;
+    return values.reduce((acc, val) => acc + val, 0);
+  }
+
+  /**
+   * Obtiene la hora de la última actualización
+   */
+  getLastUpdateTime(): string {
+    const now = new Date();
+    return now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ================= MÉTODOS DE CARGA DE DATOS =================
+
   /**
    * Carga los datos del summary desde el API
    */
@@ -197,7 +247,7 @@ export class ProjectSummaryComponent implements OnInit {
         value: this.summaryData.kpis.in_progress_tasks.value,
         icon: 'pi pi-clock',
         bgClass: 'surfarce-card',
-        iconClass: 'text-gray-900',
+        iconClass: 'text-color',
         trend: this.extractTrendValue(this.summaryData.kpis.in_progress_tasks.comparison)
       },
       {
@@ -240,6 +290,8 @@ export class ProjectSummaryComponent implements OnInit {
     }));
   }
 
+  // ================= MÉTODOS DE UTILIDAD =================
+
   /**
    * Extrae el valor numérico del trend de un string como "+12.5%"
    */
@@ -264,6 +316,8 @@ export class ProjectSummaryComponent implements OnInit {
     const diffDays = Math.floor(diffHrs / 24);
     return `Hace ${diffDays} días`;
   }
+
+  // ================= MÉTODOS DE GRÁFICOS =================
 
   initCharts() {
     if (!this.summaryData) return;
@@ -421,6 +475,8 @@ export class ProjectSummaryComponent implements OnInit {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
+  // ================= MÉTODOS DE SEVERIDAD PARA TAGS =================
+
   getPrioritySeverity(priority: string): string {
     const priorityLower = priority.toLowerCase();
     switch (priorityLower) {
@@ -460,14 +516,5 @@ export class ProjectSummaryComponent implements OnInit {
       default:
         return 'secondary';
     }
-  }
-
-  /**
-   * Refresca los datos cuando cambia el mes seleccionado
-   */
-  onMonthChange() {
-    // Aquí podrías implementar lógica para cargar datos de un mes específico
-    console.log('Month changed:', this.selectedMonth);
-    this.loadSummaryData(); // Recarga los datos
   }
 }

@@ -72,7 +72,7 @@ export class RoleListComponent {
       globalFilter = this.tableLazyLoadEvent?.globalFilter;
     }
     return {
-      "filter[search]": globalFilter || "",
+      "filter[name]": globalFilter || "",
     };
   }
 

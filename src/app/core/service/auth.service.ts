@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import { Constants, LOCAL_STORAGE_KEYS, ROLE } from 'src/app/shared/constants/constants';
 import { User } from 'src/app/shared/models/user';
 import { ApiSingleResponse } from '../../shared/models/api-response.model';
-import { Profile } from 'src/app/shared/models/auth';
+import {Profile, unassignedUsersData} from 'src/app/shared/models/auth';
 import { ApiService } from './api.service';
 
 export interface LoginData {
@@ -63,6 +63,7 @@ export class AuthService {
     console.log('Getting user');
     return this.http.get<ApiSingleResponse<User>>(`${environment.apiUrl}/user/profile`).pipe(
       tap(response => {
+        console.log(response.data);
         this._profile.set(response.data);
         this.setRole(response.data);
         localStorage.setItem(LOCAL_STORAGE_KEYS.profile, JSON.stringify(response.data));

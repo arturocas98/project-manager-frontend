@@ -1,6 +1,6 @@
 <div class="min-h-screen flex align-items-center justify-content-center px-4 py-6">
 
-  <div class="w-full max-w-3xl surface-card surface-border border-1 border-round-3xl shadow-2xl p-6 md:p-8">
+  <div class="w-full max-w-4xl surface-card surface-border border-1 border-round-3xl shadow-2xl p-6 md:p-8">
 
     <!-- Toast para mensajes -->
     <p-toast position="top-right"></p-toast>
@@ -17,7 +17,8 @@
       <h2 class="text-3xl font-bold text-color mb-2">
         Editar Tarea #{{ taskId }}
       </h2>
-      <p class="text-color-secondary">
+      <p class="text-color-secondary flex align-items-center justify-content-center gap-2">
+        <i class="pi pi-sitemap text-primary"></i>
         Modifica la información de la tarea
       </p>
     </div>
@@ -56,20 +57,31 @@
           (ngSubmit)="onSubmit()"
           class="flex flex-column gap-4">
 
-      <!-- ID de referencia y estado actual -->
-      <div class="grid">
-        <div class="col-6">
-          <div class="flex align-items-center gap-2 p-2 surface-ground border-round">
-            <i class="pi pi-hashtag text-primary"></i>
-            <span class="text-color-secondary">ID:</span>
-            <span class="font-bold text-color">{{ task.id }}</span>
+      <!-- Header con información de la tarea -->
+      <div class="surface-ground p-4 border-round-lg">
+        <div class="grid">
+          <div class="col-12 md:col-4">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-hashtag text-primary"></i>
+              <span class="text-color-secondary">ID:</span>
+              <span class="font-bold text-color">{{ task.id }}</span>
+            </div>
           </div>
-        </div>
-        <div class="col-6">
-          <div class="flex align-items-center gap-2 p-2 surface-ground border-round">
-            <i class="pi pi-tag text-primary"></i>
-            <span class="text-color-secondary">Estado:</span>
-            <span class="font-bold text-color">{{ stateName }}</span>
+          <div class="col-12 md:col-4">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-tag text-primary"></i>
+              <span class="text-color-secondary">Estado:</span>
+              <p-tag [value]="stateName" [severity]="'info'" styleClass="ml-2"></p-tag>
+            </div>
+          </div>
+          <div class="col-12 md:col-4">
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-sitemap text-primary"></i>
+              <span class="text-color-secondary">Subtareas:</span>
+              <span class="font-bold" [ngClass]="{'text-orange-500': hasChildren}">
+                {{ childrenCount }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -144,12 +156,16 @@
             Tipo <span class="text-red-500">*</span>
           </label>
 
-          <input
-            pInputText
-            [value]="task?.type?.type"
-            class="w-full surface-card"
-            readonly
-            [ngClass]="{'bg-gray-100': true}">
+          <div class="flex align-items-center gap-2 p-2 surface-ground border-round">
+            <i class="pi" [ngClass]="{
+              'pi-star-fill text-yellow-500': task.type?.id === 1,
+              'pi-list text-blue-500': task.type?.id === 2,
+              'pi-check-square text-green-500': task.type?.id === 3,
+              'pi-exclamation-triangle text-red-500': task.type?.id === 4,
+              'pi-sitemap text-purple-500': task.type?.id === 5
+            }"></i>
+            <span class="font-medium">{{ task.type?.type }}</span>
+          </div>
 
           <small class="block mt-2 text-color-secondary">
             El tipo de tarea no se puede modificar
@@ -163,8 +179,6 @@
           Asignar a
           <span *ngIf="taskType === EPIC_TYPE || taskType === HISTORY_USER_TYPE"
                 class="text-red-500">*</span>
-          <span *ngIf="taskType !== EPIC_TYPE && taskType !== HISTORY_USER_TYPE"
-                class="text-sm text-color-secondary">(opcional)</span>
         </label>
 
         <p-dropdown
@@ -178,12 +192,14 @@
           [filter]="true"
           [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
           <ng-template pTemplate="selectedItem">
-            <div *ngIf="taskForm.get('assigned_user_id')?.value">
+            <div *ngIf="taskForm.get('assigned_user_id')?.value" class="flex align-items-center gap-2">
+              <i class="pi pi-user text-primary"></i>
               <span>{{ getSelectedMemberLabel() }}</span>
             </div>
           </ng-template>
           <ng-template let-member pTemplate="item">
             <div class="flex align-items-center gap-2">
+              <i class="pi pi-user text-primary"></i>
               <span class="font-medium">{{ member.label }}</span>
             </div>
           </ng-template>
@@ -192,11 +208,6 @@
         <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
                class="p-error block mt-2">
           Debes seleccionar un usuario asignado
-        </small>
-
-        <small *ngIf="memberOptions.length === 0" class="p-warning block mt-2 text-orange-500">
-          <i class="pi pi-exclamation-triangle mr-1"></i>
-          No hay miembros disponibles en el proyecto
         </small>
       </div>
 
@@ -234,7 +245,7 @@
       </div>
 
       <!-- Selector de Padre (condicional) -->
-      <div *ngIf="showParentSelector">
+      <div *ngIf="showParentSelector" class="surface-ground p-3 border-round-lg">
         <label class="block text-color font-medium mb-2">
           {{ parentLabel }} <span class="text-red-500">*</span>
         </label>
@@ -255,54 +266,77 @@
                class="p-error block mt-2">
           Debes seleccionar un {{ parentLabel.toLowerCase() }}
         </small>
-
-        <small *ngIf="parentOptions.length === 0 && showParentSelector"
-               class="p-warning block mt-2 text-orange-500">
-          <i class="pi pi-exclamation-triangle mr-1"></i>
-          No hay {{ parentLabel.toLowerCase() }}s disponibles para seleccionar como padre.
-        </small>
       </div>
 
       <!-- Información adicional de la tarea actual -->
       <p-accordion>
         <p-accordionTab header="Información adicional">
           <div class="grid">
-            <div class="col-6">
-              <p><span class="font-medium">Creado por:</span> {{ task.created_by.name }}</p>
-              <p><span class="font-medium">Creado el:</span> {{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+            <div class="col-12 md:col-6">
+              <div class="flex align-items-center gap-2 mb-2">
+                <i class="pi pi-user text-primary"></i>
+                <span class="font-medium">Creado por:</span>
+                <span>{{ task.created_by?.name }}</span>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-calendar text-primary"></i>
+                <span class="font-medium">Creado el:</span>
+                <span>{{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
             </div>
-            <div class="col-6">
-              <p *ngIf="task.parent">
-                <span class="font-medium">Tarea padre:</span> {{ task.parent.title }}
-              </p>
-              <p><span class="font-medium">Última actualización:</span> {{ task.updated_at | date:'dd/MM/yyyy HH:mm' }}</p>
+            <div class="col-12 md:col-6">
+              <div class="flex align-items-center gap-2 mb-2" *ngIf="task.parent">
+                <i class="pi pi-level-up-alt text-primary"></i>
+                <span class="font-medium">Tarea padre:</span>
+                <span class="cursor-pointer hover:text-primary" (click)="navigateToParent()">
+                  {{ task.parent.title }}
+                </span>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-clock text-primary"></i>
+                <span class="font-medium">Última actualización:</span>
+                <span>{{ task.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
             </div>
           </div>
         </p-accordionTab>
       </p-accordion>
 
       <!-- Botones -->
-      <div class="flex justify-content-end gap-3 mt-3">
-
+      <div class="flex justify-content-between align-items-center gap-3 mt-3">
+        <!-- Botón eliminar a la izquierda -->
         <button
           pButton
           type="button"
-          label="Cancelar"
-          class="p-button-text"
-          (click)="onCancel()"
-          [disabled]="saving">
+          label="Eliminar Tarea"
+          icon="pi pi-trash"
+          class="p-button-danger p-button-outlined"
+          (click)="confirmDelete()"
+          [disabled]="saving || deleting"
+          [loading]="deleting">
         </button>
 
-        <button
-          pButton
-          type="submit"
-          label="Actualizar Tarea"
-          icon="pi pi-save"
-          class="p-button-raised"
-          [disabled]="taskForm.invalid || saving"
-          [loading]="saving">
-        </button>
+        <!-- Botones de acción a la derecha -->
+        <div class="flex gap-2">
+          <button
+            pButton
+            type="button"
+            label="Cancelar"
+            class="p-button-text"
+            (click)="onCancel()"
+            [disabled]="saving || deleting">
+          </button>
 
+          <button
+            pButton
+            type="submit"
+            label="Actualizar Tarea"
+            icon="pi pi-save"
+            class="p-button-raised p-button-primary"
+            [disabled]="taskForm.invalid || saving || deleting"
+            [loading]="saving">
+          </button>
+        </div>
       </div>
 
     </form>
@@ -311,29 +345,122 @@
 
 </div>
 
-<!-- Diálogo de confirmación -->
+<!-- Diálogo de confirmación simple para eliminar -->
+<p-dialog
+  header="Confirmar Eliminación"
+  [(visible)]="showDeleteDialog"
+  [modal]="true"
+  [style]="{width: '450px'}"
+  [draggable]="false"
+  [resizable]="false"
+  class="p-fluid">
+
+  <div class="flex flex-column align-items-center gap-3 p-3">
+    <div class="bg-red-100 border-circle p-4">
+      <i class="pi pi-exclamation-triangle text-3xl text-red-500"></i>
+    </div>
+    <h3 class="text-xl font-medium text-color text-center">
+      ¿Estás seguro de que deseas eliminar esta tarea?
+    </h3>
+    <p class="text-color-secondary text-center">
+      La tarea <span class="font-bold text-color">"{{ task?.title }}"</span> será eliminada permanentemente.
+    </p>
+    <p class="text-color-secondary text-sm text-center">
+      Esta acción no se puede deshacer.
+    </p>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <button
+        pButton
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showDeleteDialog = false">
+      </button>
+      <button
+        pButton
+        label="Eliminar"
+        icon="pi pi-trash"
+        class="p-button-danger"
+        [loading]="deleting"
+        (click)="deleteTask()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Diálogo de confirmación para tareas con hijos -->
+<p-dialog
+  header="Confirmar Eliminación Masiva"
+  [(visible)]="showDeleteWithChildrenDialog"
+  [modal]="true"
+  [style]="{width: '500px'}"
+  [draggable]="false"
+  [resizable]="false"
+  class="p-fluid">
+
+  <div class="flex flex-column gap-4 p-3">
+    <div class="flex align-items-center gap-3 text-red-500 bg-red-50 p-3 border-round-lg">
+      <i class="pi pi-exclamation-triangle text-3xl"></i>
+      <div>
+        <span class="font-bold text-lg">¡Esta tarea tiene {{ childrenCount }} subtarea(s)!</span>
+        <p class="text-sm text-color-secondary mt-1">
+          Al eliminar esta tarea, también se eliminarán TODAS sus subtareas.
+        </p>
+      </div>
+    </div>
+
+    <div class="surface-ground p-3 border-round-lg">
+      <p class="font-medium mb-2">Para confirmar, escribe el nombre de la tarea:</p>
+      <div class="flex flex-column gap-2">
+        <input
+          type="text"
+          pInputText
+          [(ngModel)]="deleteConfirmationName"
+          (input)="checkDeleteConfirmation()"
+          [placeholder]="'Escribe: ' + task?.title"
+          class="w-full">
+
+        <small class="text-color-secondary">
+          El nombre debe coincidir exactamente con <span class="font-bold">"{{ task?.title }}"</span>
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <button
+        pButton
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showDeleteWithChildrenDialog = false; deleteConfirmationName = ''">
+      </button>
+      <button
+        pButton
+        label="Eliminar Todo"
+        icon="pi pi-trash"
+        class="p-button-danger"
+        [disabled]="!deleteNameValid || deleting"
+        [loading]="deleting"
+        (click)="deleteTask()">
+      </button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Diálogo de confirmación de PrimeNG (para actualización y cancelación) -->
 <p-confirmDialog
   [baseZIndex]="10000"
   rejectButtonStyleClass="p-button-text p-button-secondary"
   acceptButtonStyleClass="p-button-success p-button-raised"
 >
   <ng-template pTemplate="header">
-    <div class="flex align-items-center gap-2"
-         [ngClass]="{
-           'text-primary': currentDialogHeader === 'Confirmar Actualización'
-         }">
-
-      <i
-        [class]="currentDialogHeader === '¡Tarea Actualizada!'
-          ? 'pi pi-check-circle'
-          : 'pi pi-question-circle'"
-        style="font-size: 1.5rem">
-      </i>
-
-      <span class="font-bold text-xl">
-        {{ currentDialogHeader }}
-      </span>
-
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-question-circle text-primary" style="font-size: 1.5rem"></i>
     </div>
   </ng-template>
 </p-confirmDialog>

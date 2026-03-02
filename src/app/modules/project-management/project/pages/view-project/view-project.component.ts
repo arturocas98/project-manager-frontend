@@ -59,11 +59,6 @@ export class ViewProjectComponent implements OnInit {
       command: () => this.router.navigate(['backlog'])
     },
     {
-      label: 'Reports',
-      icon: 'pi pi-chart-bar',
-      command: () => this.router.navigate(['reports'])
-    },
-    {
       label: 'Kanban',
       icon: 'pi pi-th-large',
       command: () => this.router.navigate([

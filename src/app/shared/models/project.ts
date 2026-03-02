@@ -17,14 +17,15 @@ export interface Project {
     members_count?: number;
   };
 }
+
+export interface ProjectItem {
+  data: Project;
+  meta?: any;
+  links?: any;
+}
+
 export interface RawProjectResponse {
-  data: {
-    [key: string]: {  // Índices numéricos como "0", "1", "2"
-      data: Project;   // El proyecto real está aquí
-      links?: any;
-      meta?: any;
-    }
-  };
+  data: ProjectItem[];
   links?: any;
   meta?: any;
 }

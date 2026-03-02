@@ -185,33 +185,40 @@
               <button
                 pButton
                 type="button"
-                label="Cancelar"
-                icon="pi pi-times"
-                class="p-button-text w-full sm:w-auto"
-                (click)="resetForm()"
-                [disabled]="!projectForm.dirty">
-              </button>
-
-              <button
-                pButton
-                type="button"
                 label="Add Member"
                 icon="pi pi-user-plus"
                 class="p-button-raised p-button-success w-full sm:w-auto"
                 (click)="openAddMemberDialog()">
               </button>
 
-            </div>
+              <button
+                pButton
+                type="button"
+                label="Remove Member"
+                icon="pi pi-user-plus"
+                class="p-button-raised p-button-warning w-full sm:w-auto"
+                (click)="openRemoveMemberDialog()">
+              </button>
 
-            <!-- Botón de eliminar (separado a la derecha) -->
-            <button
-              pButton
-              type="button"
-              label="Eliminar Proyecto"
-              icon="pi pi-trash"
-              class="p-button-raised p-button-danger"
-              (click)="confirmDelete()">
-            </button>
+              <button
+                pButton
+                type="button"
+                label="Eliminar Proyecto"
+                icon="pi pi-trash"
+                class="p-button-raised p-button-danger"
+                (click)="confirmDelete()">
+              </button>
+
+              <button
+                pButton
+                type="button"
+                label="Cancelar"
+                icon="pi pi-times"
+                class="p-button-text w-full sm:w-auto ml-auto"
+                (click)="resetForm()"
+                [disabled]="!projectForm.dirty">
+              </button>
+            </div>
           </div>
         </div>
 
@@ -235,78 +242,139 @@
   [contentStyle]="{'overflow': 'visible'}"
   [baseZIndex]="10000">
 
-<form [formGroup]="addMemberForm" (ngSubmit)="addMember()" class="flex flex-column gap-4 p-2">
+  <form [formGroup]="addMemberForm" (ngSubmit)="addMember()" class="flex flex-column gap-4 p-2">
 
-  <!-- Selector de Usuario -->
-  <div>
-    <label class="block text-color font-medium mb-2">
-      Usuario <span class="text-red-500">*</span>
-    </label>
-    <!-- Controla el scroll solo del dropdown -->
-    <p-dropdown
-      formControlName="user_id"
-      [options]="profileOptions"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Seleccionar usuario"
-      [filter]="true"
-      [showClear]="true"
-      [style]="{'width': '100%'}"
-      [panelStyle]="{'max-height': '300px'}"
-      appendTo="body">
-    </p-dropdown>
-    <small *ngIf="addMemberForm.get('user_id')?.invalid && addMemberForm.get('user_id')?.touched"
-           class="p-error block mt-2">
-      Debes seleccionar un usuario
-    </small>
-  </div>
+    <!-- Selector de Usuario -->
+    <div>
+      <label class="block text-color font-medium mb-2">
+        Usuario <span class="text-red-500">*</span>
+      </label>
+      <!-- Controla el scroll solo del dropdown -->
+      <p-dropdown
+        formControlName="user_id"
+        [options]="profileOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar usuario"
+        [filter]="true"
+        [showClear]="true"
+        [style]="{'width': '100%'}"
+        [panelStyle]="{'max-height': '300px'}"
+        appendTo="body">
+      </p-dropdown>
+      <small *ngIf="addMemberForm.get('user_id')?.invalid && addMemberForm.get('user_id')?.touched"
+             class="p-error block mt-2">
+        Debes seleccionar un usuario
+      </small>
+    </div>
 
-  <!-- Selector de Rol -->
-  <div>
-    <label class="block text-color font-medium mb-2">
-      Rol <span class="text-red-500">*</span>
-    </label>
-    <p-dropdown
-      formControlName="role_type"
-      [options]="roleOptions"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Seleccionar rol"
-      [showClear]="true"
-      [style]="{'width': '100%'}"
-      [panelStyle]="{'max-height': '300px'}"
-      appendTo="body">
-    </p-dropdown>
-    <small *ngIf="addMemberForm.get('role_type')?.invalid && addMemberForm.get('role_type')?.touched"
-           class="p-error block mt-2">
-      Debes seleccionar un rol
-    </small>
-  </div>
+    <!-- Selector de Rol -->
+    <div>
+      <label class="block text-color font-medium mb-2">
+        Rol <span class="text-red-500">*</span>
+      </label>
+      <p-dropdown
+        formControlName="role_type"
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar rol"
+        [showClear]="true"
+        [style]="{'width': '100%'}"
+        [panelStyle]="{'max-height': '300px'}"
+        appendTo="body">
+      </p-dropdown>
+      <small *ngIf="addMemberForm.get('role_type')?.invalid && addMemberForm.get('role_type')?.touched"
+             class="p-error block mt-2">
+        Debes seleccionar un rol
+      </small>
+    </div>
 
-</form>
+  </form>
 
-<ng-template pTemplate="footer">
-  <div class="flex justify-content-end gap-2">
-    <button
-      pButton
-      label="Cancelar"
-      icon="pi pi-times"
-      class="p-button-text"
-      (click)="showAddMemberDialog = false">
-    </button>
-    <button
-      pButton
-      label="Añadir"
-      icon="pi pi-check"
-      class="p-button-raised p-button-success"
-      [disabled]="addMemberForm.invalid || addMemberLoading"
-      [loading]="addMemberLoading"
-      (click)="addMember()">
-    </button>
-  </div>
-</ng-template>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <button
+        pButton
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showAddMemberDialog = false">
+      </button>
+      <button
+        pButton
+        label="Añadir"
+        icon="pi pi-check"
+        class="p-button-raised p-button-success"
+        [disabled]="addMemberForm.invalid || addMemberLoading"
+        [loading]="addMemberLoading"
+        (click)="addMember()">
+      </button>
+    </div>
+  </ng-template>
 
 </p-dialog>
+
+<p-dialog
+  header="Eliminar Miembro al Proyecto"
+  [(visible)]="showRemoveMemberDialog"
+  [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '600px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [contentStyle]="{'overflow': 'visible'}"
+  [baseZIndex]="10000">
+
+  <form [formGroup]="deleteMemberForm" (ngSubmit)="RemoveMember()" class="flex flex-column gap-4 p-2">
+
+    <!-- Selector de Usuario -->
+    <div>
+      <label class="block text-color font-medium mb-2">
+        Usuario <span class="text-red-500">*</span>
+      </label>
+      <!-- Controla el scroll solo del dropdown -->
+      <p-dropdown
+        formControlName="user_id"
+        [options]="memberOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar Miembro"
+        [filter]="true"
+        [showClear]="true"
+        [style]="{'width': '100%'}"
+        [panelStyle]="{'max-height': '300px'}"
+        appendTo="body">
+      </p-dropdown>
+      <small *ngIf="deleteMemberForm.get('user_id')?.invalid && deleteMemberForm.get('user_id')?.touched"
+             class="p-error block mt-2">
+        Debes seleccionar un miembro
+      </small>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <button
+        pButton
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showRemoveMemberDialog = false">
+      </button>
+      <button
+        pButton
+        label="Remover"
+        icon="pi pi-check"
+        class="p-button-raised p-button-danger"
+        [disabled]="deleteMemberForm.invalid || deleteMemberLoading"
+        [loading]="deleteMemberLoading"
+        (click)="RemoveMember()">
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>
+
 <!-- Toast para notificaciones -->
 <p-toast position="top-right" />
 

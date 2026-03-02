@@ -3,7 +3,16 @@ export interface Profile {
   name: string;
   email: string;
   photo: File | string;
-  roles: string[];
+  role: string;
+}
+
+export interface unassignedUsersData {
+  id: number;
+  name: string;
+  email: string;
+  profile_photo_url: string;
+  email_verified_at: string | null;
+  created_at: string;
 }
 
 export interface ProfileDataResponse {

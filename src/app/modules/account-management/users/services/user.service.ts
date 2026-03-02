@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { User } from 'src/app/shared/models/user';
+import {User, UserData} from 'src/app/shared/models/user';
 import { environment } from 'src/environments/environment';
 import { ParamJson } from '../../../../shared/models/params.model';
 import { ApiSingleResponse, MetaData } from '../../../../shared/models/api-response.model';
@@ -29,11 +29,12 @@ export class UserService {
     return this.http.delete<boolean>(`${environment.apiUrl}/auth/users/${id}`);
   }
 
-  createUser(user: User): Observable<boolean> {
+  createUser(user: UserData): Observable<boolean> {
     return this.http.post<boolean>(`${environment.apiUrl}/auth/users`, user);
   }
 
-  updateUser(user: User, userId: number): Observable<boolean> {
+  updateUser(user: UserData, userId: number): Observable<boolean> {
+    console.log(user);
     return this.http.put<boolean>(`${environment.apiUrl}/auth/users/${userId}`, user);
   }
 

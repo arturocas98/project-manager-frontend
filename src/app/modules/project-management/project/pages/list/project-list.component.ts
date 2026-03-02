@@ -13,7 +13,7 @@ import { CardModule } from 'primeng/card';
 import { ProjectService } from 'src/app/core/service/project.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ApiListResponse } from '../../../../../shared/models/api-response.model';
-import { Route, Router, RouterLink } from '@angular/router';
+import {Route, Router, RouterLink, RouterLinkActive} from '@angular/router';
 
 @Component({
   selector: 'app-project-list',
@@ -31,6 +31,7 @@ import { Route, Router, RouterLink } from '@angular/router';
     CardModule,
     ProgressSpinnerModule,
     RouterLink,
+    RouterLinkActive,
   ],
   standalone: true,
 })

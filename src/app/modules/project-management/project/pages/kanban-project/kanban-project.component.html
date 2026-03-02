@@ -11,6 +11,16 @@
       </span>
     </div>
 
+    <button
+      pButton
+      pRipple
+      label="refrescar"
+      class="w-10rem p-button-raised p-button-sm text-color"
+      [disabled]="loading"
+      [loading]="loading"
+      (click)="Refresh()">
+    </button>
+
     <!-- Barra de búsqueda y filtros -->
     <div class="flex flex-wrap gap-2 align-items-center">
       <!-- Búsqueda -->
@@ -367,7 +377,6 @@
               [label]="member.user.name[0]"
               shape="circle"
               size="normal"
-              [style.background]="getAssigneeColor(member.user.name)"
               class="text-white">
             </p-avatar>
             <span>{{ member.user.name }}</span>

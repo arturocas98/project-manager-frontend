@@ -51,6 +51,16 @@ const routes: Routes = [
             (m) => m.KanbanProjectComponent,
           ),
       },
+      /*
+      {
+        path: "project-kanban-list",
+        data: { breadcrumb: "kanban-list" },
+        loadComponent: () =>
+          import("./pages/kanban-list/kanban-list.component").then(
+            (m) => m.KanbanListComponent,
+          ),
+      },
+      */
       {
         path: "project-settings",
         data: { breadcrumb: "schedule" },

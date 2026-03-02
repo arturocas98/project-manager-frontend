@@ -3,7 +3,6 @@
   <div *ngIf="loading" class="flex justify-content-center p-4">
     <p-progressSpinner></p-progressSpinner>
   </div>
-
   <div *ngIf="!loading">
     <a
       [routerLink]="['/project-management/projects/create']"
@@ -17,7 +16,7 @@
     </a>
   </div>
   <!-- Lista de proyectos -->
-  <div *ngIf="!loading" class="flex flex-wrap">
+  <div *ngIf="!loading" class="flex flex-wrap gap-2">
     <app-project-card
       *ngFor="let project of projects"
       [project]="project"

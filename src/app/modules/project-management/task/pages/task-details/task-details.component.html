@@ -1,204 +1,435 @@
-<div class="p-4 md:p-6">
+<div class="p-4 md:p-6 surface-ground min-h-screen">
 
   <!-- Toast para mensajes -->
   <p-toast position="top-right"></p-toast>
 
-  <!-- Header con navegación -->
-  <div class="flex align-items-center justify-content-between mb-4">
+  <!-- Header con navegación mejorado -->
+  <div class="flex flex-wrap align-items-center justify-content-between gap-3 mb-5">
     <div class="flex align-items-center gap-3">
       <button
         pButton
         icon="pi pi-arrow-left"
-        class="p-button-rounded p-button-text"
+        class="p-button-rounded p-button-text p-button-lg"
         (click)="goBack()"
         pTooltip="Volver al Kanban"
         tooltipPosition="right">
       </button>
-      <h1 class="text-2xl md:text-3xl font-bold m-0 text-color">Detalles de la Tarea</h1>
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold m-0 text-color">Detalles de la Tarea</h1>
+        <p class="text-sm text-color-secondary mt-1 flex align-items-center gap-2">
+          <i class="pi pi-sitemap"></i>
+          Visualizando estructura jerárquica de la tarea
+        </p>
+      </div>
     </div>
 
-    <button
-      pButton
-      label="Editar"
-      icon="pi pi-pencil"
-      class="p-button-raised p-button-primary"
-      (click)="editTask(Number(task?.id))"
-      [disabled]="!task || loading">
-    </button>
-  </div>
-
-  <!-- Loader -->
-  <div *ngIf="loading" class="flex justify-content-center align-items-center" style="min-height: 400px;">
-    <div class="text-center">
-      <p-progressSpinner
-        styleClass="w-4rem h-4rem"
-        strokeWidth="4"
-        fill="var(--surface-ground)"
-        animationDuration=".8s">
-      </p-progressSpinner>
-      <p class="mt-3 text-color-secondary">Cargando información de la tarea...</p>
-    </div>
-  </div>
-
-  <!-- Error Message -->
-  <div *ngIf="error && !loading" class="flex justify-content-center align-items-center" style="min-height: 400px;">
-    <div class="text-center">
-      <i class="pi pi-exclamation-circle text-6xl text-red-500 mb-3"></i>
-      <h3 class="text-xl font-medium text-color mb-2">Error al cargar la tarea</h3>
-      <p class="text-color-secondary mb-4">{{ error }}</p>
+    <div class="flex align-items-center gap-2">
       <button
         pButton
-        label="Reintentar"
-        icon="pi pi-refresh"
-        class="p-button-raised"
-        (click)="loadTaskDetails()">
+        label="Editar"
+        icon="pi pi-pencil"
+        class="p-button-raised text-white p-button-primary"
+        (click)="editTask(task?.id)"
+        [disabled]="!task || loading"
+        pTooltip="Editar tarea"
+        tooltipPosition="bottom">
       </button>
     </div>
   </div>
 
+  <!-- Loader mejorado -->
+  <div *ngIf="loading" class="flex justify-content-center align-items-center" style="min-height: 500px;">
+    <div class="text-center">
+      <p-progressSpinner
+        styleClass="w-5rem h-5rem"
+        strokeWidth="4"
+        fill="var(--surface-ground)"
+        animationDuration=".8s">
+      </p-progressSpinner>
+      <p class="mt-3 text-color-secondary font-medium">Cargando información de la tarea...</p>
+      <p class="text-sm text-color-secondary">Por favor espera un momento</p>
+    </div>
+  </div>
+
+  <!-- Error Message mejorado -->
+  <div *ngIf="error && !loading" class="flex justify-content-center align-items-center" style="min-height: 500px;">
+    <p-card class="w-full max-w-30rem text-center p-4 shadow-3">
+      <div class="flex flex-column align-items-center">
+        <div class="bg-red-100 border-circle p-4 mb-3">
+          <i class="pi pi-exclamation-circle text-4xl text-red-500"></i>
+        </div>
+        <h3 class="text-xl font-medium text-color mb-2">Error al cargar la tarea</h3>
+        <p class="text-color-secondary mb-4">{{ error }}</p>
+        <div class="flex gap-3">
+          <button
+            pButton
+            label="Reintentar"
+            icon="pi pi-refresh"
+            class="p-button-raised p-button-primary"
+            (click)="loadTaskDetails()">
+          </button>
+          <button
+            pButton
+            label="Volver"
+            icon="pi pi-arrow-left"
+            class="p-button-raised p-button-secondary"
+            (click)="goBack()">
+          </button>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
   <!-- Task Details -->
-  <div *ngIf="task && !loading" class="grid">
+  <div *ngIf="task && !loading" class="flex flex-column lg:flex-row gap-5">
 
-    <!-- Columna principal -->
-    <div class="col-12 lg:col-8">
-      <!-- Card principal -->
-      <p-card class="mb-4">
-        <div class="flex flex-wrap align-items-center gap-3 mb-4">
-          <p-tag
-            [value]="task.type.type"
-            severity="info">
-          </p-tag>
+    <!-- Columna principal (2/3 del espacio) -->
+    <div class="flex-3 min-w-0">
 
-          <p-tag
-            [value]="getPriorityInfo(task.priority).label"
-            [severity]="getPriorityInfo(task.priority).severity"
-            [icon]="getPriorityInfo(task.priority).icon">
-          </p-tag>
+      <!-- Card principal con información -->
+      <p-card class="mb-4 shadow-2">
 
-          <p-tag
-            [value]="task.state.state"
-            [severity]="getStateSeverity(task.state.state)">
-          </p-tag>
-
-          <span class="text-color-secondary text-sm ml-auto">
-            <i class="pi pi-hashtag mr-1"></i>ID: {{ task.id }}
-          </span>
+        <!-- Título y breadcrumb de jerarquía -->
+        <div class="mb-4">
+          <div class="flex align-items-center gap-2 text-sm text-color-secondary mb-2">
+            <i class="pi pi-sitemap text-primary"></i>
+            <span>Ruta:</span>
+            <span *ngFor="let ancestor of taskAncestors; let last = last" class="flex align-items-center gap-1">
+              <span class="cursor-pointer hover:text-primary transition-colors" (click)="navigateToTask(ancestor.id)">
+                {{ ancestor.title | truncate:30 }}
+              </span>
+              <i class="pi pi-chevron-right text-xs" *ngIf="!last"></i>
+            </span>
+          </div>
+          <h2 class="text-2xl font-bold text-color mb-2">{{ task.title }}</h2>
+          <div class="flex align-items-center gap-2 text-sm">
+            <i class="pi pi-folder-open text-primary"></i>
+            <span class="text-color-secondary">Proyecto ID: {{ task.project_id }}</span>
+          </div>
         </div>
 
-        <h2 class="text-2xl font-bold text-color mb-3">{{ task.title }}</h2>
+        <p-divider type="dashed"></p-divider>
 
-        <p-divider></p-divider>
+        <!-- Descripción -->
+        <div class="mb-4">
+          <div class="flex align-items-center gap-2 mb-3">
+            <i class="pi pi-align-left text-primary text-lg"></i>
+            <h3 class="text-lg font-medium text-color m-0">Descripción</h3>
+          </div>
+          <div class="surface-ground p-4 border-round-lg">
+            <p class="text-color-secondary line-height-3 white-space-pre-wrap m-0">
+              {{ task.description || 'Sin descripción' }}
+            </p>
+          </div>
+        </div>
 
-        <h3 class="text-lg font-medium text-color mb-2">Descripción</h3>
-        <p class="text-color-secondary line-height-3 mb-4 white-space-pre-wrap">
-          {{ task.description || 'Sin descripción' }}
-        </p>
+        <p-divider type="dashed"></p-divider>
 
-        <p-divider></p-divider>
-
-        <!-- Fechas -->
-        <div class="grid">
-          <div class="col-12 md:col-6">
-            <div class="flex align-items-center gap-2">
+        <!-- Fechas en flex layout -->
+        <div class="flex flex-wrap gap-4 mb-4">
+          <!-- Fecha de inicio -->
+          <div class="flex-1 min-w-200px surface-ground p-3 border-round-lg">
+            <div class="flex align-items-center gap-2 mb-2">
               <i class="pi pi-calendar text-primary"></i>
-              <span class="font-medium text-color">Fecha de inicio:</span>
+              <span class="font-medium text-color">Fecha de inicio</span>
             </div>
-            <p class="text-color-secondary mt-1 ml-4">
-              {{ task.start_date ? (task.start_date | date:'dd/MM/yyyy') : 'No definida' }}
-            </p>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-circle-fill text-xs text-primary"></i>
+              <span class="text-color-secondary">
+                {{ task.start_date ? (task.start_date | date:'fullDate') : 'No definida' }}
+              </span>
+            </div>
           </div>
 
-          <div class="col-12 md:col-6">
-            <div class="flex align-items-center gap-2">
+          <!-- Fecha de vencimiento -->
+          <div class="flex-1 min-w-200px surface-ground p-3 border-round-lg">
+            <div class="flex align-items-center gap-2 mb-2">
               <i class="pi pi-calendar-times text-primary"></i>
-              <span class="font-medium text-color">Fecha de vencimiento:</span>
+              <span class="font-medium text-color">Fecha de vencimiento</span>
             </div>
-            <p class="text-color-secondary mt-1 ml-4">
-              {{ task.due_date ? (task.due_date | date:'dd/MM/yyyy') : 'No definida' }}
-            </p>
+            <div class="flex align-items-center gap-2">
+              <i class="pi pi-circle-fill text-xs" [ngClass]="{'text-red-500': isOverdue(task.due_date)}"></i>
+              <span class="text-color-secondary" [ngClass]="{'text-red-500 font-medium': isOverdue(task.due_date)}">
+                {{ task.due_date ? (task.due_date | date:'fullDate') : 'No definida' }}
+              </span>
+              <p-tag
+                *ngIf="isOverdue(task.due_date)"
+                value="Vencida"
+                severity="danger"
+                class="ml-2">
+              </p-tag>
+            </div>
           </div>
         </div>
 
-        <!-- Fecha de creación/actualización -->
-        <div class="grid mt-2">
-          <div class="col-12 md:col-6">
-            <span class="text-color-secondary text-sm">Creado: {{ task.created_at | date:'dd/MM/yyyy' }}</span>
+        <!-- Fechas de auditoría -->
+        <div class="flex flex-wrap gap-4 p-3 surface-50 border-round-lg">
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-plus-circle text-sm text-primary"></i>
+            <span class="text-xs text-color-secondary">Creado:</span>
+            <span class="text-xs font-medium">{{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
-          <div class="col-12 md:col-6">
-            <span class="text-color-secondary text-sm">Actualizado: {{ task.updated_at | date:'dd/MM/yyyy' }}</span>
+          <div class="flex align-items-center gap-2">
+            <i class="pi pi-pencil text-sm text-primary"></i>
+            <span class="text-xs text-color-secondary">Actualizado:</span>
+            <span class="text-xs font-medium">{{ task.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
         </div>
       </p-card>
 
-      <!-- Nota: El modelo no incluye child_incidences, así que omitimos esa sección -->
+      <!-- SECCIÓN DE SUBTAREAS (ÁRBOL) -->
+      <p-card class="mb-4 shadow-2" *ngIf="task.children && task.children.length > 0">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3 border-bottom-1 surface-border">
+            <i class="pi pi-sitemap text-primary"></i>
+            <span class="font-medium text-color">Subtareas ({{ getTotalChildrenCount(task) }})</span>
+            <span class="text-sm text-color-secondary ml-2">- Ordenadas cronológicamente</span>
+          </div>
+        </ng-template>
+
+        <div class="p-3">
+          <p-tree
+            [value]="treeData"
+            [loading]="loading"
+            class="w-full"
+            styleClass="p-treenode">
+            <ng-template let-node pTemplate="default">
+              <div class="flex align-items-center justify-content-between w-full p-2 border-round-lg hover:surface-hover transition-colors cursor-pointer"
+                   (click)="navigateToTask(node.data.id)">
+                <div class="flex align-items-center gap-3">
+                  <!-- Icono según tipo y si tiene hijos -->
+                  <i class="pi" [ngClass]="{
+                    'pi-folder-open text-primary': node.children && node.children.length > 0,
+                    'pi-file text-color-secondary': !node.children || node.children.length === 0
+                  }"></i>
+
+                  <!-- Información de la tarea -->
+                  <div class="flex flex-column">
+                    <span class="font-medium text-color">{{ node.label }}</span>
+                    <div class="flex align-items-center gap-3 mt-1">
+                      <!-- Tipo -->
+                      <span class="text-xs bg-primary-100 text-primary-700 px-2 py-1 border-round">
+                        {{ node.data.type?.type || 'Sin tipo' }}
+                      </span>
+
+                      <!-- Estado -->
+                      <p-tag
+                        [value]="node.data.state?.state"
+                        [severity]="getStateSeverity(node.data.state?.state)"
+                        styleClass="text-xs">
+                      </p-tag>
+
+                      <!-- Prioridad -->
+                      <span class="flex align-items-center gap-1 text-xs"
+                            [ngClass]="getPriorityColor(node.data.priority)">
+                        <i class="pi" [ngClass]="getPriorityIcon(node.data.priority)"></i>
+                        {{ getPriorityInfo(node.data.priority).label }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fechas y asignado -->
+                <div class="flex align-items-center gap-4 text-xs text-color-secondary">
+                  <!-- Fecha de inicio/creación -->
+                  <div class="flex align-items-center gap-1">
+                    <i class="pi pi-calendar"></i>
+                    <span>{{ getDisplayDate(node.data) | date:'dd/MM/yyyy' }}</span>
+                  </div>
+
+                  <!-- Asignado -->
+                  <div class="flex align-items-center gap-1" *ngIf="node.data.assigned_to">
+                    <i class="pi pi-user"></i>
+                    <p-avatar
+                      [label]="getUserInitials(node.data.assigned_to.name)"
+                      size="normal"
+                      shape="circle"
+                      styleClass="text-xs"
+                      [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff'}">
+                    </p-avatar>
+                  </div>
+
+                  <!-- Contador de hijos -->
+                  <span class="flex align-items-center gap-1" *ngIf="node.children && node.children.length > 0">
+                    <i class="pi pi-sitemap"></i>
+                    {{ node.children.length }}
+                  </span>
+                </div>
+              </div>
+            </ng-template>
+          </p-tree>
+        </div>
+      </p-card>
+
+      <!-- Mensaje si no hay subtareas -->
+      <p-card *ngIf="task.children && task.children.length === 0" class="mb-4 shadow-2">
+        <div class="flex flex-column align-items-center py-5">
+          <div class="bg-gray-100 border-circle p-4 mb-3">
+            <i class="pi pi-sitemap text-3xl text-gray-500"></i>
+          </div>
+          <h3 class="text-lg font-medium text-color mb-2">Sin subtareas</h3>
+          <p class="text-color-secondary text-center mb-3">Esta tarea no tiene subtareas asociadas</p>
+          <button
+            pButton
+            label="Crear subtarea"
+            icon="pi pi-plus"
+            class="p-button-outlined p-button-primary"
+            (click)="createSubtask()">
+          </button>
+        </div>
+      </p-card>
+
+      <div class="flex align-items-center justify-content-center mt-4">
+        <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
+          <img
+            src="assets/General/Cartoon_task_details.png"
+            alt="Task Details"
+            class="w-18rem z-1 h-20rem mb-4 sm:w-23rem sm:h-25rem object-fit-cover mt-8 sm:mt-0">
+        </div>
+      </div>
     </div>
 
-    <!-- Columna lateral -->
-    <div class="col-12 lg:col-4">
+    <!-- Columna lateral (1/3 del espacio) -->
+    <div class="flex-1 min-w-280px">
       <!-- Asignado a -->
-      <p-card header="Asignado a" class="mb-4">
-        <div *ngIf="task.assigned_to" class="flex align-items-center gap-3">
-          <p-avatar
-            [label]="getUserInitials(task.assigned_to.name)"
-            styleClass="mr-2"
-            size="large"
-            shape="circle"
-            [style]="{'background-color': '#4f46e5', 'color': '#ffffff'}">
-          </p-avatar>
-          <div>
-            <p class="font-medium text-color m-0">{{ task.assigned_to.name }}</p>
-            <p class="text-color-secondary text-sm m-0">{{ task.assigned_to.email }}</p>
+      <p-card header="Asignado a" class="mb-4 shadow-2">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3 border-bottom-1 surface-border">
+            <i class="pi pi-user text-primary"></i>
+            <span class="font-medium text-color">Asignado a</span>
           </div>
-        </div>
-        <div *ngIf="!task.assigned_to" class="text-center py-3">
-          <i class="pi pi-user-minus text-4xl text-color-secondary mb-2"></i>
-          <p class="text-color-secondary">Sin asignar</p>
+        </ng-template>
+
+        <div class="p-3">
+          <div *ngIf="task.assigned_to" class="flex align-items-center gap-3">
+            <p-avatar
+              [label]="getUserInitials(task.assigned_to.name)"
+              size="xlarge"
+              shape="circle"
+              [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'font-weight': 'bold'}">
+            </p-avatar>
+            <div class="flex flex-column">
+              <span class="font-medium text-color text-lg">{{ task.assigned_to.name }}</span>
+              <span class="text-sm text-color-secondary flex align-items-center gap-1">
+                <i class="pi pi-envelope"></i>
+                {{ task.assigned_to.email }}
+              </span>
+              <span *ngIf="task.assigned_to.role_name" class="text-xs bg-primary-100 text-primary-700 px-2 py-1 border-round mt-1">
+                {{ task.assigned_to.role_name }}
+              </span>
+            </div>
+          </div>
+          <div *ngIf="!task.assigned_to" class="flex flex-column align-items-center py-4">
+            <div class="bg-gray-100 border-circle p-3 mb-2">
+              <i class="pi pi-user-minus text-2xl text-gray-500"></i>
+            </div>
+            <p class="text-color-secondary">Sin asignar</p>
+          </div>
         </div>
       </p-card>
 
       <!-- Creado por -->
-      <p-card header="Creado por" class="mb-4">
-        <div *ngIf="task.created_by" class="flex align-items-center gap-3">
-          <p-avatar
-            [label]="getUserInitials(task.created_by.name)"
-            size="large"
-            shape="circle"
-            [style]="{'background-color': '#10b981', 'color': '#ffffff'}">
-          </p-avatar>
-          <div>
-            <p class="font-medium text-color m-0">{{ task.created_by.name }}</p>
-            <p class="text-color-secondary text-sm m-0">{{ task.created_by.email }}</p>
+      <p-card header="Creado por" class="mb-4 shadow-2">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3 border-bottom-1 surface-border">
+            <i class="pi pi-pen-to-square text-primary"></i>
+            <span class="font-medium text-color">Creado por</span>
+          </div>
+        </ng-template>
+
+        <div class="p-3">
+          <div *ngIf="task.created_by" class="flex align-items-center gap-3">
+            <p-avatar
+              [label]="getUserInitials(task.created_by.name)"
+              size="xlarge"
+              shape="circle"
+              [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'font-weight': 'bold'}">
+            </p-avatar>
+            <div class="flex flex-column">
+              <span class="font-medium text-color text-lg">{{ task.created_by.name }}</span>
+              <span class="text-sm text-color-secondary flex align-items-center gap-1">
+                <i class="pi pi-envelope"></i>
+                {{ task.created_by.email }}
+              </span>
+            </div>
           </div>
         </div>
       </p-card>
 
       <!-- Tarea padre -->
-      <p-card header="Tarea padre" *ngIf="task.parent" class="mb-4">
-        <div class="flex align-items-center justify-content-between cursor-pointer hover:surface-hover p-2 border-round"
-             (click)="goToParentTask()">
-          <div class="flex align-items-center gap-2">
+      <p-card *ngIf="task.parent" class="mb-4 shadow-2 hover:shadow-4 transition-all cursor-pointer" (click)="navigateToTask(task.parent!.id)">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3 border-bottom-1 surface-border">
             <i class="pi pi-level-up-alt text-primary"></i>
-            <span class="font-medium">{{ task.parent.title }}</span>
+            <span class="font-medium text-color">Tarea padre</span>
           </div>
-          <i class="pi pi-chevron-right text-color-secondary"></i>
+        </ng-template>
+
+        <div class="p-3">
+          <div class="flex align-items-center justify-content-between">
+            <div class="flex flex-column">
+              <span class="font-medium text-color">{{ task.parent.title }}</span>
+              <span class="text-xs text-color-secondary">ID: {{ task.parent.id }}</span>
+            </div>
+            <i class="pi pi-chevron-right text-xl text-primary"></i>
+          </div>
         </div>
       </p-card>
 
       <!-- Información adicional -->
-      <p-card header="Información adicional">
-        <div class="flex flex-column gap-3">
-          <div>
-            <span class="text-color-secondary text-sm block">ID del Proyecto</span>
-            <span class="font-medium text-color">{{ task.project_id }}</span>
+      <p-card header="Información adicional" class="shadow-2">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3 border-bottom-1 surface-border">
+            <i class="pi pi-info-circle text-primary"></i>
+            <span class="font-medium text-color">Información adicional</span>
           </div>
-          <div>
-            <span class="text-color-secondary text-sm block">Fecha de registro</span>
-            <span class="font-medium text-color">{{ task.date || 'No especificada' }}</span>
+        </ng-template>
+
+        <div class="p-3">
+          <div class="flex flex-column gap-4">
+            <div class="flex align-items-center justify-content-between p-2 surface-ground border-round-lg">
+              <span class="text-color-secondary text-sm">ID del Proyecto</span>
+              <span class="font-medium text-white bg-primary-500 px-3 py-1 border-round-lg">#{{ task.project_id }}</span>
+            </div>
+
+            <div class="flex align-items-center justify-content-between p-2 surface-ground border-round-lg">
+              <span class="text-color-secondary text-sm">Tipo</span>
+              <span class="font-medium text-color">{{ task.type?.type || 'No definido' }}</span>
+            </div>
+
+            <div class="flex align-items-center justify-content-between p-2 surface-ground border-round-lg">
+              <span class="text-color-secondary text-sm">Estado</span>
+              <p-tag [value]="task.state?.state || 'No definido'" [severity]="getStateSeverity(task.state?.state)"></p-tag>
+            </div>
+
+            <div class="flex align-items-center justify-content-between p-2 surface-ground border-round-lg">
+              <span class="text-color-secondary text-sm">Prioridad</span>
+              <p-tag
+                [value]="getPriorityInfo(task.priority).label"
+                [severity]="getPriorityInfo(task.priority).severity">
+              </p-tag>
+            </div>
+
+            <div class="flex align-items-center justify-content-between p-2 surface-ground border-round-lg">
+              <span class="text-color-secondary text-sm">Total subtareas</span>
+              <span class="font-medium text-color flex align-items-center gap-1">
+                <i class="pi pi-sitemap text-primary"></i>
+                {{ getTotalChildrenCount(task) }}
+              </span>
+            </div>
+
+            <p-divider></p-divider>
+
+            <div class="flex flex-column">
+              <span class="text-color-secondary text-sm mb-1">Fecha de registro</span>
+              <span class="font-medium text-color flex align-items-center gap-2">
+                <i class="pi pi-calendar text-primary"></i>
+                {{ task.created_at | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
           </div>
         </div>
       </p-card>
     </div>
-
   </div>
-
 </div>

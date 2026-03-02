@@ -1,282 +1,458 @@
-<div class="min-h-screen space-y-6">
-  <!-- CONTENEDOR PRINCIPAL FLEX COLUMN -->
-  <div class="p-3 surface-ground min-h-screen flex flex-column gap-6">
+<div class="min-h-screen surface-ground">
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="p-4 lg:p-6 min-h-screen flex flex-column gap-6">
 
-    <!-- HEADER CON TÍTULO Y FILTROS -->
+    <!-- HEADER CON TÍTULO Y FILTROS MEJORADO -->
     <div class="flex flex-column md:flex-row md:align-items-center md:justify-content-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-color">Dashboard Analítico</h1>
-        <p class="text-sm text-color mt-1">Visión general del rendimiento y métricas del proyecto</p>
+        <div class="flex align-items-center gap-2 mb-1">
+          <h1 class="text-3xl font-bold text-900 m-0">Dashboard Analítico</h1>
+        </div>
+        <p class="text-xl text-600 mt-1 flex align-items-center gap-2">
+          Visión general del rendimiento y métricas del proyecto
+        </p>
       </div>
+
       <div class="flex align-items-center gap-3">
-      <span class="px-3 py-2 surface-card border-round-lg text-sm text-color flex align-items-center gap-2 shadow-1 border-1 border-gray-200">
-        <i class="pi pi-calendar text-color"></i>
-        Últimos 30 días
-        <i class="pi pi-chevron-down text-xs ml-2 text-color"></i>
-      </span>
+        <!-- Selector de fecha mejorado -->
+        <p-calendar
+          [(ngModel)]="selectedMonth"
+          view="month"
+          dateFormat="mm/yy"
+          [showIcon]="true"
+          inputId="month"
+          placeholder="Últimos 30 días"
+          styleClass="shadow-1">
+        </p-calendar>
+
+        <!-- Botón de actualizar mejorado -->
         <p-button
           label="Actualizar"
           icon="pi pi-refresh"
-          styleClass="bg-blue-600 border-none hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium"
+          [loading]="loading"
+          severity="primary"
           (onClick)="refresh()">
         </p-button>
       </div>
     </div>
 
-    <!-- ================= KPI ROW FLEX ================= -->
-    <div class="flex flex-wrap gap-4 p-4">
-      <ng-container *ngFor="let kpi of kpis">
-        <div class="flex-1 min-w-260px">
-          <div class="surface-card border-round-2xl shadow-2 hover:shadow-6 transition-all duration-300 p-4 flex align-items-center justify-content-between border-left-4 border-top-1 border-right-1 border-bottom-1 border-gray-200 hover:border-blue-200 cursor-pointer bg-gradient-to-br from-white to-gray-50">
-            <div class="flex flex-column gap-2">
-          <span class="text-xs font-semibold text-600 uppercase tracking-wider flex align-items-center gap-1">
-            <i class="pi pi-circle-fill text-blue-500" style="font-size: 0.4rem"></i>
-            {{ kpi.label }}
-          </span>
-
-              <span class="text-3xl font-bold text-900 flex align-items-baseline gap-2">
-            {{ kpi.value }}
-                <span *ngIf="kpi.trend"
-                      class="text-sm font-medium px-2 py-1 border-round-xl"
-                      [ngClass]="{
-                    'bg-green-100 text-green-700': kpi.trend > 0,
-                    'bg-red-100 text-red-700': kpi.trend < 0
-                  }">
-              <i [class]="kpi.trend > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"
-                 class="text-xs mr-1"></i>
-                  {{ Math.abs(kpi.trend) }}%
-            </span>
-          </span>
-
-              <span *ngIf="kpi.trend" class="text-xs text-500">
-            vs. mes anterior
-          </span>
-            </div>
-
-            <div class="w-14 h-14 border-round-2xl flex align-items-center justify-content-center shadow-sm"
-                 [ngClass]="kpi.bgClass || 'bg-blue-50'">
-              <i [class]="kpi.icon + ' text-3xl'"
-                 [ngClass]="kpi.iconClass || 'text-blue-600'"></i>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-
-    <!-- ================= GRÁFICOS SUPERIORES FLEX ================= -->
-    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
-      <!-- ESTADO CON DONUT CHART -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Estado</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Estado actual de las tareas</p>
-          </div>
-          <div class="flex align-items-center gap-2">
-            <span class="w-2 h-2 bg-green-500 border-circle"></span>
-            <span class="text-xs text-color-secondary">12 completadas</span>
-          </div>
-        </div>
-        <div class="p-5">
-          <p-chart type="doughnut"
-                   [data]="statusData"
-                   [options]="doughnutOptions"
-                   class="h-64 w-full block text-color">
-          </p-chart>
+    <!-- SKELETON LOADING -->
+    <ng-container *ngIf="loading">
+      <div class="flex flex-wrap gap-4">
+        <div *ngFor="let i of [1,2,3,4,5]" class="flex-1 min-w-200px">
+          <p-skeleton height="160px" borderRadius="16px"></p-skeleton>
         </div>
       </div>
-
-      <!-- PRIORIDAD CON BARRAS HORIZONTALES -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Prioridad</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Clasificación de tareas por urgencia</p>
-          </div>
-          <p-tag value="Alta: 8" severity="danger" class="text-xs"></p-tag>
-        </div>
-        <div class="p-5">
-          <p-chart type="bar"
-                   [data]="priorityData"
-                   [options]="horizontalBarOptions"
-                   class="h-64 w-full block">
-          </p-chart>
-        </div>
-        <div class="flex align-items-center justify-content-center">
-          <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
-            <img
-              src="assets/General/Cartoon_Projects_dark.png"
-              alt="Crear Proyecto"
-              class="w-20rem z-1 h-20rem mb-4 sm:w-25rem sm:h-25rem object-fit-cover mt-8 sm:mt-0">
-          </div>
-        </div>
+      <div class="flex flex-wrap gap-6 mt-4">
+        <div class="flex-1 min-w-400px"><p-skeleton height="350px" borderRadius="16px"></p-skeleton></div>
+        <div class="flex-1 min-w-400px"><p-skeleton height="350px" borderRadius="16px"></p-skeleton></div>
+        <div class="flex-1 min-w-400px"><p-skeleton height="350px" borderRadius="16px"></p-skeleton></div>
+        <div class="flex-1 min-w-400px"><p-skeleton height="350px" borderRadius="16px"></p-skeleton></div>
       </div>
-    </div>
+    </ng-container>
 
-    <!-- ================= GRÁFICOS INFERIORES FLEX ================= -->
-    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
-      <!-- CARGA POR USUARIO -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border">
-          <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Carga por Usuario</h2>
-          <p class="text-xs text-color-secondary mt-0.5">Distribución de tareas asignadas</p>
-        </div>
-        <div class="p-3">
-          <p-chart type="bar"
-                   [data]="userLoadData"
-                   [options]="verticalBarOptions"
-                   class="h-64 w-full block">
-          </p-chart>
-        </div>
+    <!-- CONTENIDO PRINCIPAL -->
+    <ng-container *ngIf="!loading && !error">
+      <!-- ================= KPI ROW CON FLEX - TODOS IGUALES ================= -->
+      <div class="flex flex-wrap gap-4">
+        <ng-container *ngFor="let kpi of kpis">
+          <div class="flex-1 min-w-180px max-w-250px">
+            <p-card
+              class="kpi-card h-full"
+              [style]="{ borderRadius: '16px', height: '100%' }">
+
+              <div class="flex flex-column align-items-center text-center p-4 h-full">
+                <!-- Icono con efecto de brillo -->
+                <div class="relative mb-3">
+                  <div class="absolute inset-0 opacity-0 hover:opacity-100 transition-all duration-300"
+                       [style]="{ filter: 'blur(8px)' }">
+                    <i [class]="kpi.icon + ' text-4xl'" [ngClass]="kpi.iconClass"></i>
+                  </div>
+                  <i [class]="kpi.icon + ' text-3xl'" [ngClass]="kpi.iconClass"></i>
+                </div>
+
+                <!-- Valor -->
+                <span class="text-3xl font-bold text-900 mb-2">{{ kpi.value }}</span>
+
+                <!-- Label -->
+                <span class="text-xs font-medium text-600 uppercase tracking-wider mb-3">{{ kpi.label }}</span>
+
+                <!-- Trend badge -->
+                <p-tag
+                  *ngIf="kpi.trend !== null"
+                  [value]="(kpi.trend > 0 ? '+' : '') + kpi.trend + '%'"
+                  [severity]="kpi.trend > 0 ? 'success' : 'danger'"
+                  [rounded]="true"
+                  class="mt-auto">
+                  <i [class]="kpi.trend > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'" class="mr-1 text-xs"></i>
+                </p-tag>
+              </div>
+            </p-card>
+          </div>
+        </ng-container>
       </div>
 
-      <!-- TENDENCIA -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Tendencia de Actividad</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Últimos 7 días</p>
-          </div>
-          <div class="flex gap-3">
-          <span class="flex align-items-center gap-1">
-            <span class="w-2 h-2 bg-blue-500 border-circle"></span>
-            <span class="text-xs text-color-secondary">Completadas</span>
-          </span>
-            <span class="flex align-items-center gap-1">
-            <span class="w-2 h-2 bg-gray-300 border-circle"></span>
-            <span class="text-xs text-color-secondary">Creadas</span>
-          </span>
-          </div>
-        </div>
-        <div class="p-3">
-          <p-chart type="line"
-                   [data]="trendData"
-                   [options]="lineOptions"
-                   class="h-64 w-full block">
-          </p-chart>
-        </div>
-      </div>
-    </div>
-
-    <!-- ================= SECCIÓN INFERIOR FLEX ================= -->
-    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
-      <!-- TABLA DE ISSUES CRÍTICAS (FLEX GROW 2) -->
-      <div class="flex-2 min-w-500px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Issues Críticas</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Tareas bloqueadas o de alta prioridad</p>
-          </div>
-          <div class="flex gap-2">
-            <p-button
-              label="Ver todas"
-              size="small"
-              styleClass="bg-red-50 text-red-600 border-none hover:bg-red-100">
-            </p-button>
-          </div>
-        </div>
-
-        <div class="p-3">
-          <p-table
-            [value]="criticalIssues"
-            sortField="priority"
-            [sortOrder]="-1"
-            [paginator]="true"
-            [rows]="4"
-            responsiveLayout="scroll"
-            styleClass="p-datatable-sm">
+      <!-- ================= GRÁFICOS SUPERIORES CON FLEX ================= -->
+      <div class="flex flex-wrap gap-6">
+        <!-- ESTADO CON DONUT CHART MEJORADO -->
+        <div class="flex-1 min-w-450px">
+          <p-card
+            header="Distribución por Estado"
+            subheader="Estado actual de las tareas"
+            [style]="{ borderRadius: '16px', height: '100%' }"
+            class="chart-card h-full">
 
             <ng-template pTemplate="header">
-              <tr class="surface-ground text-xs uppercase text-color-secondary">
-                <th class="px-4 py-3 font-semibold">ID</th>
-                <th class="px-4 py-3 font-semibold">Título</th>
-                <th class="px-4 py-3 font-semibold">Proyecto</th>
-                <th class="px-4 py-3 font-semibold">Prioridad</th>
-                <th class="px-4 py-3 font-semibold">Responsable</th>
-                <th class="px-4 py-3 font-semibold">Estado</th>
-              </tr>
+              <div class="flex align-items-center justify-content-between px-4 pt-4">
+                <div>
+                  <h2 class="text-lg font-semibold text-900 m-0">Distribución por Estado</h2>
+                  <p class="text-sm text-600 mt-1">Estado actual de las tareas</p>
+                </div>
+              </div>
             </ng-template>
 
-            <ng-template pTemplate="body" let-issue>
-              <tr class="hover:surface-ground transition text-sm border-bottom-1 surface-border">
-                <td class="px-4 py-3 font-mono text-xs text-blue-600">#{{ issue.id }}</td>
-                <td class="px-4 py-3 font-medium text-color">{{ issue.title }}</td>
-                <td class="px-4 py-3 text-color-secondary">{{ issue.project_name }}</td>
-                <td class="px-4 py-3">
-                  <p-tag [value]="issue.priority"
-                         [severity]="getPrioritySeverity(issue.priority)"
-                         class="text-xs">
-                  </p-tag>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex align-items-center gap-2">
-                    <p-avatar
-                      [label]="issue.assigned_user_name?.[0] || '?'"
-                      shape="circle"
-                      size="normal" class="w-6 h-6">
-                    </p-avatar>
-                    <span class="text-xs text-color-secondary">{{ issue.assigned_user_name }}</span>
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <p-tag [value]="issue.status"
-                         [severity]="getStatusSeverity(issue.status)"
-                         class="text-xs">
-                  </p-tag>
-                </td>
-              </tr>
+            <div class="p-4">
+              <p-chart
+                type="doughnut"
+                [data]="statusData"
+                [options]="doughnutOptions"
+                class="h-64 w-full block">
+              </p-chart>
+            </div>
+
+            <ng-template pTemplate="footer">
+              <div class="flex flex-wrap align-items-center justify-content-center gap-4 p-3 surface-50 border-top-1 surface-border">
+                <div *ngFor="let state of statusData?.labels?.slice(0,4)" class="flex align-items-center gap-2">
+                  <span class="w-3 h-3 border-circle" [style.background]="getStateColor(state)"></span>
+                  <span class="text-xs text-600">{{ state }}</span>
+                </div>
+              </div>
             </ng-template>
-          </p-table>
+          </p-card>
+        </div>
+
+        <!-- PRIORIDAD CON BARRAS HORIZONTALES MEJORADO -->
+        <div class="flex-1 min-w-450px">
+          <p-card
+            header="Distribución por Prioridad"
+            subheader="Clasificación de tareas por urgencia"
+            [style]="{ borderRadius: '16px', height: '100%' }"
+            class="chart-card h-full">
+
+            <ng-template pTemplate="header">
+              <div class="flex align-items-center justify-content-between px-4 pt-4">
+                <div>
+                  <h2 class="text-lg font-semibold text-900 m-0">Distribución por Prioridad</h2>
+                  <p class="text-sm text-600 mt-1">Clasificación de tareas por urgencia</p>
+                </div>
+              </div>
+            </ng-template>
+
+            <div class="p-4">
+              <p-chart
+                type="bar"
+                [data]="priorityData"
+                [options]="horizontalBarOptions"
+                class="h-64 w-full block">
+              </p-chart>
+            </div>
+            <div class="flex align-items-center justify-content-center">
+              <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
+                <img
+                  src="assets/General/Cartoon_Projects_dark.png"
+                  alt="Crear Proyecto"
+                  class="w-20rem z-1 h-20rem mb-4 sm:w-25rem sm:h-25rem object-fit-cover mt-8 sm:mt-0">
+              </div>
+            </div>
+
+
+            <ng-template pTemplate="footer">
+              <div class="flex flex-wrap align-items-center justify-content-center gap-4 p-3 surface-50 border-top-1 surface-border">
+                <div *ngFor="let priority of priorityData?.labels" class="flex align-items-center gap-2">
+                  <span class="w-3 h-3 border-circle" [style.background]="getPriorityColor(priority)"></span>
+                  <span class="text-xs text-600">{{ priority }}</span>
+                </div>
+              </div>
+            </ng-template>
+          </p-card>
         </div>
       </div>
 
-      <!-- ACTIVIDAD RECIENTE (FLEX 1) -->
-      <div class="flex-1 min-w-300px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Actividad Reciente</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Últimas actualizaciones</p>
-          </div>
-          <span class="w-2 h-2 bg-green-500 border-circle animate-pulse"></span>
-        </div>
+      <!-- ================= GRÁFICOS INFERIORES CON FLEX ================= -->
+      <div class="flex flex-wrap gap-6">
+        <!-- CARGA POR USUARIO -->
+        <div class="flex-1 min-w-450px">
+          <p-card
+            header="Carga por Usuario"
+            subheader="Distribución de tareas asignadas"
+            [style]="{ borderRadius: '16px', height: '100%' }"
+            class="chart-card h-full">
 
-        <div class="p-2 flex flex-column gap-3 max-h-320px overflow-y-auto">
-          <div *ngFor="let act of activity"
-               class="flex align-items-start gap-3 p-3 hover:surface-ground border-round transition border-1 border-transparent hover:surface-border">
-            <p-avatar
-              [label]="act.user[0]"
-              shape="circle"
-              size="normal"
-              class="text-blue-600 font-semibold">
-            </p-avatar>
-            <div class="flex-1">
-              <p class="text-sm">
-                <span class="font-semibold text-color">{{ act.user }}</span>
-                <span class="text-color-secondary ml-1">{{ act.action }}</span>
-              </p>
-              <div class="flex align-items-center gap-2 mt-1.5">
-                <span class="text-xs surface-ground px-2 py-0.5 border-round-full text-color-secondary">{{ act.project }}</span>
-                <span class="text-xs text-color-secondary flex align-items-center gap-1">
-                <i class="pi pi-clock text-xxs"></i>
-                  {{ act.time }}
-              </span>
-              </div>
+            <div class="p-4">
+              <p-chart
+                type="bar"
+                [data]="userLoadData"
+                [options]="verticalBarOptions"
+                class="h-64 w-full block">
+              </p-chart>
             </div>
-          </div>
+
+            <ng-template pTemplate="footer">
+              <div class="flex align-items-center justify-content-between p-3 surface-50 border-top-1 surface-border">
+                <span class="text-xs text-600">Total usuarios activos: {{ userLoadData?.labels?.length || 0 }}</span>
+                <span class="text-xs font-semibold text-primary">Promedio: {{ calculateAverage(userLoadData?.datasets[0]?.data) }}</span>
+              </div>
+            </ng-template>
+          </p-card>
         </div>
 
-        <!-- PIE DE ACTIVIDAD -->
-        <div class="px-3 py-3 surface-ground border-top-1 surface-border">
+        <!-- TENDENCIA CON LINE CHART MEJORADO -->
+        <div class="flex-1 min-w-450px">
+          <p-card
+            header="Tendencia de Actividad"
+            subheader="Últimos 7 días"
+            [style]="{ borderRadius: '16px', height: '100%' }"
+            class="chart-card h-full">
+
+            <ng-template pTemplate="header">
+              <div class="flex align-items-center justify-content-between px-4 pt-4">
+                <div>
+                  <h2 class="text-lg font-semibold text-900 m-0">Tendencia de Actividad</h2>
+                  <p class="text-sm text-600 mt-1">Últimos 7 días</p>
+                </div>
+                <div class="flex gap-3">
+                  <p-chip label="Completadas" icon="pi pi-check" class="text-green-700"></p-chip>
+                  <p-chip label="Creadas" icon="pi pi-plus" class="text-blue-700"></p-chip>
+                </div>
+              </div>
+            </ng-template>
+
+            <div class="p-4">
+              <p-chart
+                type="line"
+                [data]="trendData"
+                [options]="lineOptions"
+                class="h-64 w-full block">
+              </p-chart>
+            </div>
+
+            <ng-template pTemplate="footer">
+              <div class="flex align-items-center justify-content-between p-3 surface-50 border-top-1 surface-border">
+                <span class="text-xs text-600">Total creadas: {{ calculateTotal(trendData?.datasets[0]?.data) }}</span>
+                <span class="text-xs text-600">Total completadas: {{ calculateTotal(trendData?.datasets[1]?.data) }}</span>
+              </div>
+            </ng-template>
+          </p-card>
+        </div>
+      </div>
+
+      <!-- ================= SECCIÓN INFERIOR CON FLEX ================= -->
+      <div class="flex flex-wrap gap-6">
+        <!-- TABLA DE ISSUES CRÍTICAS MEJORADA - FLEX GROW 2 -->
+        <div class="flex-2 min-w-600px">
+          <p-card
+            header="Issues Críticas"
+            subheader="Tareas bloqueadas o de alta prioridad"
+            [style]="{ borderRadius: '16px', height: '100%' }"
+            class="issues-card h-full">
+
+            <ng-template pTemplate="header">
+              <div class="flex align-items-center justify-content-between px-4 pt-4">
+                <div>
+                  <h2 class="text-lg font-semibold text-900 m-0">Issues Críticas</h2>
+                  <p class="text-sm text-600 mt-1">Tareas bloqueadas o de alta prioridad</p>
+                </div>
+                <p-button
+                  label="Ver todas"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  severity="danger"
+                  [text]="true">
+                </p-button>
+              </div>
+            </ng-template>
+
+            <div class="p-3">
+              <p-table
+                [value]="criticalIssues"
+                sortField="priority"
+                [sortOrder]="-1"
+                [paginator]="true"
+                [rows]="4"
+                [rowsPerPageOptions]="[4,8,12]"
+                responsiveLayout="scroll"
+                styleClass="p-datatable-sm p-datatable-striped"
+                [tableStyle]="{ 'min-width': '50rem' }">
+
+                <ng-template pTemplate="header">
+                  <tr class="surface-100 text-xs uppercase text-600">
+                    <th class="px-4 py-3 font-semibold">ID</th>
+                    <th class="px-4 py-3 font-semibold">Título</th>
+                    <th class="px-4 py-3 font-semibold">Proyecto</th>
+                    <th class="px-4 py-3 font-semibold">Prioridad</th>
+                    <th class="px-4 py-3 font-semibold">Responsable</th>
+                    <th class="px-4 py-3 font-semibold">Estado</th>
+                    <th class="px-4 py-3 font-semibold">Acciones</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-issue>
+                  <tr class="hover:surface-100 transition text-sm border-bottom-1 surface-border">
+                    <td class="px-4 py-3">
+                      <p-tag [value]="'#' + issue.id" severity="info" styleClass="font-mono"></p-tag>
+                    </td>
+                    <td class="px-4 py-3 font-medium text-900">{{ issue.title }}</td>
+                    <td class="px-4 py-3 text-600">{{ issue.project_name }}</td>
+                    <td class="px-4 py-3">
+                      <p-tag
+                        [value]="issue.priority"
+                        [severity]="getPrioritySeverity(issue.priority)"
+                        [rounded]="true">
+                      </p-tag>
+                    </td>
+                    <td class="px-4 py-3">
+                      <div class="flex align-items-center gap-2">
+                        <p-avatar
+                          [label]="issue.assigned_user_name?.[0] || '?'"
+                          shape="circle"
+                          size="normal"
+                          styleClass="bg-primary text-white">
+                        </p-avatar>
+                        <span class="text-xs text-600">{{ issue.assigned_user_name }}</span>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3">
+                      <p-tag
+                        [value]="issue.status"
+                        [severity]="getStatusSeverity(issue.status)"
+                        [rounded]="true">
+                      </p-tag>
+                    </td>
+                    <td class="px-4 py-3">
+                      <p-button
+                        icon="pi pi-eye"
+                        [rounded]="true"
+                        [text]="true"
+                        severity="info"
+                        size="small"
+                        pTooltip="Ver detalles"
+                        tooltipPosition="top">
+                      </p-button>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="7" class="text-center p-4">
+                      <div class="flex flex-column align-items-center gap-3">
+                        <i class="pi pi-check-circle text-4xl text-green-500"></i>
+                        <span class="text-lg font-medium text-900">¡Todo bajo control!</span>
+                        <span class="text-sm text-600">No hay issues críticas en este momento</span>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <ng-template pTemplate="footer">
+              <div class="flex align-items-center justify-content-between p-3 surface-50 border-top-1 surface-border">
+                <span class="text-xs text-600">Total issues críticas: {{ criticalIssues.length }}</span>
+                <span class="text-xs text-600">Última actualización: {{ getLastUpdateTime() }}</span>
+              </div>
+            </ng-template>
+          </p-card>
+        </div>
+
+        <!-- ACTIVIDAD RECIENTE MEJORADA - FLEX 1 -->
+        <div class="flex-1 min-w-350px">
+          <p-card
+            header="Actividad Reciente"
+            subheader="Últimas actualizaciones"
+            [style]="{ borderRadius: '16px', height: '100%' }"
+            class="activity-card h-full">
+
+            <ng-template pTemplate="header">
+              <div class="flex align-items-center justify-content-between px-4 pt-4">
+                <div>
+                  <h2 class="text-lg font-semibold text-900 m-0">Actividad Reciente</h2>
+                  <p class="text-sm text-600 mt-1">Últimas actualizaciones</p>
+                </div>
+                <span class="p-badge p-badge-success p-badge-lg">{{ activity.length }}</span>
+              </div>
+            </ng-template>
+
+            <div class="p-2" style="max-height: 400px; overflow-y: auto;">
+              <p-timeline [value]="activity" align="left" class="custom-timeline">
+                <ng-template pTemplate="content" let-event>
+                  <div class="flex align-items-start gap-3 p-3 hover:surface-100 border-round transition cursor-pointer">
+                    <p-avatar
+                      [label]="event.user[0]"
+                      shape="circle"
+                      size="normal"
+                      styleClass="bg-primary text-white font-bold">
+                    </p-avatar>
+                    <div class="flex-1">
+                      <p class="text-sm m-0">
+                        <span class="font-semibold text-900">{{ event.user }}</span>
+                        <span class="text-600 ml-1">{{ event.action }}</span>
+                      </p>
+                      <div class="flex flex-wrap align-items-center gap-2 mt-2">
+                        <p-chip
+                          [label]="event.project"
+                          styleClass="text-xs bg-50 text-600"
+                          [removable]="false">
+                        </p-chip>
+                        <span class="text-xs text-600 flex align-items-center gap-1">
+                          <i class="pi pi-clock"></i>
+                          {{ event.time }}
+                        </span>
+                        <p-tag
+                          *ngIf="event.priority"
+                          [value]="event.priority"
+                          [severity]="getPrioritySeverity(event.priority)">
+                        </p-tag>
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </p-timeline>
+            </div>
+
+            <ng-template pTemplate="footer">
+              <div class="p-3 surface-50 border-top-1 surface-border">
+                <p-button
+                  label="Ver toda la actividad"
+                  icon="pi pi-arrow-right"
+                  iconPos="right"
+                  [text]="true"
+                  severity="primary"
+                  class="w-full"
+                  styleClass="justify-content-center">
+                </p-button>
+              </div>
+            </ng-template>
+          </p-card>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ERROR STATE MEJORADO -->
+    <ng-container *ngIf="error">
+      <div class="flex flex-column align-items-center justify-content-center p-8">
+        <div class="surface-card p-8 border-round-2xl shadow-2 text-center">
+          <i class="pi pi-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+          <h2 class="text-2xl font-bold text-900 mb-2">¡Ups! Algo salió mal</h2>
+          <p class="text-lg text-600 mb-4">{{ error }}</p>
           <p-button
-            label="Ver toda la actividad"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-            [text]="true"
-            size="small"
-            styleClass="bg-blue-50 text-xs text-blue-600 hover:text-white hover:bg-blue-600 font-medium flex align-items-center gap-1">
+            label="Reintentar"
+            icon="pi pi-refresh"
+            severity="primary"
+            (onClick)="refresh()">
           </p-button>
         </div>
       </div>
-    </div>
+    </ng-container>
   </div>
 </div>

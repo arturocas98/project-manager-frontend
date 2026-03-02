@@ -67,7 +67,7 @@ export class UserEditComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: [''],
       password_confirmation: [''],
-      role: [null],
+      role_id: [null],
       modality_id: [''],
       telephone: [''],
       address: [''],
@@ -92,6 +92,7 @@ export class UserEditComponent implements OnInit {
     if (this.ngForm.invalid || !this.userId) {
       return;
     }
+    console.log(this.ngForm.value);
 
     this.userService.updateUser(this.ngForm.value, this.userId).subscribe(() => {
       this.navigateToUserList();

@@ -26,6 +26,7 @@ import {
   CdkDropListGroup, moveItemInArray,
   transferArrayItem
 } from "@angular/cdk/drag-drop";
+import {TranslateModule} from "@ngx-translate/core";
 
 interface PriorityOption {
   label: string;
@@ -69,7 +70,8 @@ interface TypeOption {
     CdkDrag,
     CdkDropListGroup,
     CdkDragPreview,
-    CdkDragPlaceholder
+    CdkDragPlaceholder,
+    TranslateModule
   ],
   templateUrl: './kanban-project.component.html',
 })
@@ -151,7 +153,12 @@ export class KanbanProjectComponent  implements OnInit, OnDestroy {
     this.setupSearch();
     this.setupFilters();
   }
-
+  Refresh(){
+    this.loadBoard();
+    this.loadMembers();
+    this.setupSearch();
+    this.setupFilters();
+  }
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
