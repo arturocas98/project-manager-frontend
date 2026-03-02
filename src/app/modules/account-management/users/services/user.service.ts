@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { User } from 'src/app/shared/models/user';
 import { environment } from 'src/environments/environment';
 import { ParamJson } from '../../../../shared/models/params.model';
-import { MetaData } from '../../../../shared/models/api-response.model';
+import { ApiSingleResponse, MetaData } from '../../../../shared/models/api-response.model';
 
 export interface UserCollectionResponse {
   data: User[];
@@ -35,5 +35,9 @@ export class UserService {
 
   updateUser(user: User, userId: number): Observable<boolean> {
     return this.http.put<boolean>(`${environment.apiUrl}/auth/users/${userId}`, user);
+  }
+
+  getUser(id: number): Observable<ApiSingleResponse<User>> {
+    return this.http.get<UserResponse>(`${environment.apiUrl}/auth/users/${id}`);
   }
 }
