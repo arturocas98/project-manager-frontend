@@ -66,16 +66,10 @@ export class ProjectSettingsComponent implements OnInit {
   member: ProjectMember[] = [];
   // Opciones de roles
   roleOptions = [
-    { label: 'administrator', value: 'administrators' },
-    { label: 'project manager', value: 'project manager' },
-    { label: 'team member', value: 'team member' },
-    { label: 'supervisor', value: 'supervisor' },
-    { label: 'external contributor', value: 'external contributor' },
-    { label: 'owner', value: 'owner' },
-    { label: 'developer', value: 'developer' },
-    { label: 'tester', value: 'tester' },
-    { label: 'guest', value: 'guest' },
-    { label: 'client', value: 'client' }
+    { label: 'Leader', value: 'LDR' },
+    { label: 'Developer', value: 'DEV' },
+    { label: 'Tester', value: 'TST' },
+    { label: 'Documenter', value: 'DOC' }
   ];
 
   // Formulario para añadir miembro
@@ -99,7 +93,7 @@ export class ProjectSettingsComponent implements OnInit {
 
     this.addMemberForm = this.fb.group({
       user_id: [null, Validators.required],
-      role_type: [null, Validators.required]
+      role_code: [null, Validators.required]
     });
 
     this.deleteMemberForm = this.fb.group({
@@ -125,6 +119,8 @@ export class ProjectSettingsComponent implements OnInit {
           name: project.name??'',
           description: project.description??''
         });
+
+        console.log(project);
 
         this.projectKey = project.key;
         this.createdAt = project.created_at ? new Date(project.created_at) : null;
@@ -209,7 +205,7 @@ export class ProjectSettingsComponent implements OnInit {
     this.addMemberLoading = true;
     const memberData: ProjectMemberRequest = {
       user_id: this.addMemberForm.value.user_id,
-      role_type: this.addMemberForm.value.role_type
+      role_code: this.addMemberForm.value.role_code
     };
 
     this.projectService.addMember(this.projectId, memberData).subscribe({

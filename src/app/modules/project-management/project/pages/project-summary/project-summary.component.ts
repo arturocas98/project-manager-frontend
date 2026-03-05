@@ -63,7 +63,6 @@ export class ProjectSummaryComponent implements OnInit {
   // Actividad reciente
   activity: any[] = [];
 
-
   doughnutOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -214,6 +213,7 @@ export class ProjectSummaryComponent implements OnInit {
     this.projectService.getProjectSummary(this.projectId).subscribe({
       next: (data) => {
         this.summaryData = data;
+        console.log(this.summaryData);
         this.transformDataForView();
         this.initCharts();
         this.loading = false;
@@ -232,7 +232,7 @@ export class ProjectSummaryComponent implements OnInit {
   private transformDataForView() {
     if (!this.summaryData) return;
 
-    // Transformar KPIs
+    // Transformar KPIs - CORREGIDO: Acceder correctamente a los valores de KpiItem
     this.kpis = [
       {
         label: 'Total Tareas',
@@ -244,23 +244,39 @@ export class ProjectSummaryComponent implements OnInit {
       },
       {
         label: 'En Progreso',
-        value: this.summaryData.kpis.in_progress_tasks.value,
+        value: this.summaryData.kpis.in_progress_tasks, // Este ya es number
         icon: 'pi pi-clock',
         bgClass: 'surfarce-card',
         iconClass: 'text-color',
-        trend: this.extractTrendValue(this.summaryData.kpis.in_progress_tasks.comparison)
+        trend: null // in_progress_tasks no tiene comparison
       },
       {
-        label: 'Finalizadas',
-        value: this.summaryData.kpis.finished_tasks.value,
+        label: 'Revisión',
+        value: this.summaryData.kpis.review_tasks, // Este ya es number
+        icon: 'pi pi-eye',
+        bgClass: 'surfarce-card',
+        iconClass: 'text-blue-400',
+        trend: null
+      },
+      {
+        label: 'Completadas',
+        value: this.summaryData.kpis.completed_tasks, // Este ya es number
         icon: 'pi pi-check-circle',
         bgClass: 'surfarce-card',
         iconClass: 'text-green-500',
-        trend: this.extractTrendValue(this.summaryData.kpis.finished_tasks.comparison)
+        trend: null
+      },
+      {
+        label: 'Finalizadas',
+        value: this.summaryData.kpis.finished_tasks, // Este ya es number
+        icon: 'pi pi-flag',
+        bgClass: 'surfarce-card',
+        iconClass: 'text-green-600',
+        trend: null
       },
       {
         label: 'Por vencer esta semana',
-        value: this.summaryData.kpis.expiring_this_week,
+        value: this.summaryData.kpis.expiring_this_week, // Este ya es number
         icon: 'pi pi-calendar-times',
         bgClass: 'surfarce-card',
         iconClass: 'text-yellow-500',
@@ -342,16 +358,6 @@ export class ProjectSummaryComponent implements OnInit {
       ]
     };
 
-    this.doughnutOptions = {
-      plugins: {
-        legend: {
-          labels: {
-            color: textColor
-          }
-        }
-      }
-    };
-
     // DISTRIBUCIÓN POR PRIORIDAD
     const priorityLabels = Object.keys(this.summaryData.distribution_by_priority);
     const priorityValues = Object.values(this.summaryData.distribution_by_priority);
@@ -386,21 +392,15 @@ export class ProjectSummaryComponent implements OnInit {
       ]
     };
 
-    // TENDENCIA SEMANAL
+    // TENDENCIA SEMANAL - CORREGIDO: Usar los nombres correctos de los días en español
     const weeklyTrend = this.summaryData.trends.weekly;
-    const days: (keyof WeeklyTrend)[] = [
-      'monday',
-      'tuesday',
-      'wednesday',
-      'thursday',
-      'friday',
-      'saturday',
-      'sunday'
-    ];
+
+    // Mapeo correcto de los días según la interfaz WeeklyTrend
+    const daysOrder = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
     const dayLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-    const createdData = days.map(day => weeklyTrend[day]?.tasks_created || 0);
-    const completedData = days.map(day => weeklyTrend[day]?.tasks_completed || 0);
+    const createdData = daysOrder.map(day => weeklyTrend[day as keyof WeeklyTrend]?.tasks_created || 0);
+    const completedData = daysOrder.map(day => weeklyTrend[day as keyof WeeklyTrend]?.tasks_completed || 0);
 
     this.trendData = {
       labels: dayLabels,
@@ -504,14 +504,17 @@ export class ProjectSummaryComponent implements OnInit {
       case 'bloqueada':
       case 'blocked':
         return 'danger';
+      case 'en progreso':
       case 'in progress':
-      case 'progress':
         return 'warning';
+      case 'revision':
       case 'review':
         return 'info';
-      case 'finished':
-      case 'done':
       case 'completada':
+      case 'completed':
+        return 'success';
+      case 'finalizada':
+      case 'finished':
         return 'success';
       default:
         return 'secondary';

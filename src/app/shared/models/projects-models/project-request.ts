@@ -10,7 +10,7 @@ export type UpdateProjectRequest = {
 
 export interface ProjectMemberRequest {
   user_id: number;
-  role_type: string;
+  role_code: string;
 }
 
 

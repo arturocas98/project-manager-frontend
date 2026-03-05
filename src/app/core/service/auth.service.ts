@@ -134,6 +134,8 @@ export class AuthService {
   }
   setRole(user: User): void {
     const role = user.role ?? null; // tomar el rol único
+    console.log(role);
+    console.log("El unico rol");
     this.role$.next(role);
   }
 

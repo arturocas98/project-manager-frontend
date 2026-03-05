@@ -14,6 +14,7 @@ import { ProjectService } from 'src/app/core/service/project.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ApiListResponse } from '../../../../../shared/models/api-response.model';
 import {Route, Router, RouterLink, RouterLinkActive} from '@angular/router';
+import {AuthService} from "../../../../../core/service/auth.service";
 
 @Component({
   selector: 'app-project-list',
@@ -37,12 +38,16 @@ import {Route, Router, RouterLink, RouterLinkActive} from '@angular/router';
 })
 export class ProjectListComponent implements OnInit {
   projects: Project[] = [];
-  loading = false;
+  loading: boolean = false;
+  isAdmin: boolean = false;
 
   constructor(
     private projectService: ProjectService,
+    private authservice: AuthService,
     private router: Router
-  ) {}
+  ) {
+    this.isAdmin = this.authservice.isAdmin;
+  }
 
   goToProject(id: number) {
     this.router.navigate(['/project-management/projects/kanban', id]);
@@ -72,4 +77,5 @@ export class ProjectListComponent implements OnInit {
       },
     });
   }
+
 }
