@@ -1,8 +1,12 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {IncidenceModel, TaskUpdateModelRequest} from "../../../../../shared/models/task-models/task-create-model";
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  IncidenceDetail, IncidenceDetailChild,
+  IncidenceModel,
+  TaskUpdateModelRequest
+} from "../../../../../shared/models/task-models/task-create-model";
 import {ProjectMember} from "../../../../../shared/models/kanban.models";
 import {Subject, Subscription, takeUntil} from "rxjs";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ProjectService} from "../../../../../core/service/project.service";
 import {KanbanService} from "../../../../../core/service/kanban-service";
@@ -17,6 +21,8 @@ import {DropdownModule} from "primeng/dropdown";
 import {CalendarModule} from "primeng/calendar";
 import {AccordionModule} from "primeng/accordion";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {DialogModule} from "primeng/dialog";
+import {TagModule} from "primeng/tag";
 
 @Component({
   selector: 'app-task-update',
@@ -34,18 +40,35 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
     CalendarModule,
     AccordionModule,
     DatePipe,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    DialogModule,
+    TagModule,
+    FormsModule
   ],
   templateUrl: './task-update.component.html',
 })
 export class TaskUpdateComponent implements OnInit, OnDestroy {
+  @ViewChild('deleteDialog') deleteDialog: any;
+  @ViewChild('confirmDeleteWithChildrenDialog') confirmDeleteWithChildrenDialog: any;
+
   loading = true;
   saving = false;
+  deleting = false;
   projectId!: number;
   taskId!: number;
-  task: IncidenceModel | null = null;
+  task: IncidenceDetail | null = null;
   error: string | null = null;
   stateName: string = '';
+
+  // Control para eliminación con nombre de tarea
+  deleteConfirmationName = '';
+  deleteNameValid = false;
+  hasChildren = false;
+  childrenCount = 0;
+
+  // Diálogos
+  showDeleteDialog = false;
+  showDeleteWithChildrenDialog = false;
 
   // Lista de miembros del proyecto
   members: ProjectMember[] = [];
@@ -68,10 +91,21 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   priorities = [
-    { label: 'Alta', value: 3 },    // high = 3
-    { label: 'Media', value: 2 },    // medium = 2
-    { label: 'Baja', value: 1 }      // low = 1
+    { label: 'Baja', value: 1 },
+    { label: 'Media', value: 2 },
+    { label: 'Alta', value: 3 },
+    { label: 'Crítica', value: 4 }
   ];
+
+  formatDate(date: Date | null): string | null {
+    if (!date) return null;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
 
   // Mapeo de tipos a valores para el dropdown (solo para mostrar)
   types = [
@@ -103,7 +137,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     title: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', Validators.required],
     priority: [<number | null>null, Validators.required],
-    type: [{value: <number | null>null, disabled: true}, Validators.required], // Tipo no editable
+    type: [{value: <number | null>null, disabled: true}, Validators.required],
     assigned_user_id: [<number | null>null],
     parent_id: [<number | null>null],
     state_id: [{value: <number | null>null, disabled: true}, Validators.required],
@@ -124,7 +158,6 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
 
-    // Obtener taskId de los parámetros de ruta
     const taskSub = this.route.paramMap.subscribe(params => {
       this.taskId = Number(params.get('IncidenceId'));
 
@@ -139,8 +172,6 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     });
 
     this.subscriptions.push(taskSub);
-
-    // Escuchar cambios en el tipo para actualizar el selector de padre
     this.setupTypeListener();
   }
 
@@ -158,9 +189,10 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     this.error = null;
 
     const taskSub = this.projectService.getOneTask(this.projectId, this.taskId).subscribe({
-      next: (task) => {
+      next: (task: IncidenceDetail) => {
         this.task = task;
-        this.stateName = this.getStateName(task.state.id);
+        this.stateName = this.getStateName(task.state?.id);
+        this.checkChildren(task);
         this.patchFormValues(task);
         this.loading = false;
       },
@@ -168,13 +200,32 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
         console.error('Error loading task details:', error);
         this.error = 'No se pudo cargar la información de la tarea';
         this.loading = false;
-
-        const errorMessage = error.error?.message || 'Error al cargar la tarea';
-        this.showError('Error', errorMessage);
+        this.showError('Error', 'Error al cargar la tarea');
       }
     });
 
     this.subscriptions.push(taskSub);
+  }
+
+  /**
+   * Verifica si la tarea tiene hijos
+   */
+  private checkChildren(task: IncidenceDetail) {
+    const countChildren = (children: IncidenceDetailChild[] | undefined): number => {
+      if (!children) return 0;
+
+      let count = 0;
+      children.forEach(child => {
+        count++;
+        if (child.children && child.children.length > 0) {
+          count += countChildren(child.children);
+        }
+      });
+      return count;
+    };
+
+    this.childrenCount = countChildren(task.children);
+    this.hasChildren = this.childrenCount > 0;
   }
 
   /**
@@ -207,7 +258,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   /**
    * Parsea el formulario con los valores de la tarea
    */
-  private patchFormValues(task: IncidenceModel) {
+  private patchFormValues(task: IncidenceDetail) {
     // Mapear prioridad string a ID
     const priorityMap: Record<string, number> = {
       'low': 1,
@@ -222,16 +273,15 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       title: task.title,
       description: task.description,
       priority: priorityId,
-      type: task.type.id,
+      type: task.type?.id,
       assigned_user_id: task.assigned_to?.id || null,
       parent_id: task.parent?.id || null,
-      state_id: task.state.id,
+      state_id: task.state?.id,
       start_date: task.start_date,
       due_date: task.due_date
     });
 
-    // Actualizar selector de padre si es necesario
-    if (task.type.id in this.typeParentMap) {
+    if (task.type?.id && task.type.id in this.typeParentMap) {
       this.updateParentSelector(task.type.id);
       this.updateAssignedUserValidator(task.type.id);
     }
@@ -257,7 +307,6 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
    * Actualiza el selector de padre según el tipo seleccionado
    */
   private updateParentSelector(typeId: number) {
-    // Limpiar selección anterior
     this.taskForm.patchValue({ parent_id: null });
 
     const parentConfig = this.typeParentMap[typeId];
@@ -281,11 +330,9 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
    * Actualiza los validadores del usuario asignado según el tipo
    */
   private updateAssignedUserValidator(typeId: number) {
-    // Para Epic (1) y History (2), el usuario asignado es obligatorio
     if (typeId === 1 || typeId === 2) {
       this.taskForm.get('assigned_user_id')?.setValidators([Validators.required]);
     } else {
-      // Para Task (3), Bug (4), Subtask (5), es opcional
       this.taskForm.get('assigned_user_id')?.clearValidators();
     }
     this.taskForm.get('assigned_user_id')?.updateValueAndValidity();
@@ -297,18 +344,15 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   private loadParentOptions(parentTypeId: number) {
     const taskSub = this.kanbanService.getProjectTasks(this.projectId).subscribe({
       next: (tasks) => {
-        // Filtrar tareas por tipo y excluir la tarea actual
         const filteredTasks = tasks.filter(task => {
           return task.type.id === parentTypeId && task.id !== this.taskId;
         });
 
-        // Mapear a opciones del dropdown
         this.parentOptions = filteredTasks.map(task => ({
           label: task.title,
           value: task.id
         }));
 
-        // Si no hay opciones disponibles, mostrar mensaje
         if (this.parentOptions.length === 0 && this.showParentSelector) {
           const parentTypeName = this.getTypeName(parentTypeId);
           this.messageService.add({
@@ -345,7 +389,8 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   /**
    * Obtiene el nombre del estado por su ID
    */
-  private getStateName(stateId: number): string {
+  private getStateName(stateId: number | undefined): string {
+    if (!stateId) return 'Open';
     return this.stateMap[stateId] || 'Open';
   }
 
@@ -354,15 +399,8 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
    */
   getSelectedMemberLabel(): string {
     const selectedId = this.taskForm.get('assigned_user_id')?.value;
-
-    if (selectedId == null) {
-      return '';
-    }
-
-    const selectedMember = this.memberOptions.find(
-      m => m.value === selectedId
-    );
-
+    if (selectedId == null) return '';
+    const selectedMember = this.memberOptions.find(m => m.value === selectedId);
     return selectedMember ? selectedMember.label : '';
   }
 
@@ -376,17 +414,17 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       title: formValue.title || null,
       description: formValue.description || null,
       incidence_priority_id: formValue.priority || null,
-      incidence_type_id: this.task?.type.id || null, // Usar el tipo original
-      incidence_state_id: this.task?.state.id || null, // Usar el estado original
+      incidence_type_id: this.task?.type?.id || null,
+      incidence_state_id: this.task?.state?.id || null,
       assigned_user_id: formValue.assigned_user_id || null,
       parent_incidence_id: formValue.parent_id || null,
-      start_date: formValue.start_date || null,
-      due_date: formValue.due_date || null
+      start_date: this.formatDate(formValue.start_date ? new Date(formValue.start_date) : null),
+      due_date: this.formatDate(formValue.due_date ? new Date(formValue.due_date) : null)
     };
   }
 
   /**
-   * Muestra un toast
+   * Muestra un toast de error
    */
   private showError(summary: string, detail: string) {
     this.messageService.add({
@@ -398,13 +436,83 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Muestra diálogo de confirmación de éxito
+   * Verifica si el nombre de confirmación coincide
    */
-  currentDialogHeader: string = "Actualización"
+  checkDeleteConfirmation() {
+    this.deleteNameValid = this.deleteConfirmationName === this.task?.title;
+  }
+
+  /**
+   * Abre el diálogo de eliminación según si tiene hijos o no
+   */
+  confirmDelete() {
+    if (this.hasChildren) {
+      this.showDeleteWithChildrenDialog = true;
+    } else {
+      this.showDeleteDialog = true;
+    }
+  }
+
+  /**
+   * Elimina la tarea
+   */
+  deleteTask() {
+    this.deleting = true;
+    this.showDeleteDialog = false;
+    this.showDeleteWithChildrenDialog = false;
+
+    this.projectService.removeIncidence(this.projectId, this.taskId).subscribe({
+      next: () => {
+        this.deleting = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Tarea eliminada correctamente',
+          life: 3000
+        });
+
+        setTimeout(() => {
+          this.router.navigate([
+            '/project-management/projects/kanban',
+            this.projectId,
+            'project-kanban'
+          ]);
+        }, 1500);
+      },
+      error: (error) => {
+        this.deleting = false;
+        console.error('Error deleting task:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo eliminar la tarea',
+          life: 5000
+        });
+      }
+    });
+  }
+
+  /**
+   * Navega a la tarea padre
+   */
+  navigateToParent() {
+    if (this.task?.parent) {
+      this.router.navigate([
+        '/project-management/projects/kanban',
+        this.projectId,
+        'task-update',
+        this.task.parent.id
+      ]);
+    }
+  }
+
+  /**
+   * Muestra diálogo de éxito
+   */
   private showSuccessDialog(taskTitle: string) {
     this.confirmationService.confirm({
       message: `La tarea "${taskTitle}" ha sido actualizada exitosamente.`,
-      header: this.currentDialogHeader,
+      header: '¡Tarea Actualizada!',
       acceptLabel: 'Ver Tareas',
       rejectLabel: 'Cerrar',
       acceptIcon: 'pi pi-eye',
@@ -418,9 +526,6 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
           this.projectId,
           'project-kanban'
         ]);
-      },
-      reject: () => {
-        console.log('Diálogo cerrado');
       }
     });
   }
@@ -432,7 +537,6 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     if (this.taskForm.invalid) {
       this.taskForm.markAllAsTouched();
 
-      // Mostrar campos inválidos
       const invalidFields = [];
       if (this.taskForm.get('title')?.invalid) invalidFields.push('Título');
       if (this.taskForm.get('description')?.invalid) invalidFields.push('Descripción');
@@ -450,7 +554,6 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Confirmar actualización
     this.confirmationService.confirm({
       message: '¿Estás seguro de que deseas actualizar esta tarea?',
       header: 'Confirmar Actualización',
@@ -481,12 +584,10 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.saving = false;
         console.error('Error updating task:', error);
-
-        const errorMessage = error.error?.message || 'No se pudo actualizar la tarea';
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: errorMessage,
+          detail: 'No se pudo actualizar la tarea',
           life: 5000
         });
       }

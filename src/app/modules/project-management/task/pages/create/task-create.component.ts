@@ -13,7 +13,8 @@ import {TaskCreateModelRequest} from "../../../../../shared/models/task-models/t
 import {KanbanService} from "../../../../../core/service/kanban-service";
 import {Subject, Subscription, takeUntil} from "rxjs";
 import {ProjectMember} from "../../../../../shared/models/kanban.models";
-
+import {CalendarModule} from "primeng/calendar";
+import { FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-task-create',
   standalone: true,
@@ -25,7 +26,8 @@ import {ProjectMember} from "../../../../../shared/models/kanban.models";
     ChipsModule,
     InputTextareaModule,
     NgIf,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    CalendarModule
   ],
   templateUrl: './task-create.component.html',
 })
@@ -33,6 +35,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
   loading = false;
   projectId!: number;
   stateId!: number;
+  errorMessage: string | null = null;
   stateName: string = '';
 
   // Lista de miembros del proyecto
@@ -49,6 +52,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   priorities = [
+    { label: 'Crítica', value: 'critical' },
     { label: 'Alta', value: 'high' },
     { label: 'Media', value: 'medium' },
     { label: 'Baja', value: 'low' }
@@ -63,12 +67,13 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
   ];
 
   private readonly stateMap: Record<number, string> = {
-    1: 'Open',
-    2: 'In Progress',
-    3: 'Review',
-    4: 'Closed',
-    5: 'Locked',
-    6: 'Finished'
+    1: 'Asignado',
+    2: 'Ejecutando',
+    3: 'Suspendido',
+    4: 'Terminada',
+    5: 'Terminada (fuera de plazo)',
+    6: 'En Revisión',
+    7: 'Finalizada'
   };
 
   // Mapeo de tipos a IDs
@@ -85,10 +90,12 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     description: ['', Validators.required],
     priority: ['', Validators.required],
     type: ['', Validators.required],
-    assigned_user_id: [null], // Nuevo campo para usuario asignado
+    assigned_user_id: [null],
     parent_id: [null],
+    start_date: [null], // Nuevo campo
+    due_date: [null], // Nuevo campo
     state_id: [{value: this.stateId, disabled: true}, Validators.required]
-  });
+  }, { validators: this.dateRangeValidator }); // Validador personalizado para fechas
 
   constructor(
     private fb: FormBuilder,
@@ -99,7 +106,13 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
+  get maxStartDate(): Date | null {
+    return this.taskForm.get('due_date')?.value;
+  }
 
+  get minDueDate(): Date | null {
+    return this.taskForm.get('start_date')?.value;
+  }
   ngOnInit() {
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
 
@@ -117,12 +130,55 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
 
     // Escuchar cambios en el tipo para actualizar el selector de padre
     this.setupTypeListener();
+
+    // Escuchar cambios en prioridad para auto-calcular fechas
+    this.setupPriorityListener();
   }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Validador personalizado para el rango de fechas
+   */
+  private dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
+    const startDate = group.get('start_date')?.value;
+    const dueDate = group.get('due_date')?.value;
+
+    if (startDate && dueDate) {
+      const start = new Date(startDate);
+      const due = new Date(dueDate);
+
+      // Resetear horas para comparación justa
+      start.setHours(0, 0, 0, 0);
+      due.setHours(0, 0, 0, 0);
+
+      if (start > due) {
+        group.get('due_date')?.setErrors({ dateError: 'La fecha de vencimiento debe ser posterior o igual a la fecha de inicio' });
+        return { dateRange: true };
+      }
+    }
+
+    // Limpiar errores si son válidos
+    if (group.get('due_date')?.hasError('dateError')) {
+      const currentErrors = group.get('due_date')?.errors;
+      if (currentErrors) {
+        delete currentErrors['dateError'];
+        group.get('due_date')?.setErrors(Object.keys(currentErrors).length ? currentErrors : null);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Valida las fechas manualmente (llamado desde el template)
+   */
+  validateDates() {
+    this.dateRangeValidator(this.taskForm);
   }
 
   /**
@@ -164,6 +220,56 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     if (typeSub) {
       this.subscriptions.push(typeSub);
     }
+  }
+
+  /**
+   * Configura el listener para cambios en prioridad
+   */
+  private setupPriorityListener() {
+    const prioritySub = this.taskForm.get('priority')?.valueChanges.subscribe(priority => {
+      if (priority && !this.taskForm.get('start_date')?.value && !this.taskForm.get('due_date')?.value) {
+        // Solo auto-calcular si el usuario no ha seleccionado fechas manualmente
+        this.autoCalculateDates(priority as string);
+      }
+    });
+
+    if (prioritySub) {
+      this.subscriptions.push(prioritySub);
+    }
+  }
+
+  /**
+   * Auto-calcula fechas basadas en la prioridad
+   */
+  private autoCalculateDates(priority: string): void {
+    const today = new Date();
+    const startDate = new Date(today);
+
+    let daysToAdd = 7;
+    switch (priority) {
+      case 'critical':
+        daysToAdd = 1;
+        break;
+      case 'high':
+        daysToAdd = 2;
+        break;
+      case 'medium':
+        daysToAdd = 7;
+        break;
+      case 'low':
+        daysToAdd = 14;
+        break;
+    }
+
+    const dueDate = new Date(today);
+    dueDate.setDate(today.getDate() + daysToAdd);
+
+    this.taskForm.patchValue({
+      start_date: startDate,
+      due_date: dueDate
+    });
+
+    this.validateDates();
   }
 
   /**
@@ -280,6 +386,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
   private getStateName(stateId: number): string {
     return this.stateMap[stateId] || 'Open';
   }
+
   /**
    * Obtiene la etiqueta del miembro seleccionado
    */
@@ -296,11 +403,18 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
 
     return selectedMember ? selectedMember.label : '';
   }
+
   /**
    * Prepara los datos para enviar al backend
    */
   private prepareTaskData(): TaskCreateModelRequest {
     const formValue = this.taskForm.getRawValue();
+
+    // Formatear fechas a YYYY-MM-DD
+    const formatDate = (date: Date | null): string | null => {
+      if (!date) return null;
+      return date.toISOString().split('T')[0];
+    };
 
     return {
       title: formValue.title || '',
@@ -309,8 +423,8 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       incidence_type_id: this.getTypeId(formValue.type || 'task'),
       incidence_state_id: this.stateId,
       assigned_user_id: formValue.assigned_user_id || null,
-      start_date: new Date().toISOString().split('T')[0],
-      due_date: this.calculateDueDate(formValue.priority || 'medium'),
+      start_date: formatDate(formValue.start_date) || new Date().toISOString().split('T')[0],
+      due_date: formatDate(formValue.due_date) || this.calculateDueDate(formValue.priority || 'medium'),
       parent_incidence_id: formValue.parent_id || null
     };
   }
@@ -343,6 +457,9 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     let daysToAdd = 7;
 
     switch (priority) {
+      case 'critical':
+        daysToAdd = 1;
+        break;
       case 'high':
         daysToAdd = 2;
         break;
@@ -391,13 +508,17 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
    * Maneja el envío del formulario
    */
   onSubmit() {
+    // Validar fechas antes de enviar
+    this.validateDates();
+
     if (this.taskForm.invalid) {
+      this.errorMessage = null;
       this.taskForm.markAllAsTouched();
 
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Por favor completa todos los campos requeridos'
+        detail: 'Por favor completa todos los campos requeridos correctamente'
       });
 
       return;
@@ -415,13 +536,12 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.loading = false;
         console.error('Error creating task:', error);
-
-        const errorMessage = error.error?.message || 'No se pudo crear la tarea';
+        this.errorMessage = error.error?.message || 'Error al crear el proyecto';
 
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: errorMessage,
+          detail: this.errorMessage ?? 'Error',
           life: 5000
         });
       }
@@ -429,6 +549,10 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
   }
 
   onCancel() {
-    this.router.navigate(['/projects', this.projectId, 'tasks']);
+    this.router.navigate([
+      '/project-management/projects/kanban',
+      this.projectId,
+      'project-kanban'
+    ]);
   }
 }

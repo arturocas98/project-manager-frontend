@@ -33,6 +33,7 @@ export interface KanbanTask {
   state: {
     id: number;
     state: string;
+    color: string;
   };
 
   created_by: User;

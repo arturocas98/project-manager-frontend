@@ -12,7 +12,7 @@ import {RippleModule} from "primeng/ripple";
 import { BadgeModule } from 'primeng/badge';
 import {TooltipModule} from "primeng/tooltip";
 import {AvatarModule} from "primeng/avatar";
-import {DatePipe, NgForOf, NgIf, SlicePipe} from "@angular/common";
+import {DatePipe, NgForOf, NgIf, NgStyle, SlicePipe} from "@angular/common";
 import {Menu, MenuModule} from 'primeng/menu';
 import {TagModule} from "primeng/tag";
 import { DragDropModule } from 'primeng/dragdrop';
@@ -69,7 +69,8 @@ interface TypeOption {
     CdkDrag,
     CdkDropListGroup,
     CdkDragPreview,
-    CdkDragPlaceholder
+    CdkDragPlaceholder,
+    NgStyle
   ],
   templateUrl: './kanban-project.component.html',
 })
@@ -236,6 +237,8 @@ export class KanbanProjectComponent  implements OnInit, OnDestroy {
   showFilters(): void {
     this.showFiltersPanel = true;
   }
+
+
 
   /**
    * Aplica los filtros seleccionados
@@ -594,5 +597,64 @@ export class KanbanProjectComponent  implements OnInit, OnDestroy {
    */
   openSortMenu(event: Event): void {
     this.sortMenu.toggle(event);
+  }
+
+  getTaskAccentColor(task: KanbanTask): string {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Si la tarea está finalizada (aprobada)
+    if (task.state?.state?.toLowerCase() === 'finalizada' ||
+      task.state?.state?.toLowerCase() === 'aprobada') {
+      return 'DAEEF3'; // Azul claro - Finalizada (aprobada)
+    }
+
+    // Si la tarea está en revisión
+    if (task.state?.state?.toLowerCase() === 'revisión' ||
+      task.state?.state?.toLowerCase() === 'review') {
+      return 'FFF9C4'; // Amarillo claro - En Revisión
+    }
+
+    // Si la tarea está terminada
+    if (task.state?.state?.toLowerCase() === 'terminada' ||
+      task.state?.state?.toLowerCase() === 'completed' ||
+      task.state?.state?.toLowerCase() === 'done') {
+
+      // Verificar si tiene fecha de vencimiento
+      if (task.due_date) {
+        const dueDate = new Date(task.due_date);
+        dueDate.setHours(0, 0, 0, 0);
+
+        // Si la fecha de vencimiento es menor a hoy (terminada después de vencer)
+        if (dueDate < today) {
+          return 'F2DCDB'; // Rosa claro - Terminada fuera de plazo
+        }
+      }
+
+      return 'C6EFCE'; // Verde claro - Terminada a tiempo
+    }
+
+    // Si la tarea NO está terminada (pendiente, en progreso, etc.)
+    if (task.due_date) {
+      const dueDate = new Date(task.due_date);
+      dueDate.setHours(0, 0, 0, 0);
+
+      // Calcular diferencia en días
+      const diffTime = dueDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // Si está vencida (fecha pasada)
+      if (dueDate < today) {
+        return 'F4CCCC'; // Rojo claro - Vencida sin terminar
+      }
+
+      // Si está por vencer en 72 horas (3 días) o menos
+      if (diffDays <= 3) {
+        return 'FCE4CC'; // Naranja claro - A 72 horas de vencer
+      }
+    }
+
+    // Si no aplica ninguna condición especial, usar el color del estado original
+    return task.state?.color || 'E5E7EB'; // Gris por defecto
   }
 }

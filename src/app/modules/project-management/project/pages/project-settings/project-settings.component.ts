@@ -18,6 +18,9 @@ import {ApiCollectionResponse} from "../../../../../shared/models/api-response.m
 import {environment} from "../../../../../../environments/environment";
 import {ApiService} from "../../../../../core/service/api.service";
 import {AuthService} from "../../../../../core/service/auth.service";
+import {unassignedUsersData} from "../../../../../shared/models/auth";
+import {ProjectMember} from "../../../../../shared/models/kanban.models";
+import {KanbanService} from "../../../../../core/service/kanban-service";
 
 @Component({
   selector: 'app-project-settings',
@@ -53,26 +56,24 @@ export class ProjectSettingsComponent implements OnInit {
 
   // Variables para el diálogo de añadir miembro
   showAddMemberDialog = false;
+  showRemoveMemberDialog = false;
   addMemberLoading = false;
-  profiles: Profile[] = [];
+  deleteMemberLoading = false;
+  profiles: unassignedUsersData[] = [];
   profileOptions: { label: string, value: number }[] = [];
-
+  memberOptions: { label: string, value: number }[] = [];
+  member: ProjectMember[] = [];
   // Opciones de roles
   roleOptions = [
-    { label: 'administrator', value: 'administrators' },
-    { label: 'project manager', value: 'project manager' },
-    { label: 'team member', value: 'team member' },
-    { label: 'supervisor', value: 'supervisor' },
-    { label: 'external contributor', value: 'external contributor' },
-    { label: 'owner', value: 'owner' },
-    { label: 'developer', value: 'developer' },
-    { label: 'tester', value: 'tester' },
-    { label: 'guest', value: 'guest' },
-    { label: 'client', value: 'client' }
+    { label: 'Leader', value: 'LDR' },
+    { label: 'Developer', value: 'DEV' },
+    { label: 'Tester', value: 'TST' },
+    { label: 'Documenter', value: 'DOC' }
   ];
 
   // Formulario para añadir miembro
   addMemberForm: FormGroup;
+  deleteMemberForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -82,7 +83,7 @@ export class ProjectSettingsComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private http: HttpClient,
-    private authService: AuthService
+    private kanbanService: KanbanService
   ) {
     this.projectForm = this.fb.group({
       name: ['', Validators.required],
@@ -93,12 +94,17 @@ export class ProjectSettingsComponent implements OnInit {
       user_id: [null, Validators.required],
       role_type: [null, Validators.required]
     });
+
+    this.deleteMemberForm = this.fb.group({
+      user_id: [null, Validators.required],
+    });
   }
 
   ngOnInit() {
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
     this.loadProjectData();
-    this.loadProfiles();
+    this.loadUnassignedUsers();
+    this.loadMembers();
   }
 
   /**
@@ -112,6 +118,8 @@ export class ProjectSettingsComponent implements OnInit {
           name: project.name??'',
           description: project.description??''
         });
+
+        console.log(project);
 
         this.projectKey = project.key;
         this.createdAt = project.created_at ? new Date(project.created_at) : null;
@@ -130,8 +138,8 @@ export class ProjectSettingsComponent implements OnInit {
   /**
    * Carga los perfiles de usuario
    */
-  loadProfiles() {
-    this.authService.getProfiles().subscribe({
+  loadUnassignedUsers() {
+    this.projectService.getUnassignedUsers(this.projectId).subscribe({
       next: (profiles) => {
         this.profiles = profiles;
 
@@ -151,12 +159,37 @@ export class ProjectSettingsComponent implements OnInit {
     });
   }
 
+  loadMembers() {
+    this.kanbanService.getProjectMembers(this.projectId).subscribe({
+      next: (members) => {
+        this.member = members;
+
+        this.memberOptions = members.map(member => ({
+          label: `${member.user.name} (${member.role.type})`,
+          value: member.user.id
+        }));
+      },
+      error: (error) => {
+        console.error('Error loading members:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los members de usuario'
+        });
+      }
+    });
+  }
   /**
    * Abre el diálogo para añadir miembro
    */
   openAddMemberDialog() {
     this.addMemberForm.reset();
     this.showAddMemberDialog = true;
+  }
+
+  openRemoveMemberDialog() {
+    this.deleteMemberForm.reset();
+    this.showRemoveMemberDialog = true;
   }
 
   /**
@@ -195,6 +228,41 @@ export class ProjectSettingsComponent implements OnInit {
           severity: 'error',
           summary: 'Error',
           detail: error.error?.message || 'No se pudo añadir el miembro al proyecto',
+          life: 5000
+        });
+      }
+    });
+  }
+
+  RemoveMember() {
+    if (this.deleteMemberForm.invalid) {
+      this.deleteMemberForm.markAllAsTouched();
+      return;
+    }
+
+    this.deleteMemberLoading = true;
+
+    this.projectService.removeMember(this.projectId, this.deleteMemberForm.value.user_id,).subscribe({
+      next: () => {
+        this.deleteMemberLoading = false;
+        this.showRemoveMemberDialog = false;
+        this.deleteMemberForm.reset();
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Miembro eliminado correctamente',
+          detail: 'Usuario  eliminado correctamente del proyecto',
+          life: 3000
+        });
+      },
+      error: (error) => {
+        this.deleteMemberLoading = false;
+        console.error('Error removing member:', error);
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error?.message || 'No se pudo eliminado el miembro al proyecto',
           life: 5000
         });
       }

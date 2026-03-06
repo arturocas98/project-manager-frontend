@@ -17,14 +17,15 @@ export class KanbanService {
 
   filters$ = this.filtersSubject.asObservable();
 
-  // Mapeo de estados a IDs numéricos (esto debería coincidir con tu backend)
+  // Mapeo de estados según los datos de la base de datos
   private readonly STATE_IDS = {
-    open: 1,
-    progress: 2,
-    review: 3,
-    closed: 4,
-    locked: 5,
-    finished: 6,
+    asignado: 1,
+    ejecutando: 2,
+    suspendido: 3,
+    terminada: 4,
+    terminada_fuera_plazo: 5,
+    en_revision: 6,
+    finalizada: 7,
   } as const;
 
   constructor(private apiService: ApiService) {}
@@ -82,62 +83,71 @@ export class KanbanService {
   }
 
   /**
-   * Organiza las tareas por estado con IDs numéricos
+   * Organiza las tareas por estado usando los IDs de la base de datos
    */
   private organizeTasksByStatus(tasks: KanbanTask[]): KanbanColumn[] {
     // Ordenar tareas por fecha de creación (más recientes primero)
-    const sortedTasks = [...tasks].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const sortedTasks = [...tasks].sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
-    // Columnas con IDs numéricos
+    // Columnas basadas en los estados de la base de datos
     const columns: KanbanColumn[] = [
       {
-        id: this.STATE_IDS.open, // 1
-        title: 'Por hacer',
-        icon: 'pi pi-folder-open',
-        color: '#94a3b8',
+        id: this.STATE_IDS.asignado, // 1
+        title: 'Asignado',
+        icon: 'pi pi-user-plus',
+        color: '#D6E4F0', // Usando el color de la BD
         tasks: [],
       },
       {
-        id: this.STATE_IDS.progress, // 2
-        title: 'En progreso',
-        icon: 'pi pi-spinner',
-        color: '#f59e0b',
+        id: this.STATE_IDS.ejecutando, // 2
+        title: 'Ejecutando',
+        icon: 'pi pi-play',
+        color: '#D9E2F3', // Usando el color de la BD
         tasks: [],
       },
       {
-        id: this.STATE_IDS.review, // 3
-        title: 'En revision',
+        id: this.STATE_IDS.suspendido, // 3
+        title: 'Suspendido',
+        icon: 'pi pi-pause',
+        color: '#FFF2CC', // Usando el color de la BD
+        tasks: [],
+      },
+      {
+        id: this.STATE_IDS.terminada, // 4
+        title: 'Terminada',
+        icon: 'pi pi-check',
+        color: '#C6EFCE', // Usando el color de la BD
+        tasks: [],
+      },
+      {
+        id: this.STATE_IDS.terminada_fuera_plazo, // 5
+        title: 'Terminada (fuera de plazo)',
+        icon: 'pi pi-exclamation-triangle',
+        color: '#F2DCDB', // Usando el color de la BD
+        tasks: [],
+      },
+      {
+        id: this.STATE_IDS.en_revision, // 6
+        title: 'En Revisión',
         icon: 'pi pi-eye',
-        color: '#3b82f6',
+        color: '#FFF9C4', // Usando el color de la BD
         tasks: [],
       },
-      // {
-      //   id: this.STATE_IDS.closed, // 4
-      //   title: 'Closed',
-      //   icon: 'pi pi-times-circle',
-      //   color: '#6b7280',
-      //   tasks: [],
-      // },
-      // {
-      //   id: this.STATE_IDS.locked, // 5
-      //   title: 'Locked',
-      //   icon: 'pi pi-lock',
-      //   color: '#ef4444',
-      //   tasks: [],
-      // },
       {
-        id: this.STATE_IDS.finished, // 6
+        id: this.STATE_IDS.finalizada, // 7
         title: 'Finalizada',
-        icon: 'pi pi-check-circle',
-        color: '#10b981',
+        icon: 'pi pi-flag',
+        color: '#DAEEF3', // Usando el color de la BD
         tasks: [],
       },
     ];
 
-    // Asignar tareas a las columnas correspondientes usando el ID numérico
+    // Asignar tareas a las columnas correspondientes usando el ID del estado
     sortedTasks.forEach(task => {
-      // Obtener el ID del estado basado en el string del estado
-      const stateId = this.getStateIdFromString(task.state.state?.toLowerCase());
+      // El ID del estado viene en task.state.id
+      const stateId = task.state?.id;
 
       // Buscar la columna por ID numérico
       const column = columns.find(col => col.id === stateId);
@@ -145,11 +155,8 @@ export class KanbanService {
       if (column) {
         column.tasks.push(task);
       } else {
-        // Si el estado no coincide, poner en open por defecto (ID 1)
-        const defaultColumn = columns.find(col => col.id === this.STATE_IDS.open);
-        if (defaultColumn) {
-          defaultColumn.tasks.push(task);
-        }
+        // Si el estado no coincide, podrías manejarlo o ignorarlo
+        console.warn(`Estado no reconocido: ${stateId} para la tarea ${task.id}`);
       }
     });
 
@@ -157,48 +164,35 @@ export class KanbanService {
   }
 
   /**
-   * Convierte un string de estado a su ID numérico
+   * Convierte un string de estado a su ID numérico (útil para búsquedas)
    */
-  private getStateIdFromString(state: string | undefined): number {
-    switch (state) {
-      case 'open':
-        return this.STATE_IDS.open;
-      case 'progress':
-      case 'in progress':
-        return this.STATE_IDS.progress;
-      case 'review':
-        return this.STATE_IDS.review;
-      case 'closed':
-        return this.STATE_IDS.closed;
-      case 'locked':
-        return this.STATE_IDS.locked;
-      case 'finished':
-        return this.STATE_IDS.finished;
-      default:
-        return this.STATE_IDS.open; // Default a open
-    }
+  getStateIdFromString(state: string): number {
+    const stateMap: Record<string, number> = {
+      'asignado': this.STATE_IDS.asignado,
+      'ejecutando': this.STATE_IDS.ejecutando,
+      'suspendido': this.STATE_IDS.suspendido,
+      'terminada': this.STATE_IDS.terminada,
+      'terminada (fuera de plazo)': this.STATE_IDS.terminada_fuera_plazo,
+      'en revisión': this.STATE_IDS.en_revision,
+      'finalizada': this.STATE_IDS.finalizada,
+    };
+    return stateMap[state.toLowerCase()] || this.STATE_IDS.asignado;
   }
 
   /**
-   * Obtiene el string del estado a partir del ID (útil para debugging)
+   * Obtiene el string del estado a partir del ID
    */
   getStateStringFromId(stateId: number): string {
-    switch (stateId) {
-      case this.STATE_IDS.open:
-        return 'open';
-      case this.STATE_IDS.progress:
-        return 'progress';
-      case this.STATE_IDS.review:
-        return 'review';
-      case this.STATE_IDS.closed:
-        return 'closed';
-      case this.STATE_IDS.locked:
-        return 'locked';
-      case this.STATE_IDS.finished:
-        return 'finished';
-      default:
-        return 'open';
-    }
+    const stateMap: Record<number, string> = {
+      [this.STATE_IDS.asignado]: 'Asignado',
+      [this.STATE_IDS.ejecutando]: 'Ejecutando',
+      [this.STATE_IDS.suspendido]: 'Suspendido',
+      [this.STATE_IDS.terminada]: 'Terminada',
+      [this.STATE_IDS.terminada_fuera_plazo]: 'Terminada (fuera de plazo)',
+      [this.STATE_IDS.en_revision]: 'En Revisión',
+      [this.STATE_IDS.finalizada]: 'Finalizada',
+    };
+    return stateMap[stateId] || 'Desconocido';
   }
 
   /**
@@ -228,7 +222,9 @@ export class KanbanService {
    * Actualiza el estado de una tarea (drag & drop)
    */
   updateTaskStatus(projectId: number, taskId: number, newStateId: number): Observable<any> {
-    return this.apiService.put(`projects/${projectId}/incidences/${taskId}/update`, { incidence_state_id: newStateId });
+    return this.apiService.put(`projects/${projectId}/incidences/${taskId}/update`, {
+      incidence_state_id: newStateId
+    });
   }
 
   /**
@@ -237,45 +233,52 @@ export class KanbanService {
   getAvailableColumns(): KanbanColumn[] {
     return [
       {
-        id: this.STATE_IDS.open,
-        title: 'Open',
-        icon: 'pi pi-folder-open',
-        color: '#94a3b8',
+        id: this.STATE_IDS.asignado,
+        title: 'Asignado',
+        icon: 'pi pi-user-plus',
+        color: '#D6E4F0',
         tasks: [],
       },
       {
-        id: this.STATE_IDS.progress,
-        title: 'In Progress',
-        icon: 'pi pi-spinner',
-        color: '#f59e0b',
+        id: this.STATE_IDS.ejecutando,
+        title: 'Ejecutando',
+        icon: 'pi pi-play',
+        color: '#D9E2F3',
         tasks: [],
       },
       {
-        id: this.STATE_IDS.review,
-        title: 'Review',
+        id: this.STATE_IDS.suspendido,
+        title: 'Suspendido',
+        icon: 'pi pi-pause',
+        color: '#FFF2CC',
+        tasks: [],
+      },
+      {
+        id: this.STATE_IDS.terminada,
+        title: 'Terminada',
+        icon: 'pi pi-check',
+        color: '#C6EFCE',
+        tasks: [],
+      },
+      {
+        id: this.STATE_IDS.terminada_fuera_plazo,
+        title: 'Terminada (fuera de plazo)',
+        icon: 'pi pi-exclamation-triangle',
+        color: '#F2DCDB',
+        tasks: [],
+      },
+      {
+        id: this.STATE_IDS.en_revision,
+        title: 'En Revisión',
         icon: 'pi pi-eye',
-        color: '#3b82f6',
+        color: '#FFF9C4',
         tasks: [],
       },
       {
-        id: this.STATE_IDS.closed,
-        title: 'Closed',
-        icon: 'pi pi-times-circle',
-        color: '#6b7280',
-        tasks: [],
-      },
-      {
-        id: this.STATE_IDS.locked,
-        title: 'Locked',
-        icon: 'pi pi-lock',
-        color: '#ef4444',
-        tasks: [],
-      },
-      {
-        id: this.STATE_IDS.finished,
-        title: 'Finished',
-        icon: 'pi pi-check-circle',
-        color: '#10b981',
+        id: this.STATE_IDS.finalizada,
+        title: 'Finalizada',
+        icon: 'pi pi-flag',
+        color: '#DAEEF3',
         tasks: [],
       },
     ];
