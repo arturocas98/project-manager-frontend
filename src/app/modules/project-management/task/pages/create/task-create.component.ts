@@ -486,7 +486,6 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       header: '¡Tarea Creada Correctamente!',
       acceptLabel: 'Ver Tareas',
       rejectLabel: 'Cerrar',
-      acceptIcon: 'pi pi-eye',
       rejectIcon: 'pi pi-times',
       acceptButtonStyleClass: 'p-button-success p-button-raised mr-2 gap-2',
       rejectButtonStyleClass: 'p-button-text p-button-secondary gap-2',

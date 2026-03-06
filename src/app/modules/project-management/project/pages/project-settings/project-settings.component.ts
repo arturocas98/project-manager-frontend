@@ -3,24 +3,24 @@ import {ButtonModule} from "primeng/button";
 import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ToastModule} from "primeng/toast";
 import {InputTextareaModule} from "primeng/inputtextarea";
-import {DatePipe, NgClass, NgIf} from "@angular/common";
+import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {ActivatedRoute, Router} from "@angular/router";
 import {ProjectService} from "../../../../../core/service/project.service";
 import {ConfirmationService, MessageService} from "primeng/api";
-import {ProjectMemberRequest, UpdateProjectRequest} from "../../../../../shared/models/projects-models/project-request";
+import {
+  ProjectMemberRequest,
+  ProjectMemberUpdateRequest,
+  UpdateProjectRequest
+} from "../../../../../shared/models/projects-models/project-request";
 import {InputTextModule} from "primeng/inputtext";
 import {DropdownModule} from "primeng/dropdown";
 import {DialogModule} from "primeng/dialog";
-import {Profile} from "../../../../../shared/models/user";
 import {HttpClient} from "@angular/common/http";
-import {ApiCollectionResponse} from "../../../../../shared/models/api-response.model";
-import {environment} from "../../../../../../environments/environment";
-import {ApiService} from "../../../../../core/service/api.service";
-import {AuthService} from "../../../../../core/service/auth.service";
 import {unassignedUsersData} from "../../../../../shared/models/auth";
 import {ProjectMember} from "../../../../../shared/models/kanban.models";
 import {KanbanService} from "../../../../../core/service/kanban-service";
+import {TooltipModule} from "primeng/tooltip";
 
 @Component({
   selector: 'app-project-settings',
@@ -36,7 +36,9 @@ import {KanbanService} from "../../../../../core/service/kanban-service";
     InputTextModule,
     DatePipe,
     DropdownModule,
-    DialogModule
+    DialogModule,
+    TooltipModule,
+    NgForOf
   ],
   templateUrl: './project-settings.component.html',
 })
@@ -54,16 +56,25 @@ export class ProjectSettingsComponent implements OnInit {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
-  // Variables para el diálogo de añadir miembro
+  // Variables para los diálogos
   showAddMemberDialog = false;
   showRemoveMemberDialog = false;
+  showEditRoleDialog = false;
+
   addMemberLoading = false;
   deleteMemberLoading = false;
+  editRoleLoading = false;
+
   profiles: unassignedUsersData[] = [];
   profileOptions: { label: string, value: number }[] = [];
   memberOptions: { label: string, value: number }[] = [];
   member: ProjectMember[] = [];
+
+  // Miembro seleccionado para editar
+  selectedMember: ProjectMember | null = null;
+
   // Opciones de roles
+
   roleOptions = [
     { label: 'Leader', value: 'LDR' },
     { label: 'Developer', value: 'DEV' },
@@ -71,9 +82,10 @@ export class ProjectSettingsComponent implements OnInit {
     { label: 'Documenter', value: 'DOC' }
   ];
 
-  // Formulario para añadir miembro
+  // Formularios
   addMemberForm: FormGroup;
   deleteMemberForm: FormGroup;
+  editRoleForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -98,6 +110,10 @@ export class ProjectSettingsComponent implements OnInit {
     this.deleteMemberForm = this.fb.group({
       user_id: [null, Validators.required],
     });
+
+    this.editRoleForm = this.fb.group({
+      role_type: [null, Validators.required]
+    });
   }
 
   ngOnInit() {
@@ -115,11 +131,9 @@ export class ProjectSettingsComponent implements OnInit {
     this.projectService.getProject(this.projectId).subscribe({
       next: (project) => {
         this.projectForm.patchValue({
-          name: project.name??'',
-          description: project.description??''
+          name: project.name ?? '',
+          description: project.description ?? ''
         });
-
-        console.log(project);
 
         this.projectKey = project.key;
         this.createdAt = project.created_at ? new Date(project.created_at) : null;
@@ -136,7 +150,7 @@ export class ProjectSettingsComponent implements OnInit {
   }
 
   /**
-   * Carga los perfiles de usuario
+   * Carga los perfiles de usuario no asignados
    */
   loadUnassignedUsers() {
     this.projectService.getUnassignedUsers(this.projectId).subscribe({
@@ -159,13 +173,16 @@ export class ProjectSettingsComponent implements OnInit {
     });
   }
 
+  /**
+   * Carga los miembros del proyecto
+   */
   loadMembers() {
     this.kanbanService.getProjectMembers(this.projectId).subscribe({
       next: (members) => {
         this.member = members;
 
         this.memberOptions = members.map(member => ({
-          label: `${member.user.name} (${member.role.type})`,
+          label: `${member.user.name} (${this.getRoleName(member.role.type)})`,
           value: member.user.id
         }));
       },
@@ -174,11 +191,28 @@ export class ProjectSettingsComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudieron cargar los members de usuario'
+          detail: 'No se pudieron cargar los miembros del proyecto'
         });
       }
     });
   }
+
+  /**
+   * Obtiene las iniciales del nombre
+   */
+  getInitials(name: string): string {
+    if (!name) return '?';
+    return name.charAt(0).toUpperCase();
+  }
+
+  /**
+   * Obtiene el nombre legible del rol
+   */
+  getRoleName(roleCode: string): string {
+    const role = this.roleOptions.find(r => r.value === roleCode);
+    return role ? role.label : roleCode;
+  }
+
   /**
    * Abre el diálogo para añadir miembro
    */
@@ -187,9 +221,23 @@ export class ProjectSettingsComponent implements OnInit {
     this.showAddMemberDialog = true;
   }
 
+  /**
+   * Abre el diálogo para eliminar miembro
+   */
   openRemoveMemberDialog() {
     this.deleteMemberForm.reset();
     this.showRemoveMemberDialog = true;
+  }
+
+  /**
+   * Abre el diálogo para editar rol
+   */
+  openEditRoleDialog(member: ProjectMember) {
+    this.selectedMember = member;
+    this.editRoleForm.patchValue({
+      role_type: member.role.type
+    });
+    this.showEditRoleDialog = true;
   }
 
   /**
@@ -213,6 +261,11 @@ export class ProjectSettingsComponent implements OnInit {
         this.showAddMemberDialog = false;
         this.addMemberForm.reset();
 
+        // Recargar la lista de miembros
+        this.loadMembers();
+        // Recargar usuarios no asignados
+        this.loadUnassignedUsers();
+
         this.messageService.add({
           severity: 'success',
           summary: 'Miembro añadido',
@@ -234,6 +287,9 @@ export class ProjectSettingsComponent implements OnInit {
     });
   }
 
+  /**
+   * Elimina un miembro del proyecto
+   */
   RemoveMember() {
     if (this.deleteMemberForm.invalid) {
       this.deleteMemberForm.markAllAsTouched();
@@ -242,16 +298,21 @@ export class ProjectSettingsComponent implements OnInit {
 
     this.deleteMemberLoading = true;
 
-    this.projectService.removeMember(this.projectId, this.deleteMemberForm.value.user_id,).subscribe({
+    this.projectService.removeMember(this.projectId, this.deleteMemberForm.value.user_id).subscribe({
       next: () => {
         this.deleteMemberLoading = false;
         this.showRemoveMemberDialog = false;
         this.deleteMemberForm.reset();
 
+        // Recargar la lista de miembros
+        this.loadMembers();
+        // Recargar usuarios no asignados
+        this.loadUnassignedUsers();
+
         this.messageService.add({
           severity: 'success',
-          summary: 'Miembro eliminado correctamente',
-          detail: 'Usuario  eliminado correctamente del proyecto',
+          summary: 'Miembro eliminado',
+          detail: 'Usuario eliminado correctamente del proyecto',
           life: 3000
         });
       },
@@ -262,7 +323,52 @@ export class ProjectSettingsComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: error.error?.message || 'No se pudo eliminado el miembro al proyecto',
+          detail: error.error?.message || 'No se pudo eliminar el miembro del proyecto',
+          life: 5000
+        });
+      }
+    });
+  }
+
+  /**
+   * Actualiza el rol de un miembro
+   */
+  updateMemberRole() {
+    if (this.editRoleForm.invalid || !this.selectedMember) {
+      this.editRoleForm.markAllAsTouched();
+      return;
+    }
+
+    this.editRoleLoading = true;
+
+    const updateData: ProjectMemberUpdateRequest = {
+      role_type: this.editRoleForm.value.role_type
+    };
+
+    this.projectService.updateMember(this.projectId, this.selectedMember.user.id, updateData).subscribe({
+      next: () => {
+        this.editRoleLoading = false;
+        this.showEditRoleDialog = false;
+        this.editRoleForm.reset();
+
+        // Recargar la lista de miembros
+        this.loadMembers();
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Rol actualizado',
+          detail: `Rol actualizado correctamente para ${this.selectedMember?.user.name}`,
+          life: 3000
+        });
+      },
+      error: (error) => {
+        this.editRoleLoading = false;
+        console.error('Error updating member role:', error);
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: error.error?.message || 'No se pudo actualizar el rol del miembro',
           life: 5000
         });
       }
@@ -283,7 +389,7 @@ export class ProjectSettingsComponent implements OnInit {
       };
 
       this.projectService.updateProject(projectData, this.projectId).subscribe({
-        next: (response) => {
+        next: () => {
           this.updateLoading = false;
           this.projectForm.markAsPristine();
 

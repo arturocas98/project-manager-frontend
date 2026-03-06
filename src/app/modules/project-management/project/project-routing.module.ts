@@ -28,6 +28,14 @@ const routes: Routes = [
     children: [
       { path: "", redirectTo: "project-summary", pathMatch: "full" },
       {
+        path: "project-timeline",
+        data: { breadcrumb: "timeline" },
+        loadComponent: () =>
+          import("./pages/timeline/timeline.component").then(
+            (m) => m.TimelineComponent,
+          ),
+      },
+      {
         path: "project-summary",
         data: { breadcrumb: "summary" },
         loadComponent: () =>

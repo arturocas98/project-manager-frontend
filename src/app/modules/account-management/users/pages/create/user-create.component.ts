@@ -44,7 +44,7 @@ export class UserCreateComponent {
       name: 'Presencial',
     },
     {
-      id: 1,
+      id: 2,
       name: 'Teletrabajo',
     },
   ];
@@ -60,7 +60,7 @@ export class UserCreateComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       password_confirmation: ['', [Validators.required]],
-      rols: ['', Validators.required],
+      role_id: ['', Validators.required],
       modality_id: [''],
       telephone: [''],
       address: [''],

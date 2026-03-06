@@ -14,6 +14,6 @@ export interface ProjectMemberRequest {
 }
 
 
-export type ProjectMemberUpdateRequest = {
-  [K in keyof ProjectMemberRequest]?: ProjectMemberRequest[K] | null;
+export interface ProjectMemberUpdateRequest {
+  role_type: string;
 }

@@ -67,7 +67,7 @@ export class UserEditComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: [''],
       password_confirmation: [''],
-      role: [null],
+      role_id: [null],
       modality_id: [''],
       telephone: [''],
       address: [''],

@@ -1,0 +1,232 @@
+<div class="bg-white rounded-lg shadow-sm p-4">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center py-8">
+    <i class="pi pi-spin pi-spinner text-4xl text-indigo-600"></i>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Header con controles -->
+    <div class="flex flex-wrap gap-3 items-center justify-between mb-4">
+      <div class="flex items-center gap-3">
+        <h2 class="text-xl font-bold m-0">Línea de Tiempo</h2>
+
+        <!-- Selector de vista -->
+        <p-selectButton
+          [options]="viewModes"
+          [(ngModel)]="currentView"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onViewChange()"
+          styleClass="text-sm">
+        </p-selectButton>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Navegación -->
+        <button
+          pButton
+          type="button"
+          icon="pi pi-chevron-left"
+          class="p-button-text p-button-sm"
+          (click)="navigate(-1)">
+        </button>
+        <span class="font-medium px-3">{{ getPeriodLabel() }}</span>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-chevron-right"
+          class="p-button-text p-button-sm"
+          (click)="navigate(1)">
+        </button>
+
+        <!-- Hoy -->
+        <button
+          pButton
+          type="button"
+          label="Hoy"
+          icon="pi pi-calendar"
+          class="p-button-outlined p-button-sm ml-2"
+          (click)="goToToday()">
+        </button>
+      </div>
+
+      <!-- Filtros rápidos por miembro -->
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-500">Miembros:</span>
+        <div class="flex gap-1">
+          <div
+            *ngFor="let member of members | slice:0:5"
+            class="cursor-pointer transition-opacity duration-200"
+            [class.opacity-40]="selectedAssignee && selectedAssignee !== member.user.id"
+            (click)="filterByAssignee(member.user.id)">
+            <p-avatar
+              [label]="member.user.name[0]"
+              shape="circle"
+              size="normal"
+              [style]="{ 'background-color': getAssigneeColor(member.user.name) }"
+              [pTooltip]="member.user.name"
+              class="text-white">
+            </p-avatar>
+          </div>
+          <div
+            *ngIf="members.length > 5"
+            class="flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-700 rounded-full text-xs font-medium cursor-pointer"
+            [pTooltip]="'Y ' + (members.length - 5) + ' miembros más'">
+            +{{ members.length - 5 }}
+          </div>
+          <button
+            *ngIf="selectedAssignee"
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="p-button-text p-button-rounded p-button-sm ml-1"
+            (click)="clearAssigneeFilter()"
+            pTooltip="Limpiar filtro">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leyenda de colores -->
+    <div class="flex flex-wrap gap-4 mb-3 text-sm">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3" [style.background-color]="'#C6EFCE'"></div>
+        <span>Completada</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3" [style.background-color]="'#F2DCDB'"></div>
+        <span>Completada fuera de plazo</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3" [style.background-color]="'#FCE4CC'"></div>
+        <span>Próxima a vencer</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3" [style.background-color]="'#F4CCCC'"></div>
+        <span>Vencida</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3" [style.background-color]="'#D9E2F3'"></div>
+        <span>En progreso</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3" [style.background-color]="'#FFF9C4'"></div>
+        <span>En revisión</span>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="border border-gray-200 rounded-lg overflow-hidden">
+      <!-- Cabecera de fechas -->
+      <div class="grid bg-gray-50 border-b border-gray-200"
+           [style.width.px]="timelineWidth"
+           [style.grid-template-columns]="getGridTemplate()">
+        <div
+          *ngFor="let col of visibleColumns; let i = index"
+          class="text-center py-2 border-r border-gray-200"
+          [class.bg-yellow-50]="col.isToday"
+          [class.text-gray-400]="col.isWeekend">
+          <div class="font-medium text-sm">{{ col.label }}</div>
+          <div *ngIf="currentView === 'day'" class="text-xs text-gray-500">
+            {{ getDayOfWeek(col.date) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de tareas -->
+      <div class="relative overflow-auto"
+           [style.height.px]="getTimelineHeight()"
+           #timelineBody>
+
+        <!-- Líneas de cuadrícula -->
+        <div class="grid absolute top-0 left-0 w-full h-full pointer-events-none"
+             [style.grid-template-columns]="" ]="getGridTemplate()">
+          <div *ngFor="let col of visibleColumns; let i = index"
+               class="h-full border-r border-gray-200"
+               [class.bg-yellow-50]="col.isToday">
+          </div>
+        </div>
+
+        <!-- Línea de "Hoy" -->
+        <div *ngIf="todayPosition > 0"
+             class="absolute top-0 w-0 border-l-2 border-red-400"
+             [style.left.px]="todayPosition"
+             style="height: 100%; z-index: 5;">
+          <div class="absolute bg-red-400 text-white text-xs px-1 rounded -translate-x-1/2"
+               style="top: 0; left: 0;">
+            Hoy
+          </div>
+        </div>
+
+        <!-- Tareas -->
+        <div class="absolute top-0 left-0 w-full">
+          <div *ngFor="let task of filteredTasks"
+               class="absolute cursor-pointer transition-all duration-200 hover:scale-y-110 hover:z-10 hover:shadow-lg rounded overflow-hidden"
+               [style.top.px]="task.row * 40 + 10"
+               [style.left.px]="task.left"
+               [style.width.px]="task.width"
+               [style.height.px]="30"
+               [style.background-color]="" ]="getTaskColor(task)"
+               (click)="viewTask(task.id)"
+               [pTooltip]="getTaskTooltip(task)"
+               tooltipPosition="top"
+               [escape]="false">
+
+            <!-- Barra de progreso -->
+            <div class="absolute bottom-0 left-0 h-1"
+                 [style.width.%]="task.progress"
+                 [style.background-color]="getProgressColor(task)">
+            </div>
+
+            <!-- Contenido de la tarea -->
+            <div class="flex items-center px-2 h-full text-xs truncate text-gray-800 font-medium">
+              <i [class]="getTypeIcon(task.type?.type)" class="mr-1 text-xs"></i>
+              <span class="truncate">{{ task.title }}</span>
+
+              <!-- Avatar del asignado (si hay espacio) -->
+              <div *ngIf="task.width > 80 && task.assigned_to" class="ml-auto">
+                <p-avatar
+                  [label]="task.assigned_to.name[0]"
+                  shape="circle"
+                  size="normal"
+                  [style]="{ 'background-color': getAssigneeColor(task.assigned_to.name), 'width': '20px', 'height': '20px' }"
+                  class="text-white text-xs">
+                </p-avatar>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div *ngIf="filteredTasks.length === 0"
+               class="flex flex-col items-center justify-center w-full"
+               [style.height.px]="200">
+            <i class="pi pi-calendar-times text-4xl text-gray-400 mb-3"></i>
+            <p class="text-gray-500">No hay tareas en este período</p>
+            <button
+              pButton
+              label="Crear tarea"
+              icon="pi pi-plus"
+              class="p-button-text p-button-sm"
+              (click)="createTask()">
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de zoom -->
+    <div class="flex items-center gap-3 mt-3">
+      <i class="pi pi-search-minus text-gray-500"></i>
+      <p-slider
+        [(ngModel)]="zoomLevel"
+        [min]="50"
+        [max]="200"
+        [step]="10"
+        styleClass="w-full"
+        (onChange)="updateZoom()">
+      </p-slider>
+      <i class="pi pi-search-plus text-gray-500"></i>
+      <span class="text-sm text-gray-500 w-16">{{ zoomLevel }}%</span>
+    </div>
+  </div>
+</div>

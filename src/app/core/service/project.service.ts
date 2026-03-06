@@ -95,7 +95,7 @@ export class ProjectService {
     return this.apiService.delete<any>(`projects/${projectId}/incidences/${userId}`);
   }
 
-  updateMember(projectId: number,memberId:number, projectMemberUpdateData: ProjectMemberUpdateRequest): Observable<any> {
+  updateMember(projectId: number, memberId:number, projectMemberUpdateData: ProjectMemberUpdateRequest): Observable<any> {
     return this.apiService.patch<any>(`projects/${projectId}/members/${memberId}/role`, projectMemberUpdateData);
   }
 

@@ -36,7 +36,7 @@ export class ViewProjectComponent implements OnInit {
 
   menuItems: MenuItem[] = [
     {
-      label: 'Summary',
+      label: 'Resumen',
       icon: 'pi pi-star',
       command: () => this.router.navigate([
         '/project-management/projects/kanban',
@@ -44,13 +44,14 @@ export class ViewProjectComponent implements OnInit {
         'project-summary'
       ])
     },
+    /*
     {
       label: 'Schedule',
       icon: 'pi pi-calendar',
       command: () => this.router.navigate([
         '/project-management/projects/kanban',
         this.projectId,
-        'project-schedule'
+        'project-timeline'
       ])
     },
     {
@@ -63,6 +64,7 @@ export class ViewProjectComponent implements OnInit {
       icon: 'pi pi-chart-bar',
       command: () => this.router.navigate(['reports'])
     },
+    */
     {
       label: 'Kanban',
       icon: 'pi pi-th-large',

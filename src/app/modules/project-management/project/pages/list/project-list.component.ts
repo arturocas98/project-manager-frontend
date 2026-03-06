@@ -13,7 +13,9 @@ import { CardModule } from 'primeng/card';
 import { ProjectService } from 'src/app/core/service/project.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ApiListResponse } from '../../../../../shared/models/api-response.model';
-import { Route, Router, RouterLink } from '@angular/router';
+import {Router, RouterLink, RouterLinkActive} from '@angular/router';
+import {AuthService} from "../../../../../core/service/auth.service";
+import {Profile} from "../../../../../shared/models/auth";
 
 @Component({
   selector: 'app-project-list',
@@ -31,17 +33,26 @@ import { Route, Router, RouterLink } from '@angular/router';
     CardModule,
     ProgressSpinnerModule,
     RouterLink,
+    RouterLinkActive,
   ],
   standalone: true,
 })
 export class ProjectListComponent implements OnInit {
   projects: Project[] = [];
-  loading = false;
+  loading: boolean = false;
+  isAdmin: boolean = false;
+  profile?: Profile;
 
   constructor(
     private projectService: ProjectService,
+    private authservice: AuthService,
     private router: Router
-  ) {}
+  ) {
+    this.profile = this.authservice.getProfileLocal();
+    console.log(this.profile);
+
+    this.isAdmin = this.profile?.roles?.includes('Admin') ?? false;
+  }
 
   goToProject(id: number) {
     this.router.navigate(['/project-management/projects/kanban', id]);
@@ -56,11 +67,10 @@ export class ProjectListComponent implements OnInit {
 
     this.projectService.getAll().subscribe({
       next: (response: ApiListResponse<Project>) => {
-        this.projects = response.data; // TypeScript sabe que es Project[]
+        this.projects = response.data;
         console.log('Proyectos cargados:', this.projects);
         this.loading = false;
 
-        // Puedes acceder a meta si existe
         if (response.meta?.pagination) {
           console.log('Total de proyectos:', response.meta.total);
         }

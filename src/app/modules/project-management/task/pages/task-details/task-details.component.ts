@@ -216,14 +216,13 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     );
   }
 
-  /**
-   * Crea una nueva subtarea
-   */
-  createSubtask() {
-    this.router.navigate(
-      ['/project-management/projects/kanban', this.projectId, 'task-create'],
-      { queryParams: { parentId: this.taskId } }
-    );
+  createTask(columnId: number): void {
+    this.router.navigate([
+      '/project-management/projects/kanban',
+      this.projectId,
+      'create-task',
+      columnId
+    ])
   }
 
   /**

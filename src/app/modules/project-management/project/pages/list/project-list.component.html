@@ -3,8 +3,7 @@
   <div *ngIf="loading" class="flex justify-content-center p-4">
     <p-progressSpinner></p-progressSpinner>
   </div>
-
-  <div *ngIf="!loading">
+  <div *ngIf="!loading && isAdmin">
     <a
       [routerLink]="['/project-management/projects/create']"
       routerLinkActive="text-white bg-green-700 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
@@ -17,7 +16,7 @@
     </a>
   </div>
   <!-- Lista de proyectos -->
-  <div *ngIf="!loading" class="flex flex-wrap">
+  <div *ngIf="!loading" class="flex flex-wrap gap-2">
     <app-project-card
       *ngFor="let project of projects"
       [project]="project"
