@@ -3,7 +3,7 @@ export interface Profile {
   name: string;
   email: string;
   photo: File | string;
-  roles: string[];
+  role: string;
 }
 
 export interface ProfileDataResponse {

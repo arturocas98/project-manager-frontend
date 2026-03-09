@@ -51,7 +51,7 @@ export class ProjectListComponent implements OnInit {
     this.profile = this.authservice.getProfileLocal();
     console.log(this.profile);
 
-    this.isAdmin = this.profile?.roles?.includes('Admin') ?? false;
+    this.isAdmin = this.profile?.role?.includes('Admin') ?? false;
   }
 
   goToProject(id: number) {
