@@ -30,6 +30,12 @@ export interface KanbanTask {
     type: 'task' | 'bug' | 'subtask' | 'history_user';
   };
 
+  category: {
+    id: number;
+    name: string;
+  };
+
+
   state: {
     id: number;
     state: string;

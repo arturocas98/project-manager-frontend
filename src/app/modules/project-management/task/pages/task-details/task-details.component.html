@@ -2,6 +2,7 @@
 
   <!-- Toast para mensajes -->
   <p-toast position="top-right"></p-toast>
+  <p-confirmDialog></p-confirmDialog>
 
   <!-- Header con navegación mejorado -->
   <div class="flex flex-wrap align-items-center justify-content-between gap-3 mb-5">
@@ -22,7 +23,6 @@
         </p>
       </div>
     </div>
-
     <div class="flex align-items-center gap-2">
       <button
         pButton
@@ -101,7 +101,8 @@
               <i class="pi pi-chevron-right text-xs" *ngIf="!last"></i>
             </span>
           </div>
-          <h2 class="text-2xl font-bold text-color mb-2">{{ task.title }}</h2>
+          <h2 class="text-2xl font-bold text-color">{{ task.title }}</h2>
+          <h2 class="text-2xl font-bold text-indigo-500 mb-2">{{ task.category?.name }}</h2>
           <div class="flex align-items-center gap-2 text-sm">
             <i class="pi pi-folder-open text-primary"></i>
             <span class="text-color-secondary">Proyecto ID: {{ task.project_id }}</span>
@@ -177,14 +178,132 @@
         </div>
       </p-card>
 
-      <div class="flex align-items-center justify-content-center mt-4">
-        <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
-          <img
-            src="assets/General/Cartoon_task_details.png"
-            alt="Task Details"
-            class="w-18rem z-1 h-20rem mb-4 sm:w-23rem sm:h-25rem object-fit-cover mt-8 sm:mt-0">
+      <!-- SECCIÓN DE COMENTARIOS -->
+      <p-card class="mb-4 shadow-2">
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center gap-2 p-3 border-bottom-1 surface-border">
+            <i class="pi pi-comments text-primary"></i>
+            <span class="font-medium text-color">Comentarios ({{ comments.length }})</span>
+          </div>
+        </ng-template>
+
+        <div class="p-3">
+          <!-- Formulario para nuevo comentario -->
+          <div class="flex gap-3 mb-4">
+            <p-avatar
+              [label]="getUserInitials('Usuario')"
+              size="large"
+              shape="circle"
+              [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'font-weight': 'bold'}"
+              class="flex-shrink-0">
+            </p-avatar>
+            <div class="flex-1">
+              <span class="text-sm text-color-secondary block mb-1">Nuevo comentario</span>
+              <div class="flex flex-column gap-2">
+                <textarea
+                  pInputTextarea
+                  [(ngModel)]="newComment"
+                  placeholder="Escribe un comentario..."
+                  rows="3"
+                  class="w-full p-3 border-round-lg surface-ground"
+                  [disabled]="submittingComment">
+                </textarea>
+                <div class="flex justify-content-end">
+                  <button
+                    pButton
+                    label="Publicar comentario"
+                    icon="pi pi-send"
+                    [disabled]="!newComment.trim() || submittingComment"
+                    [loading]="submittingComment"
+                    (click)="submitComment()"
+                    class="p-button-primary">
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p-divider></p-divider>
+
+          <!-- Lista de comentarios -->
+          <p-scrollPanel [style]="{ height: comments.length > 0 ? '400px' : '200px' }" class="w-full">
+            <!-- Loader de comentarios -->
+            <div *ngIf="loadingComments" class="flex justify-content-center align-items-center py-5">
+              <p-progressSpinner
+                styleClass="w-3rem h-3rem"
+                strokeWidth="4"
+                fill="var(--surface-ground)"
+                animationDuration=".8s">
+              </p-progressSpinner>
+            </div>
+
+            <!-- Mensaje sin comentarios -->
+            <div *ngIf="!loadingComments && comments.length === 0" class="flex flex-column align-items-center py-5">
+              <div class="bg-gray-100 border-circle p-4 mb-3">
+                <i class="pi pi-comments text-3xl text-gray-500"></i>
+              </div>
+              <h3 class="text-lg font-medium text-color mb-2">Sin comentarios</h3>
+              <p class="text-color-secondary text-center mb-3">Sé el primero en comentar esta tarea</p>
+            </div>
+
+            <!-- Lista de comentarios -->
+            <div *ngIf="!loadingComments && comments.length > 0" class="flex flex-column gap-4">
+              <div *ngFor="let comment of comments" class="flex gap-3 p-3 surface-ground border-round-lg hover:surface-hover transition-colors">
+                <!-- Avatar del creador -->
+                <p-avatar
+                  [label]="getUserInitials(comment.createdBy?.name || 'Usuario')"
+                  size="large"
+                  shape="circle"
+                  [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'font-weight': 'bold'}"
+                  class="flex-shrink-0">
+                </p-avatar>
+
+                <!-- Contenido del comentario -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex align-items-center justify-content-between gap-2 mb-2">
+                    <div class="flex align-items-center gap-2 flex-wrap">
+
+                      <span class="text-xs text-color-secondary flex align-items-center gap-1">
+                        <i class="pi pi-clock"></i>
+                        {{ comment.created_at ? (comment.created_at | date:'dd/MM/yyyy HH:mm') : 'Fecha no disponible' }}
+                      </span>
+                    </div>
+
+                    <!-- Menú de opciones del comentario -->
+                    <button
+                      pButton
+                      icon="pi pi-ellipsis-h"
+                      class="p-button-rounded p-button-text p-button-sm"
+                      (click)="menu.toggle($event)"
+                      #menuBtn>
+                    </button>
+                    <p-menu
+                      #menu
+                      [model]="commentMenuItems[comment.id]"
+                      [popup]="true"
+                      appendTo="body">
+                    </p-menu>
+                  </div>
+
+                  <p class="text-color-secondary line-height-3 white-space-pre-wrap m-0">
+                    {{ comment.description }}
+                  </p>
+
+                  <!-- Información de la incidencia relacionada -->
+                  <div *ngIf="comment.incidence" class="flex align-items-center gap-2 mt-2 pt-2 border-top-1 surface-border">
+                    <i class="pi pi-tag text-xs text-primary"></i>
+                    <span class="text-xs text-color-secondary">En:</span>
+                    <span class="text-xs font-medium text-color cursor-pointer hover:text-primary transition-colors"
+                          (click)="navigateToTask(comment.incidence.id)">
+                      {{ comment.incidence.name }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p-scrollPanel>
         </div>
-      </div>
+      </p-card>
     </div>
 
     <!-- Columna lateral (1/3 del espacio) -->
@@ -329,7 +448,7 @@
         </div>
       </p-card>
 
-      <!-- SECCIÓN DE SUBTAREAS (ÁRBOL) - MOVIDA A LA SEGUNDA COLUMNA -->
+      <!-- SECCIÓN DE SUBTAREAS (ÁRBOL) -->
       <p-card class="shadow-2" *ngIf="task.children && task.children.length > 0">
         <ng-template pTemplate="header">
           <div class="flex align-items-center gap-2 p-3 border-bottom-1 surface-border">

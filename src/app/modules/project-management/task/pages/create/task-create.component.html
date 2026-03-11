@@ -104,25 +104,44 @@
               La prioridad es obligatoria
             </small>
           </div>
+          <div class="grid">
+            <!-- Fecha de inicio -->
+            <div class="col-12 md:col-6">
+              <label class="block text-color font-medium mb-2"> Tipo <span class="text-red-500">*</span> </label>
+              <p-dropdown
+                formControlName="type"
+                [options]="types"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar tipo"
+                class="w-full"
+                [ngClass]="{ 'p-invalid': taskForm.get('type')?.invalid && taskForm.get('type')?.touched }"
+              >
+              </p-dropdown>
 
-          <!-- Tipo -->
-          <div>
-            <label class="block text-color font-medium mb-2"> Tipo <span class="text-red-500">*</span> </label>
+              <small *ngIf="taskForm.get('type')?.invalid && taskForm.get('type')?.touched" class="p-error block mt-2">
+                El tipo es obligatorio
+              </small>
+            </div>
 
-            <p-dropdown
-              formControlName="type"
-              [options]="types"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Seleccionar tipo"
-              class="w-full"
-              [ngClass]="{ 'p-invalid': taskForm.get('type')?.invalid && taskForm.get('type')?.touched }"
-            >
-            </p-dropdown>
+            <!-- Fecha de vencimiento -->
+            <div class="col-12 md:col-6">
+              <label class="block text-color font-medium mb-2"> Categoria <span class="text-red-500">*</span> </label>
+              <p-dropdown
+                formControlName="category"
+                [options]="categories"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar categoria"
+                class="w-full"
+                [ngClass]="{ 'p-invalid': taskForm.get('category')?.invalid && taskForm.get('category')?.touched }"
+              >
+              </p-dropdown>
 
-            <small *ngIf="taskForm.get('type')?.invalid && taskForm.get('type')?.touched" class="p-error block mt-2">
-              El tipo es obligatorio
-            </small>
+              <small *ngIf="taskForm.get('category')?.invalid && taskForm.get('category')?.touched" class="p-error block mt-2">
+                El tipo es obligatorio
+              </small>
+            </div>
           </div>
 
           <!-- Usuario Asignado -->

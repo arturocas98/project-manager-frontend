@@ -14,7 +14,6 @@ import {CommonModule, DatePipe} from "@angular/common";
 })
 export class ProjectCardComponent {
   @Input({ required: true }) project!: Project;
-  // Array de colores disponibles
   colorPalette = [
     {
       name: 'indigo',
@@ -106,13 +105,11 @@ export class ProjectCardComponent {
     }
   ];
 
-// Método para obtener un color basado en el ID del proyecto
   getProjectColor(projectId: number) {
     const index = (projectId || 0) % this.colorPalette.length;
     return this.colorPalette[index];
   }
 
-// Métodos helper para cada elemento del card
   getHeaderColorClass(projectId: number): string {
     return this.getProjectColor(projectId).header;
   }
@@ -143,5 +140,22 @@ export class ProjectCardComponent {
 
   getProgressBarColor(projectId: number): string {
     return this.getProjectColor(projectId).progress;
+  }
+
+  calculateProgress(project: Project): number {
+    if (project.start_date && project.end_date && project.duration_days) {
+      const start = new Date(project.start_date).getTime();
+      const end = new Date(project.end_date).getTime();
+      const now = new Date().getTime();
+
+      if (now < start) return 0;
+      if (now > end) return 100;
+
+      const total = end - start;
+      const elapsed = now - start;
+      return Math.round((elapsed / total) * 100);
+    }
+
+    return project.duration_days ? 50 : 0;
   }
 }

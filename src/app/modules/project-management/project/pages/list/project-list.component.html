@@ -1,33 +1,70 @@
-<div>
-  <!-- Estado de carga -->
-  <div *ngIf="loading" class="flex justify-content-center p-4">
+<div class="flex flex-column gap-4">
+
+  <!-- HEADER -->
+  <div class="flex justify-content-between align-items-center flex-wrap gap-3">
+
+    <div>
+      <h2 class="text-2xl font-semibold m-0">Proyectos</h2>
+      <p class="text-sm text-color-secondary m-0">
+        Gestiona los proyectos disponibles
+      </p>
+    </div>
+
+    <!-- Botón crear proyecto -->
+    <button
+      *ngIf="!loading && isAdmin"
+      pButton
+      type="button"
+      icon="ph ph-plus"
+      label="Crear proyecto"
+      class="p-button-success"
+      [routerLink]="['/project-management/projects/create']">
+    </button>
+
+  </div>
+
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="flex justify-content-center py-6">
     <p-progressSpinner></p-progressSpinner>
   </div>
-  <div *ngIf="!loading && isAdmin">
-    <a
-      [routerLink]="['/project-management/projects/create']"
-      routerLinkActive="text-white bg-green-700 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
-      class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-green-700 hover:text-white transition-all duration-300 group"
-      style="border-radius: 20px"
-      role="menuitem"
-    >
-      <i class="ph ph-plus text-xl"></i>
-      <span class="text-xl">Crear proyecto</span>
-    </a>
-  </div>
-  <!-- Lista de proyectos -->
-  <div *ngIf="!loading" class="flex flex-wrap gap-2">
-    <app-project-card
-      *ngFor="let project of projects"
-      [project]="project"
-      (click)="goToProject(project.id)"
-      class="w-full sm:w-6 md:w-4 lg:w-3"
-    >
-    </app-project-card>
 
-    <!-- Mensaje si no hay proyectos -->
-    <div *ngIf="projects.length === 0" class="text-center w-full p-4 text-color-secondary">
-      No hay proyectos disponibles
+
+  <!-- GRID DE PROYECTOS -->
+  <div *ngIf="!loading">
+
+    <div *ngIf="projects.length > 0"
+         class="flex flex-wrap gap-4">
+
+      <app-project-card
+        *ngFor="let project of projects"
+        [project]="project"
+        (click)="goToProject(project.id)">
+      </app-project-card>
+
     </div>
+
+
+    <!-- SIN PROYECTOS -->
+    <div *ngIf="projects.length === 0"
+         class="flex flex-column align-items-center justify-content-center py-8 text-center text-color-secondary">
+
+      <i class="ph ph-folder-open text-4xl mb-3"></i>
+      <p class="text-lg font-medium m-0">
+        No hay proyectos disponibles
+      </p>
+
+      <button
+        *ngIf="isAdmin"
+        pButton
+        icon="ph ph-plus"
+        label="Crear el primer proyecto"
+        class="p-button-outlined mt-3"
+        [routerLink]="['/project-management/projects/create']">
+      </button>
+
+    </div>
+
   </div>
+
 </div>

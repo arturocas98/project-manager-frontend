@@ -162,40 +162,62 @@
             </div>
           </div>
 
-          <!-- Usuario Asignado -->
-          <div>
-            <label class="block text-color font-medium mb-2">
-              Asignar a
-              <span *ngIf="taskType === EPIC_TYPE || taskType === HISTORY_USER_TYPE"
-                    class="text-red-500">*</span>
-            </label>
-            <p-dropdown
-              formControlName="assigned_user_id"
-              [options]="memberOptions"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Seleccionar usuario"
-              class="w-full"
-              [showClear]="true"
-              [filter]="true"
-              [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
-              <ng-template pTemplate="selectedItem">
-                <div *ngIf="taskForm.get('assigned_user_id')?.value" class="flex align-items-center gap-2">
-                  <i class="pi pi-user text-primary"></i>
-                  <span>{{ getSelectedMemberLabel() }}</span>
-                </div>
-              </ng-template>
-              <ng-template let-member pTemplate="item">
-                <div class="flex align-items-center gap-2">
-                  <i class="pi pi-user text-primary"></i>
-                  <span class="font-medium">{{ member.label }}</span>
-                </div>
-              </ng-template>
-            </p-dropdown>
-            <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
-                   class="p-error block mt-2">
-              Debes seleccionar un usuario asignado
-            </small>
+          <div class="grid">
+            <!-- Prioridad -->
+            <div class="col-12 md:col-6">
+              <label class="block text-color font-medium mb-2">
+                Asignar a
+                <span *ngIf="taskType === EPIC_TYPE || taskType === HISTORY_USER_TYPE"
+                      class="text-red-500">*</span>
+              </label>
+              <p-dropdown
+                formControlName="assigned_user_id"
+                [options]="memberOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar usuario"
+                class="w-full"
+                [showClear]="true"
+                [filter]="true"
+                [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
+                <ng-template pTemplate="selectedItem">
+                  <div *ngIf="taskForm.get('assigned_user_id')?.value" class="flex align-items-center gap-2">
+                    <i class="pi pi-user text-primary"></i>
+                    <span>{{ getSelectedMemberLabel() }}</span>
+                  </div>
+                </ng-template>
+                <ng-template let-member pTemplate="item">
+                  <div class="flex align-items-center gap-2">
+                    <i class="pi pi-user text-primary"></i>
+                    <span class="font-medium">{{ member.label }}</span>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
+                     class="p-error block mt-2">
+                Debes seleccionar un usuario asignado
+              </small>
+            </div>
+
+            <!-- Tipo (no editable) -->
+            <div class="col-12 md:col-6">
+              <label class="block text-color font-medium mb-2">
+                Categoria <span class="text-red-500">*</span>
+              </label>
+              <p-dropdown
+                formControlName="category"
+                [options]="categories"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar prioridad"
+                class="w-full"
+                [ngClass]="{'p-invalid': taskForm.get('category')?.invalid && taskForm.get('category')?.touched}">
+              </p-dropdown>
+              <small *ngIf="taskForm.get('category')?.invalid && taskForm.get('category')?.touched"
+                     class="p-error block mt-2">
+                La prioridad es obligatoria
+              </small>
+            </div>
           </div>
 
           <!-- Fechas -->
@@ -318,7 +340,7 @@
                 label="Actualizar Tarea"
                 icon="pi pi-save"
                 class="p-button-raised p-button-primary"
-                [disabled]="taskForm.invalid || saving || deleting"
+                [disabled]="saving || deleting"
                 [loading]="saving">
               </button>
             </div>

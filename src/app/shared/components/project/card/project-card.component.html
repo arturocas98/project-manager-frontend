@@ -1,139 +1,185 @@
-  <p-card
-    class="project-card group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 surface-card"
-    [style]="{ overflow: 'hidden' }">
+<p-card
+  class="project-card group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 surface-card"
+  [style]="{ width: '21rem', height: '23rem', overflow: 'hidden' }">
 
-    <!-- Header -->
-    <ng-template pTemplate="header">
-      <div class="relative p-6" [ngClass]="getHeaderColorClass(project.id)">
+  <div class="flex h-full">
+    <!-- Header Lateral Izquierdo -->
+    <div class="flex flex-column align-items-center p-3"
+         [ngClass]="getHeaderColorClass(project.id)"
+         style="width: 80px;">
 
-        <!-- Patrón decorativo -->
-        <div class="absolute inset-0 opacity-10"
-             style="background-image: radial-gradient(circle at 2px 2px, #ffffff 1px, transparent 0);
-                    background-size: 24px 24px;">
-        </div>
-
-        <div class="relative flex justify-content-center">
-          <div class="transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-            <p-avatar
-              label="{{ project.name.charAt(0) || '?' }}"
-              shape="circle"
-              [style]="{
-                backgroundColor: 'var(--surface-card)',
-                color: getAvatarTextColor(project.id),
-                fontWeight: 'bold',
-                fontSize: '2.5rem',
-                width: '6rem',
-                height: '6rem'
-              }"
-              class="shadow-lg">
-            </p-avatar>
-          </div>
-        </div>
-
-        <div class="absolute top-3 right-3">
-          <span class="flex align-items-center px-4 py-2 rounded-full border-round text-base font-bold surface-card"
-                [ngClass]="getBadgeTextColor(project.id)">
-            {{ project.key }}
-          </span>
-        </div>
+      <!-- Avatar -->
+      <div class="transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 mb-2">
+        <p-avatar
+          label="{{ project.project_type?.charAt(0) || '?' }}"
+          shape="circle"
+          [style]="{
+            backgroundColor: 'var(--surface-card)',
+            color: getAvatarTextColor(project.id),
+            fontWeight: 'bold',
+            fontSize: '1.8rem',
+            width: '3.5rem',
+            height: '3.5rem'
+          }"
+          class="shadow-lg">
+        </p-avatar>
       </div>
-    </ng-template>
 
-    <!-- Content -->
-    <div class="content">
+      <!-- ContractNo -->
+      <span
+        class="flex align-items-center px-2 py-1 rounded-full border-round text-sm font-bold surface-card mb-2"
+        [ngClass]="getBadgeTextColor(project.id)">
+        {{ project.ContractNo }}
+      </span>
 
-      <h4 class="text-2xl font-bold text-color mb-2 line-clamp-1 transition-colors"
-          [ngClass]="getHoverTextColor(project.id)">
-        {{ project.name }}
-      </h4>
+      <!-- Patrón decorativo -->
+      <div class="absolute inset-0 opacity-10"
+           style="background-image: radial-gradient(circle at 2px 2px, #ffffff 1px, transparent 0);
+                  background-size: 24px 24px;">
+      </div>
+    </div>
 
-      <p class="description text-base text-color-secondary line-clamp-2 leading-relaxed min-h-[3rem]">
-        {{ project.description || 'Sin descripción' }}
-      </p>
+    <!-- Contenido Derecho -->
+    <div class="flex flex-column flex-1 p-3" style="width: calc(100% - 80px);">
 
-      <div class="mt-4 space-y-3">
+      <!-- Título -->
+      <div class="mb-2">
+        <h4 class="text-lg font-bold text-color mb-1 line-clamp-1 transition-colors"
+            [ngClass]="getHoverTextColor(project.id)">
+          {{ project.project_type }}
+        </h4>
 
-        <div *ngIf="project.created_by"
-             class="flex items-center gap-3 text-base text-color">
-          <div class="w-2rem h-2rem border-round-3xl flex align-items-center justify-content-center"
+        <p class="description text-sm text-color-secondary line-clamp-2 leading-relaxed">
+          {{ project.objectContract || 'Sin descripción' }}
+        </p>
+      </div>
+
+      <!-- Información -->
+      <div class="flex-1 space-y-2">
+
+        <!-- Administrador -->
+        <div *ngIf="project.administrator"
+             class="flex items-center gap-2 text-sm text-color">
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center flex-shrink-0"
                [ngClass]="getIconBgColor(project.id)">
             <i class="ph ph-user-circle text-xl"
                [ngClass]="getIconColor(project.id)"></i>
           </div>
-          <span>Creado por:
-            <span class="font-semibold">{{ project.created_by.name }}</span>
+          <span class="truncate">
+            Admin: <span class="font-semibold">{{ project.administrator.name }}</span>
           </span>
         </div>
 
+        <!-- Cliente -->
+        <div class="flex items-center gap-2 text-sm text-color">
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
+               [ngClass]="getIconBgColor(project.id)">
+            <i class="ph ph-buildings text-xl"
+               [ngClass]="getIconColor(project.id)"></i>
+          </div>
+          <span class="truncate">{{ project.client }}</span>
+        </div>
+
+        <!-- Empresa contratada -->
+        <div class="flex items-center gap-2 text-sm text-color">
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
+               [ngClass]="getIconBgColor(project.id)">
+            <i class="ph ph-briefcase text-xl"
+               [ngClass]="getIconColor(project.id)"></i>
+          </div>
+          <span class="truncate">{{ project.contracted_company }}</span>
+        </div>
+
+        <!-- Fase -->
+        <div class="flex items-center gap-2 text-sm text-color">
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
+               [ngClass]="getIconBgColor(project.id)">
+            <i class="ph ph-flag text-xl"
+               [ngClass]="getIconColor(project.id)"></i>
+          </div>
+          <span class="truncate">{{ project.last_phase }}</span>
+        </div>
+
+        <!-- Rol del usuario -->
         <div *ngIf="project.user_role"
-             class="flex items-center gap-3 text-base text-color">
-          <div class="w-2rem h-2rem border-round-3xl flex align-items-center justify-content-center"
+             class="flex items-center gap-2 text-sm text-color">
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
                [ngClass]="getIconBgColor(project.id)">
             <i class="ph ph-tag text-xl"
                [ngClass]="getIconColor(project.id)"></i>
           </div>
-          <span class="font-medium">{{ project.user_role.type }}</span>
+          <span class="font-medium truncate">{{ project.user_role.type }}</span>
         </div>
 
+        <!-- Estado -->
+        <div *ngIf="project.state"
+             class="flex items-center gap-2 text-sm text-color">
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
+               [ngClass]="getIconBgColor(project.id)">
+            <i class="ph ph-check-circle text-xl"
+               [ngClass]="getIconColor(project.id)"></i>
+          </div>
+          <span class="font-medium">{{ project.state.name }}</span>
+        </div>
+
+        <!-- Stats -->
+        <div class="mt-3">
+
+          <div class="flex items-center justify-content-between text-sm mb-1">
+            <span class="text-color-secondary font-medium">Miembros:</span>
+            <span class="font-bold text-sm"
+                  [ngClass]="getNumberColor(project.id)">
+              {{ project.stats?.members_count || 0 }}
+            </span>
+          </div>
+
+          <div class="flex items-center justify-content-between text-sm mb-2">
+            <span class="text-color-secondary font-medium">Proyecto ID:</span>
+            <span class="font-bold text-sm"
+                  [ngClass]="getNumberColor(project.id)">
+              #{{ project.id }}
+            </span>
+          </div>
+
+          <div class="w-full surface-border border-round h-1 mt-2 surface-ground">
+            <div class="h-1 border-round"
+                 [ngClass]="getProgressBarColor(project.id)"
+                 style="width: 75%">
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      <!-- Stats -->
-      <div class="mt-3">
+      <!-- Footer -->
+      <div class="footer pt-2 border-top-1 surface-border surface-section flex align-items-center justify-content-between">
 
-        <div class="flex items-center justify-content-between text-base mb-2">
-          <span class="text-color-secondary font-medium">Miembros:</span>
-          <span class="font-bold text-xl"
-                [ngClass]="getNumberColor(project.id)">
-            {{ project.stats?.members_count || 0 }}
-          </span>
-        </div>
-
-        <div class="flex items-center justify-content-between text-base mb-2">
-          <span class="text-color-secondary font-medium">Proyecto ID:</span>
-          <span class="font-bold text-xl"
-                [ngClass]="getNumberColor(project.id)">
-            #{{ project.id }}
-          </span>
-        </div>
-
-        <!-- Progress bar adaptada -->
-        <div class="w-full surface-border border-round h-2 mt-3 surface-ground">
-          <div class="h-2 border-round"
-               [ngClass]="getProgressBarColor(project.id)"
-               style="width: 75%">
+        <div class="flex align-items-center gap-2">
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
+               [ngClass]="getIconBgColor(project.id)">
+            <i class="ph ph-users-three text-sm"
+               [ngClass]="getIconColor(project.id)"></i>
           </div>
         </div>
-
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <ng-template pTemplate="footer">
-      <div class="footer py-4 border-top-1 surface-border surface-section flex flex-row align-items-center justify-content-between">
 
         <div class="flex align-items-center gap-3">
-          <div class="w-2rem h-2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-users-three text-xl"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-        </div>
 
-        <div class="flex align-items-center gap-4">
-
-          <div *ngIf="project.created_at"
-               class="text-base text-color-secondary">
-            {{ project.created_at | date:'dd/MM/yyyy' }}
+          <div *ngIf="project.start_date"
+               class="text-sm text-color-secondary">
+            {{ project.start_date | date:'dd/MM/yyyy' }}
           </div>
 
-          <div class="w-2rem h-2rem border-round-3xl flex align-items-center justify-content-center"
+          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
                [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-arrow-right text-xl"
+            <i class="ph ph-arrow-right text-sm"
                [ngClass]="getIconColor(project.id)"></i>
           </div>
 
         </div>
+
       </div>
-    </ng-template>
 
-  </p-card>
+    </div>
+  </div>
+
+</p-card>

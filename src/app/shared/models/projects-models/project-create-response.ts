@@ -17,10 +17,22 @@ export interface UserRole {
  */
 export interface CreatedProject {
   id: number;
-  name: string;
-  key: string;
-  description: string;
+
+  ContractNo: string;
+  client: string;
+  project_type: string;
+  objectContract?: string;
+
+  start_date?: string;
+  end_date?: string;
+  duration_days?: number;
+
+  administrator_email?: string;
+  contracted_company?: string;
+  last_phase?: string;
+
   created_at: string;
+
   user_role: UserRole;
 }
 

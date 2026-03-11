@@ -38,6 +38,20 @@ import { KeyFilterModule } from 'primeng/keyfilter';
 export class UserCreateComponent {
   ngForm: FormGroup;
   roles: Option[] = [];
+  roles_options: Option[] = [
+    {
+      id: 1,
+      name: 'Administrador',
+    },
+    {
+      id: 2,
+      name: 'Gerente de proyecto',
+    },
+    {
+      id: 3,
+      name: 'Colaborador',
+    },
+  ];
   modalities: Option[] = [
     {
       id: 1,

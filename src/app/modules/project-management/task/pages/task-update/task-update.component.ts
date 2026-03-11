@@ -116,6 +116,19 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     { label: 'Subtask', value: 5 }
   ];
 
+  categories = [
+    { label: 'Desarrollo', value: 1 },
+    { label: 'Diseño', value: 2 },
+    { label: 'Documentación', value: 3 },
+    { label: 'Pruebas', value: 4 },
+    { label: 'Despliegue', value: 5 },
+    { label: 'Capacitación', value: 6 },
+    { label: 'Soporte/Validación', value: 7 },
+    { label: 'Corrección de errores', value: 8 },
+    { label: 'Reunión/Coordinación', value: 9 },
+    { label: 'Migración', value: 10 }
+  ];
+
   private readonly stateMap: Record<number, string> = {
     1: 'Open',
     2: 'In Progress',
@@ -138,6 +151,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     description: ['', Validators.required],
     priority: [<number | null>null, Validators.required],
     type: [{value: <number | null>null, disabled: true}, Validators.required],
+    category: [<number | null>null, Validators.required],
     assigned_user_id: [<number | null>null],
     parent_id: [<number | null>null],
     state_id: [{value: <number | null>null, disabled: true}, Validators.required],
@@ -274,6 +288,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       description: task.description,
       priority: priorityId,
       type: task.type?.id,
+      category: task.category?.id,
       assigned_user_id: task.assigned_to?.id || null,
       parent_id: task.parent?.id || null,
       state_id: task.state?.id,
@@ -415,6 +430,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       description: formValue.description || null,
       incidence_priority_id: formValue.priority || null,
       incidence_type_id: this.task?.type?.id || null,
+      incidence_category_id: this.task?.category?.id || null,
       incidence_state_id: this.task?.state?.id || null,
       assigned_user_id: formValue.assigned_user_id || null,
       parent_incidence_id: formValue.parent_id || null,
@@ -568,7 +584,9 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       }
     });
   }
-
+  markAsDirty(fieldName: string) {
+    this.taskForm.get(fieldName)?.markAsDirty();
+  }
   /**
    * Ejecuta la actualización
    */

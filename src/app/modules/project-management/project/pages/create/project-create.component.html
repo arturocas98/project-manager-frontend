@@ -2,19 +2,8 @@
   <div
     class="w-full max-w-6xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl"
   >
-    <!-- <a
-          [routerLink]="['/project-management/projects/create']"
-          routerLinkActive="text-white bg-green-700 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-green-700 hover:text-white transition-all duration-300 group"
-          style="border-radius: 20px"
-          role="menuitem">
-          <i class="ph ph-stack-plus text-xl"></i>
-          <span class="text-xl">Agregar</span>
-        </a> -->
     <!-- Imagen / Panel Decorativo -->
     <div class="w-full md:w-6 flex flex-column p-5 align-items-center justify-content-center relative">
-      <!-- Imagen -->
       <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
         <img
           src="assets/General/Cartoon-project-create.png"
@@ -23,7 +12,6 @@
         />
       </div>
 
-      <!-- Texto decorativo opcional -->
       <div class="text-center z-1 text-white px-4 py-4">
         <h3 class="text-2xl font-bold">Organiza tu equipo</h3>
         <p class="text-primary">Crea proyectos y asigna miembros fácilmente</p>
@@ -63,78 +51,171 @@
       </div>
 
       <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
-        <!-- Nombre -->
+        <!-- Número de Contrato -->
         <div>
-          <label class="block text-color font-medium mb-2"> Nombre del Proyecto </label>
-
+          <label class="block text-color font-medium mb-2">Número de Contrato *</label>
           <div class="p-inputgroup">
             <span class="p-inputgroup-addon">
-              <i class="pi pi-folder"></i>
+              <i class="pi pi-file"></i>
             </span>
             <input
               pInputText
-              formControlName="name"
+              formControlName="ContractNo"
               class="w-full"
-              placeholder="Ej: Sistema de Gestión Interna"
-              [ngClass]="{ 'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched }"
+              placeholder="Ej: CONT-2024-001"
+              [ngClass]="{ 'p-invalid': projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched }"
             />
           </div>
-
-          <small
-            *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
-            class="p-error block mt-2"
-          >
-            El nombre es obligatorio
+          <small *ngIf="projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched" class="p-error block mt-2">
+            El número de contrato es obligatorio
           </small>
         </div>
 
-        <!-- Descripción -->
+        <!-- Cliente -->
         <div>
-          <label class="block text-color font-medium mb-2"> Descripción </label>
+          <label class="block text-color font-medium mb-2">Cliente *</label>
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-user"></i>
+            </span>
+            <input
+              pInputText
+              formControlName="client"
+              class="w-full"
+              placeholder="Ej: Empresa ABC"
+              [ngClass]="{ 'p-invalid': projectForm.get('client')?.invalid && projectForm.get('client')?.touched }"
+            />
+          </div>
+          <small *ngIf="projectForm.get('client')?.invalid && projectForm.get('client')?.touched" class="p-error block mt-2">
+            El cliente es obligatorio
+          </small>
+        </div>
 
+        <!-- Tipo de Proyecto -->
+        <div>
+          <label class="block text-color font-medium mb-2">Tipo de Proyecto *</label>
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-tag"></i>
+            </span>
+            <input
+              pInputText
+              formControlName="project_type"
+              class="w-full"
+              placeholder="Ej: Desarrollo de Software"
+              [ngClass]="{ 'p-invalid': projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched }"
+            />
+          </div>
+          <small *ngIf="projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched" class="p-error block mt-2">
+            El tipo de proyecto es obligatorio
+          </small>
+        </div>
+
+        <!-- Objeto del Contrato -->
+        <div>
+          <label class="block text-color font-medium mb-2">Objeto del Contrato</label>
           <textarea
             pInputTextarea
-            rows="4"
-            formControlName="description"
+            rows="3"
+            formControlName="objectContract"
             class="w-full"
-            placeholder="Describe brevemente el propósito del proyecto"
-            [ngClass]="{
-              'p-invalid': projectForm.get('description')?.invalid && projectForm.get('description')?.touched,
-            }"
-          >
-          </textarea>
-
-          <small
-            *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"
-            class="p-error block mt-2"
-          >
-            La descripción es obligatoria
-          </small>
+            placeholder="Describe el objeto del contrato..."
+          ></textarea>
         </div>
 
-        <div>
-          <label class="block text-color font-medium mb-2"> Administrador del contrato del proyecto </label>
+        <!-- Fecha de Inicio y Duración -->
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <label class="block text-color font-medium mb-2">Fecha de Inicio *</label>
+            <div class="p-inputgroup">
+              <span class="p-inputgroup-addon">
+                <i class="pi pi-calendar"></i>
+              </span>
+              <input
+                pInputText
+                type="date"
+                formControlName="start_date"
+                class="w-full"
+                [ngClass]="{ 'p-invalid': projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched }"
+              />
+            </div>
+            <small *ngIf="projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched" class="p-error block mt-2">
+              La fecha de inicio es obligatoria
+            </small>
+          </div>
 
+          <div class="col-12 md:col-6">
+            <label class="block text-color font-medium mb-2">Duración (días)</label>
+            <div class="p-inputgroup">
+              <span class="p-inputgroup-addon">
+                <i class="pi pi-clock"></i>
+              </span>
+              <input
+                pInputText
+                type="number"
+                formControlName="duration_days"
+                class="w-full"
+                placeholder="Ej: 90"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Email del Administrador -->
+        <div>
+          <label class="block text-color font-medium mb-2">Email del Administrador</label>
           <div class="p-inputgroup">
             <span class="p-inputgroup-addon">
-              <i class="pi pi-folder"></i>
+              <i class="pi pi-envelope"></i>
             </span>
             <input
               pInputText
-              formControlName="contract_admin"
+              type="email"
+              formControlName="administrator_email"
               class="w-full"
-              placeholder="Ej: Ing. Admin"
-              [ngClass]="{ 'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched }"
+              placeholder="admin@empresa.com"
+              [ngClass]="{ 'p-invalid': projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched }"
             />
           </div>
-
-          <small
-            *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
-            class="p-error block mt-2"
-          >
-            El administrador del contrato es obligatorio
+          <small *ngIf="projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched" class="p-error block mt-2">
+            Ingrese un email válido
           </small>
         </div>
+
+        <!-- Compañía Contratada -->
+        <div>
+          <label class="block text-color font-medium mb-2">Compañía Contratada</label>
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-building"></i>
+            </span>
+            <input
+              pInputText
+              formControlName="contracted_company"
+              class="w-full"
+              placeholder="Ej: Constructora XYZ"
+            />
+          </div>
+        </div>
+
+        <!-- Última Fase (opcional) -->
+        <div>
+          <label class="block text-color font-medium mb-2">Última Fase</label>
+          <div class="p-inputgroup">
+            <span class="p-inputgroup-addon">
+              <i class="pi pi-sitemap"></i>
+            </span>
+            <input
+              pInputText
+              formControlName="last_phase"
+              class="w-full"
+              placeholder="Ej: Fase de Desarrollo"
+            />
+          </div>
+        </div>
+
+        <!-- Estado del Proyecto (oculto, se envía con valor por defecto) -->
+        <input type="hidden" formControlName="project_state_id" value="1" />
 
         <!-- Botones -->
         <div class="flex justify-content-end gap-3 mt-3">
@@ -152,13 +233,12 @@
     </div>
   </div>
 
-  <!-- Diálogo de confirmación (se muestra automáticamente al llamar confirmationService.confirm) -->
+  <!-- Diálogo de confirmación -->
   <p-confirmDialog
     [baseZIndex]="10000"
     rejectButtonStyleClass="p-button-text"
     acceptButtonStyleClass="p-button-success"
   >
-    <!-- Personalización del header (opcional) -->
     <ng-template pTemplate="header">
       <div class="flex align-items-center gap-2 text-green-700">
         <i class="pi pi-check-circle" style="font-size: 1.5rem"></i>
@@ -166,7 +246,6 @@
       </div>
     </ng-template>
 
-    <!-- Personalización del footer (opcional) -->
     <ng-template pTemplate="footer">
       <button
         type="button"

@@ -8,17 +8,22 @@ import {AvatarModule} from 'primeng/avatar';
 import {DividerModule} from 'primeng/divider';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
 import {TooltipModule} from 'primeng/tooltip';
-import {MessageService, TreeNode} from 'primeng/api';
+import {ConfirmationService, MenuItem, MessageService, TreeNode} from 'primeng/api';
 import {ToastModule} from 'primeng/toast';
 import {Subscription} from 'rxjs';
 import {ProjectService} from "../../../../../core/service/project.service";
 import {
   IncidenceDetail,
   IncidenceDetailChild,
-  IncidenceModel
 } from "../../../../../shared/models/task-models/task-create-model";
 import {TreeModule} from "primeng/tree";
 import {TruncatePipe} from "../../../../../shared/Pipes/TruncatePipe";
+import {CommentResponse} from "../../../../../shared/models/task-models/CommentResponse";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {InputTextareaModule} from "primeng/inputtextarea";
+import {FormsModule} from "@angular/forms";
+import {ScrollPanelModule} from "primeng/scrollpanel";
+import {MenuModule} from "primeng/menu";
 
 @Component({
   selector: 'app-task-details',
@@ -36,6 +41,11 @@ import {TruncatePipe} from "../../../../../shared/Pipes/TruncatePipe";
     ToastModule,
     TreeModule,
     TruncatePipe,
+    ConfirmDialogModule,
+    InputTextareaModule,
+    FormsModule,
+    ScrollPanelModule,
+    MenuModule,
   ],
   templateUrl: './task-details.component.html',
   providers: [MessageService]
@@ -46,6 +56,13 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   taskId!: number;
   task: IncidenceDetail | null = null;
   error: string | null = null;
+
+  // Para comentarios
+  comments: CommentResponse[] = [];
+  newComment: string = '';
+  loadingComments: boolean = false;
+  submittingComment: boolean = false;
+  commentMenuItems: { [key: number]: MenuItem[] } = {};
 
   // Para el árbol de PrimeNG
   treeData: TreeNode[] = [];
@@ -77,7 +94,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private projectService: ProjectService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
@@ -115,6 +133,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
         this.buildTreeData();
         this.buildAncestorsPath();
         this.loading = false;
+        this.loadComments(); // Cargar comentarios después de la tarea
       },
       error: (error) => {
         console.error('Error loading task details:', error);
@@ -128,11 +147,129 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Carga los comentarios de la tarea
+   */
+  loadComments(): void {
+    if (!this.projectId || !this.taskId) return;
+
+    this.loadingComments = true;
+    const commentsSub = this.projectService.getComments(this.projectId, this.taskId).subscribe({
+      next: (comments) => {
+        this.comments = comments
+
+        this.buildCommentMenuItems();
+        this.loadingComments = false;
+        console.log(this.comments);
+        console.log(comments);
+      },
+      error: (error) => {
+        console.error('Error loading comments:', error);
+        this.loadingComments = false;
+        this.showError('Error', 'No se pudieron cargar los comentarios');
+      }
+    });
+
+    this.subscriptions.push(commentsSub);
+  }
+
+  /**
+   * Construye los items del menú para cada comentario
+   */
+  buildCommentMenuItems(): void {
+    this.comments.forEach(comment => {
+      this.commentMenuItems[comment.id] = [
+        {
+          label: 'Eliminar',
+          icon: 'pi pi-trash',
+          command: () => this.confirmDeleteComment(comment)
+        }
+      ];
+    });
+  }
+
+  /**
+   * Publica un nuevo comentario
+   */
+  submitComment(): void {
+    if (!this.newComment.trim()) {
+      this.showError('Error', 'El comentario no puede estar vacío');
+      return;
+    }
+
+    this.submittingComment = true;
+
+    const commentSub = this.projectService.createComment(
+      this.projectId,
+      this.taskId,
+      this.newComment
+    ).subscribe({
+      next: (newComment) => {
+        this.comments = [newComment, ...this.comments];
+        this.buildCommentMenuItems();
+        this.newComment = '';
+        this.submittingComment = false;
+        this.showSuccess('Comentario agregado', 'El comentario se publicó correctamente');
+      },
+      error: (error) => {
+        console.error('Error creating comment:', error);
+        this.submittingComment = false;
+        this.showError('Error', 'No se pudo publicar el comentario');
+      }
+    });
+
+    this.subscriptions.push(commentSub);
+  }
+
+  /**
+   * Edita un comentario
+   */
+  editComment(comment: CommentResponse): void {
+    // Implementar edición cuando tengas el endpoint
+    console.log('Editar comentario:', comment);
+  }
+
+  /**
+   * Confirma la eliminación de un comentario
+   */
+  confirmDeleteComment(comment: CommentResponse): void {
+    this.confirmationService.confirm({
+      message: `¿Estás seguro de que deseas eliminar este comentario?`,
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.deleteComment(comment.id);
+      }
+    });
+  }
+
+  /**
+   * Elimina un comentario
+   */
+  deleteComment(commentId: number): void {
+    const deleteSub = this.projectService.deleteComment(
+      this.projectId,
+      this.taskId,
+      commentId
+    ).subscribe({
+      next: () => {
+        this.comments = this.comments.filter(c => c.id !== commentId);
+        this.buildCommentMenuItems();
+        this.showSuccess('Comentario eliminado', 'El comentario se eliminó correctamente');
+      },
+      error: (error) => {
+        console.error('Error deleting comment:', error);
+        this.showError('Error', 'No se pudo eliminar el comentario');
+      }
+    });
+
+    this.subscriptions.push(deleteSub);
+  }
+
+  /**
    * Construye los datos para el árbol de PrimeNG
    */
   private buildTreeData() {
     if (!this.task) return;
-
     this.treeData = this.task.children.map(child => this.mapToTreeNode(child));
   }
 
@@ -146,7 +283,6 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       expanded: true,
       children: child.children?.map(grandChild => this.mapToTreeNode(grandChild)) || []
     };
-
     return node;
   }
 
@@ -155,20 +291,6 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    */
   private buildAncestorsPath() {
     this.taskAncestors = [];
-
-    // Aquí necesitarías una función recursiva para obtener los ancestros
-    // Esto depende de cómo tu API maneje los ancestros
-    if (this.task?.parent) {
-      this.loadAncestors(this.task.parent.id);
-    }
-  }
-
-  /**
-   * Carga los ancestros de una tarea
-   */
-  private loadAncestors(taskId: number) {
-    // Esta función debería cargar los ancestros desde el servicio
-    // Por ahora solo agregamos el padre directo
     if (this.task?.parent) {
       this.taskAncestors = [this.task.parent];
     }
@@ -179,21 +301,16 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    */
   getTotalChildrenCount(task: IncidenceDetail | IncidenceDetailChild): number {
     let count = 0;
-
     const countChildren = (children?: IncidenceDetailChild[]): void => {
       if (!children) return;
-
       children.forEach(child => {
         count++;
-
         if (child.children?.length) {
           countChildren(child.children);
         }
       });
     };
-
     countChildren(task.children);
-
     return count;
   }
 
@@ -208,8 +325,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    * Navega a una tarea específica
    */
   navigateToTask(taskId: number) {
-    if (taskId === this.taskId) return; // Ya estamos en esta tarea
-
+    if (taskId === this.taskId) return;
     this.router.navigate(
       ['/project-management/projects/kanban', this.projectId, 'task-details', taskId],
       { queryParamsHandling: 'merge' }
@@ -222,7 +338,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       this.projectId,
       'create-task',
       columnId
-    ])
+    ]);
   }
 
   /**
@@ -234,6 +350,18 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       summary: summary,
       detail: detail,
       life: 5000
+    });
+  }
+
+  /**
+   * Muestra un mensaje de éxito
+   */
+  private showSuccess(summary: string, detail: string) {
+    this.messageService.add({
+      severity: 'success',
+      summary: summary,
+      detail: detail,
+      life: 3000
     });
   }
 
@@ -290,7 +418,6 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    */
   editTask(taskId: number | undefined): void {
     if (!taskId) return;
-
     this.router.navigate([
       '/project-management/projects/kanban',
       this.projectId,
@@ -304,7 +431,6 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    */
   getUserInitials(name: string): string {
     if (!name) return '?';
-
     return name
       .split(' ')
       .map(word => word.charAt(0))

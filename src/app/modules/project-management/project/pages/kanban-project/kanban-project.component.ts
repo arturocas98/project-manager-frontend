@@ -103,7 +103,7 @@ export class KanbanProjectComponent  implements OnInit, OnDestroy {
 
   typeOptions: TypeOption[] = [
     { label: 'Task', value: 'task', icon: 'pi pi-check-square' },
-    { label: 'Bug', value: 'bug', icon: 'pi pi-bug' },
+    { label: 'Bug', value: 'bug', icon: 'pi pi-exclamation-triangle' },
     { label: 'Subtask', value: 'subtask', icon: 'pi pi-sitemap' },
     { label: 'History', value: 'history_user', icon: 'pi pi-history' }
   ];
@@ -657,4 +657,20 @@ export class KanbanProjectComponent  implements OnInit, OnDestroy {
     // Si no aplica ninguna condición especial, usar el color del estado original
     return task.state?.color || 'E5E7EB'; // Gris por defecto
   }
+  /**
+   * Traduce la prioridad del backend a español para mostrar en pantalla
+   */
+  getPriorityDisplay(priority: string | null): string {
+    if (!priority) return '';
+
+    const priorityMap: Record<string, string> = {
+      'critical': 'crítico',
+      'high': 'alto',
+      'medium': 'medio',
+      'low': 'bajo'
+    };
+
+    return priorityMap[priority.toLowerCase()] || priority;
+  }
+
 }

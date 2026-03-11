@@ -188,7 +188,7 @@
               <span class="text-xs" *ngIf="task.type?.type">· {{ task.type.type }}</span>
             </div>
             <p-tag
-              [value]="task.priority || 'Sin prioridad'"
+              [value]="getPriorityDisplay(task.priority)"
               [severity]="getPrioritySeverity(task.priority)"
               styleClass="text-xs">
             </p-tag>
@@ -198,6 +198,16 @@
           <p class="text-sm mb-2 line-height-2">
             {{ task.title }}
           </p>
+
+          <!-- Categoría de la tarea -->
+          <div *ngIf="task.category?.name" class="mb-2">
+            <p-tag
+              [value]="task.category.name"
+              severity="info"
+              styleClass="text-xs"
+              [rounded]="true">
+            </p-tag>
+          </div>
 
           <!-- Descripción (truncada) -->
           <p *ngIf="task.description" class="text-xs mb-3 line-height-2">
@@ -226,7 +236,6 @@
               </p-avatar>
             </div>
 
-
             <!-- Acciones -->
             <div class="flex gap-1">
               <button
@@ -248,7 +257,6 @@
             </div>
           </div>
 
-
           <!-- Badge de due date si existe -->
           <span *ngIf="task.due_date"
                 class="text-xs flex align-items-center gap-1 px-2 py-1 border-round"
@@ -257,30 +265,32 @@
                 [class.text-orange-700]="isNearDueDate(task.due_date) && !isOverdue(task.due_date)"
                 [class.text-red-700]="isOverdue(task.due_date)"
                 [pTooltip]="'Vence: ' + (task.due_date | date:'dd/MM/yyyy')">
-        <i class="pi pi-clock"></i>
+            <i class="pi pi-clock"></i>
             {{ task.due_date | date:'dd/MM' }}
-      </span>
-
+          </span>
 
           <!-- Badge de tarea padre (si es subtarea) -->
           <div *ngIf="task.parent" class="mt-2 border-top-1 surface-border gap-1">
-                 <span class="mb-2 text-xs flex align-items-center gap-2">
-      <i class="pi pi-sitemap text-xs"></i>
-      Subtarea de: {{ task.parent.title }}
-    </span>
+            <span class="mb-2 text-xs flex align-items-center gap-2">
+              <i class="pi pi-sitemap text-xs"></i>
+              Subtarea de: {{ task.parent.title }}
+            </span>
           </div>
+
+          <!-- Fecha de creación -->
           <div *ngIf="task.created_by" class="mt-1">
-   <span class="text-xs flex align-items-center gap-1">
-        <i class="pi pi-calendar text-xs"></i>
-     {{ task.created_at | date:'dd/MM' }}
-      </span>
+            <span class="text-xs flex align-items-center gap-1">
+              <i class="pi pi-calendar text-xs"></i>
+              {{ task.created_at | date:'dd/MM' }}
+            </span>
           </div>
-          <!-- Badge de creador (opcional) -->
+
+          <!-- Badge de creador -->
           <div *ngIf="task.created_by" class="mt-1">
-    <span class="text-xs flex align-items-center gap-1">
-      <i class="pi pi-user text-xs"></i>
-      Creado por: {{ task.created_by.name }}
-    </span>
+            <span class="text-xs flex align-items-center gap-1">
+              <i class="pi pi-user text-xs"></i>
+              Creado por: {{ task.created_by.name }}
+            </span>
           </div>
 
         </div>
@@ -333,16 +343,17 @@
             (onChange)="applyPriorityFilter(priority.value)">
           </p-checkbox>
           <label [for]="'priority_' + priority.value" class="ml-2 flex align-items-center gap-1">
-            <i [class]="priority.icon + ' mr-1'" [class.text-red-500]="priority.value === 'critical'"
+            <i [class]="priority.icon + ' mr-1'"
+               [class.text-red-500]="priority.value === 'critical'"
                [class.text-orange-500]="priority.value === 'high'"
                [class.text-yellow-500]="priority.value === 'medium'"
-               [class.text-green-500]="priority.value === 'low'"></i>
-            {{ priority.label }}
+               [class.text-green-500]="priority.value === 'low'">
+            </i>
+            {{ getPriorityDisplay(priority.value) }}
           </label>
         </div>
       </div>
     </div>
-
     <!-- Filtro por tipo -->
     <div>
       <label class="block font-medium mb-2">Tipo</label>
@@ -378,7 +389,6 @@
               [label]="member.user.name[0]"
               shape="circle"
               size="normal"
-              [style.background]="getAssigneeColor(member.user.name)"
               class="text-white">
             </p-avatar>
             <span>{{ member.user.name }}</span>

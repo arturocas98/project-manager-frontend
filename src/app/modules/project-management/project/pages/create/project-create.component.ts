@@ -7,12 +7,12 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ChipsModule } from 'primeng/chips';
 import { AvailableRole } from '../../../../../shared/models/projects-models/project-create-response';
-import { Router } from '@angular/router';
 import { ProjectService } from '../../../../../core/service/project.service';
 import { ProjectRequest } from '../../../../../shared/models/projects-models/project-request';
 import { TagModule } from 'primeng/tag';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 
 @Component({
   selector: 'app-project-create',
@@ -34,9 +34,26 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 })
 export class ProjectCreateComponent {
   projectForm = this.fb.group({
-    name: ['', Validators.required],
-    description: ['', Validators.required],
-    contract_admin: [''],
+    // Datos básicos del proyecto
+    ContractNo: ['', Validators.required],
+    client: ['', Validators.required],
+    project_type: ['', Validators.required],
+    objectContract: [''],
+
+    // Fechas y duración
+    start_date: ['', Validators.required],
+    duration_days: [0],
+    end_date: [{ value: '', disabled: true }],
+
+    // Información de contacto y empresa
+    administrator_email: ['', [Validators.email]],
+    contracted_company: [''],
+
+    // Estado del proyecto
+    project_state_id: [1, Validators.required],
+
+    // Fase opcional
+    last_phase: ['']
   });
 
   loading = false;
@@ -46,25 +63,64 @@ export class ProjectCreateComponent {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
     private projectService: ProjectService,
     public confirmationService: ConfirmationService
-  ) {}
+  ) {
+    // Calcular end_date automáticamente cuando cambian start_date o duration_days
+    this.setupEndDateCalculation();
+  }
+
+  private setupEndDateCalculation(): void {
+    this.projectForm.get('start_date')?.valueChanges.subscribe(() => {
+      this.calculateEndDate();
+    });
+
+    this.projectForm.get('duration_days')?.valueChanges.subscribe(() => {
+      this.calculateEndDate();
+    });
+  }
+
+  private calculateEndDate(): void {
+    const startDate = this.projectForm.get('start_date')?.value;
+    const durationDays = this.projectForm.get('duration_days')?.value;
+
+    if (startDate && durationDays && durationDays > 0) {
+      const start = new Date(startDate);
+      const end = new Date(start);
+      end.setDate(start.getDate() + durationDays);
+
+      // Formatear fecha como YYYY-MM-DD
+      const endDateStr = end.toISOString().split('T')[0];
+      this.projectForm.patchValue({ end_date: endDateStr });
+    } else {
+      this.projectForm.patchValue({ end_date: '' });
+    }
+  }
 
   onSubmit() {
     if (this.projectForm.valid) {
-      // Limpiar mensajes anteriores
       this.loading = true;
       this.errorMessage = null;
 
+      // Obtener el valor de end_date calculado
+      const formValue = this.projectForm.getRawValue();
+
       const projectData: ProjectRequest = {
-        name: this.projectForm.value.name!,
-        description: this.projectForm.value.description!,
+        ContractNo: formValue.ContractNo!,
+        client: formValue.client!,
+        project_type: formValue.project_type!,
+        start_date: formValue.start_date!,
+        duration_days: formValue.duration_days || undefined,
+        end_date: formValue.end_date || undefined,
+        administrator_email: formValue.administrator_email || undefined,
+        contracted_company: formValue.contracted_company || undefined,
+        last_phase: formValue.last_phase || undefined,
+        project_state_id: formValue.project_state_id!,
+        objectContract: formValue.objectContract || undefined
       };
 
       console.log('Enviando datos:', projectData);
 
-      // Usar el servicio createProject
       this.projectService.createProject(projectData).subscribe({
         next: response => {
           console.log('Respuesta del servidor:', response);
@@ -73,10 +129,13 @@ export class ProjectCreateComponent {
           this.availableRoles = response.available_roles;
 
           this.loading = false;
-          this.projectForm.reset();
+          this.projectForm.reset({
+            project_state_id: 1, // Resetear al estado por defecto
+            duration_days: 0
+          });
 
-          // Mostrar diálogo de éxito
-          this.showSuccessDialog(response.project.name);
+          // Mostrar diálogo de éxito con el nombre del cliente o ContractNo
+          this.showSuccessDialog(response.project.client || response.project.ContractNo);
         },
         error: error => {
           console.error('Error creando proyecto:', error);
@@ -85,14 +144,10 @@ export class ProjectCreateComponent {
         },
       });
     } else {
-      // Marcar todos los campos como tocados para mostrar errores
       this.projectForm.markAllAsTouched();
     }
   }
 
-  /**
-   * Muestra el diálogo de confirmación de éxito
-   */
   showSuccessDialog(projectName: string) {
     this.confirmationService.confirm({
       message: `El proyecto "${projectName}" ha sido creado exitosamente.`,
@@ -101,16 +156,10 @@ export class ProjectCreateComponent {
       rejectLabel: 'Cerrar',
       acceptIcon: 'pi pi-eye',
       rejectIcon: 'pi pi-times',
-
-      // Personalización de estilos
       acceptButtonStyleClass: 'p-button-success p-button-raised',
       rejectButtonStyleClass: 'p-button-text p-button-secondary',
-
-      // Personalización de colores (verde oscuro para el texto)
       defaultFocus: 'accept',
-
       reject: () => {
-        // Solo cerrar el diálogo
         console.log('Diálogo cerrado');
       },
     });

@@ -3,6 +3,7 @@ export interface TaskCreateModelRequest {
   description: string;
   incidence_priority_id: number;
   incidence_type_id: number;
+  incidence_category_id: number;
   incidence_state_id: number | null;
   assigned_user_id: number | null;
   parent_incidence_id: number | null;
@@ -13,6 +14,7 @@ export interface TaskCreateModelRequest {
 export interface TaskUpdateModelRequest {
   title: string | null;
   description: string | null;
+  incidence_category_id: number | null;
   incidence_priority_id: number | null;
   incidence_type_id: number | null;
   parent_incidence_id: number | null;
@@ -85,6 +87,7 @@ export interface IncidenceDetail {
   start_date: string | null;
 
   type: IncidenceType | null;
+  category: IncidenceCategory | null;
   state: IncidenceState | null;
 
   created_by: CreatedBy | null;
@@ -120,6 +123,20 @@ export interface IncidenceType {
   id: number;
   type: string;
 }
+
+
+export interface IncidenceType {
+  id: number;
+  type: string;
+}
+
+export interface IncidenceCategory {
+  id: number;
+  name: string;
+  description: string;
+  code: string;
+}
+
 
 export interface IncidenceState {
   id: number;

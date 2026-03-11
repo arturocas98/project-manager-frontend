@@ -1,30 +1,38 @@
 export interface Project {
   id: number;
-  name: string;
-  key: string;
-  description?: string;
+
+  ContractNo: string;
+  client: string;
+  project_type: string;
+  objectContract: string;
+
+  start_date?: string;
+  end_date?: string;
+  duration_days?: number;
+
+  administrator_email?: string;
+  contracted_company?: string;
+  last_phase?: string;
+
   created_at?: string;
-  created_by?: {
+
+  administrator?: {
     id: number;
     name: string;
     email: string;
   };
+
+  state?: {
+    id: number;
+    name: string;
+  };
+
   user_role?: {
     id: number;
     type: string;
   } | null;
+
   stats?: {
     members_count?: number;
   };
-}
-export interface RawProjectResponse {
-  data: {
-    [key: string]: {  // Índices numéricos como "0", "1", "2"
-      data: Project;   // El proyecto real está aquí
-      links?: any;
-      meta?: any;
-    }
-  };
-  links?: any;
-  meta?: any;
 }

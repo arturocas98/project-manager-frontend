@@ -1,13 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import {Project, RawProjectResponse} from "src/app/shared/models/project";
+import {Project} from "src/app/shared/models/project";
 import { Role } from "src/app/shared/models/role";
 import { environment } from "src/environments/environment";
-import {ApiListResponse, ApiResponse, ApiSingleResponse} from "../../shared/models/api-response.model";
+import {ApiSingleResponse} from "../../shared/models/api-response.model";
 import {map, Observable} from "rxjs";
 import {ApiService} from "./api.service";
 import {ProjectSummaryData} from "../../shared/models/summary-response";
-import {UserUnassigned} from "../../shared/models/projects-models/userunassigned-model";
 import {
   ProjectMemberRequest, ProjectMemberUpdateRequest,
   ProjectRequest,
@@ -22,14 +21,7 @@ import {
   TaskUpdateModelRequest
 } from "../../shared/models/task-models/task-create-model";
 import {unassignedUsersData} from "../../shared/models/auth";
-
-export interface RoleCollectionResponse {
-  data: Role[];
-}
-
-export interface RoleResponse {
-  data: Role;
-}
+import {CommentResponse} from "../../shared/models/task-models/CommentResponse";
 
 @Injectable({
   providedIn: "root",
@@ -37,23 +29,13 @@ export interface RoleResponse {
 export class ProjectService {
   constructor(private http: HttpClient, private apiService: ApiService) {}
 
-  getAll(): Observable<ApiListResponse<Project>> {
-    return this.http.get<RawProjectResponse>(`${environment.apiUrl}/projects`)
+  getAll(): Observable<Project[]> {
+    return this.apiService
+      .get<any[]>('projects')
       .pipe(
-        map(rawResponse => {
-          // Transformar la estructura anidada a un array plano de proyectos
-          const projectsArray = Object.values(rawResponse.data).map(item => item.data);
-
-          // Devolver en el formato que espera ApiListResponse
-          return {
-            data: projectsArray,
-            links: rawResponse.links,
-            meta: rawResponse.meta
-          };
-        })
+        map(response => response.map(item => item.data))
       );
   }
-
   getProjectSummary(projectId: number): Observable<ProjectSummaryData> {
     return this.apiService.get<ProjectSummaryData>(`projects/${projectId}/summary`);
   }
@@ -104,16 +86,45 @@ export class ProjectService {
     return this.apiService.get<unassignedUsersData[]>(`projects/${projectId}/unassigned-users`);
   }
 
-  // Para un proyecto específico (show)
-  getById(id: number) {
-    return this.http.get<ApiSingleResponse<Project>>(
-      `${environment.apiUrl}/projects/${id}`
-    );
-  }
-
-  // Para crear (store)
   createProject(projectData: ProjectRequest): Observable<ProjectCreationData> {
     return this.apiService.post<ProjectCreationData>('projects', projectData);
+  }
+
+  /*comentarios*/
+  getComments(projectId: number, taskId:number): Observable<CommentResponse[]> {
+    // GET /projects/{project}/incidences/{incidence}/comments
+    return this.apiService
+      .get<{ data: CommentResponse }[]>(`projects/${projectId}/incidences/${taskId}/comments`)
+      .pipe(
+        map(responseArray => responseArray.map(item => item.data)) // extraemos solo data
+      );
+  }
+
+// Crear un nuevo comentario
+  createComment(projectId: number, taskId: number, description: string): Observable<CommentResponse> {
+    // POST /projects/{project}/incidences/{incidence}/comments
+    return this.apiService
+      .post<{ data: CommentResponse }>(`projects/${projectId}/incidences/${taskId}/comments`, { description })
+      .pipe(
+        map(res => res.data) // extraemos solo data
+      );
+  }
+
+// Actualizar un comentario existente
+  updateComment(projectId: number, taskId: number, commentId: number, description: string): Observable<CommentResponse> {
+    // PUT /projects/{project}/incidences/{incidence}/comments/{commentId}
+    return this.apiService
+      .put<{ data: CommentResponse }>(`projects/${projectId}/incidences/${taskId}/comments/${commentId}`, { description })
+      .pipe(
+        map(res => res.data) // extraemos solo data
+      );
+  }
+
+// Eliminar un comentario
+  deleteComment(projectId: number, taskId: number, commentId: number): Observable<void> {
+    // DELETE /projects/{project}/incidences/{incidence}/comments/{commentId}
+    return this.apiService
+      .delete<void>(`projects/${projectId}/incidences/${taskId}/comments/${commentId}`);
   }
 
 }

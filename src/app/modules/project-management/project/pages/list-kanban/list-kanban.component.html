@@ -1,0 +1,512 @@
+<div class="list-container p-4 surface-ground min-h-screen">
+
+  <!-- Barra de herramientas superior (igual que en kanban) -->
+  <div class="flex flex-column md:flex-row gap-3 align-items-center justify-content-between mb-4">
+
+    <!-- Título y contadores -->
+    <div class="flex align-items-center gap-3">
+      <h1 class="text-2xl font-bold text-color m-0">Lista de Tareas</h1>
+      <span class="text-color-secondary text-sm">
+        {{ totalTasks }} tareas
+      </span>
+    </div>
+
+    <!-- Barra de búsqueda y filtros (idéntica al kanban) -->
+    <div class="flex flex-wrap gap-2 align-items-center">
+      <!-- Búsqueda -->
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          [formControl]="searchControl"
+          placeholder="Buscar tarea..."
+          class="p-inputtext-sm"
+          style="width: 250px;">
+      </span>
+
+      <!-- Botón de filtros -->
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-filter"
+        class="p-button-outlined p-button-sm"
+        [class.p-button-info]="filtersActive"
+        (click)="showFilters()">
+        <span *ngIf="getActiveFiltersCount() > 0" class="ml-1 bg-primary text-white border-circle px-2 py-1 text-xs">
+          {{ getActiveFiltersCount() }}
+        </span>
+      </button>
+
+      <!-- Botón limpiar filtros -->
+      <button
+        *ngIf="filtersActive"
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-filter-slash"
+        class="p-button-text p-button-sm"
+        (click)="clearFilters()"
+        pTooltip="Limpiar filtros">
+      </button>
+
+      <!-- Separador -->
+      <span class="text-color-secondary mx-2">|</span>
+
+      <!-- Avatares de miembros -->
+      <div class="flex align-items-center gap-1">
+        <span class="text-color-secondary text-sm mr-2">Miembros:</span>
+        <div class="flex -space-x-2">
+          <p-avatar
+            *ngFor="let member of members | slice:0:5"
+            [label]="member.user.name[0]"
+            shape="circle"
+            size="normal"
+            class="border-circle border-2 border-white cursor-pointer"
+            [pTooltip]="member.user.name + ' (' + member.role.type + ')'"
+            tooltipPosition="top">
+          </p-avatar>
+          <p-avatar
+            *ngIf="members.length > 5"
+            label="+{{ members.length - 5 }}"
+            shape="circle"
+            size="normal"
+            styleClass="bg-gray-300 text-gray-700 border-circle border-2 border-white"
+            [pTooltip]="'Y ' + (members.length - 5) + ' miembros más'">
+          </p-avatar>
+        </div>
+      </div>
+
+      <!-- Botones de vista (Board/Lista) -->
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-th-large"
+        class="p-button-text p-button-sm"
+        [class.text-primary]="viewMode === 'board'"
+        (click)="changeView('board')"
+        pTooltip="Vista Board">
+      </button>
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-list"
+        class="p-button-text p-button-sm"
+        [class.text-primary]="viewMode === 'list'"
+        (click)="changeView('list')"
+        pTooltip="Vista Lista">
+      </button>
+
+      <!-- Menú de ordenamiento -->
+      <p-menu #menu [model]="sortMenuItems" [popup]="true"></p-menu>
+      <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-sort"
+        class="p-button-text p-button-sm"
+        (click)="openSortMenu($event)"
+        pTooltip="Ordenar tareas">
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-content-center align-items-center" style="height: 400px;">
+    <i class="pi pi-spin pi-spinner" style="font-size: 3rem; color: var(--indigo-600)"></i>
+  </div>
+
+  <!-- Vista de Lista -->
+  <div *ngIf="!loading" class="list-view">
+
+    <!-- Selector de columna (filtro por estado) -->
+    <div class="flex align-items-center gap-3 mb-4 flex-wrap">
+      <span class="font-medium text-color">Filtrar por estado:</span>
+      <div class="flex gap-2 flex-wrap">
+        <button
+          *ngFor="let column of columns"
+          pButton
+          pRipple
+          type="button"
+          [label]="column.title + ' (' + column.tasks.length + ')'"
+          [class]="selectedColumn === column.id ? 'p-button-primary' : 'p-button-outlined'"
+          class="p-button-sm"
+          (click)="filterByColumn(column.id)">
+        </button>
+        <button
+          *ngIf="selectedColumn"
+          pButton
+          pRipple
+          type="button"
+          icon="pi pi-times"
+          label="Limpiar filtro"
+          class="p-button-text p-button-sm"
+          (click)="clearColumnFilter()">
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de tareas con PrimeNG -->
+    <p-table
+      #dt
+      [value]="filteredTasks"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [loading]="loading"
+      styleClass="p-datatable-sm p-datatable-striped"
+      [globalFilterFields]="['title', 'description', 'id', 'assigned_to.name', 'type.type', 'category.name']"
+      sortMode="multiple"
+      dataKey="id">
+
+      <!-- Header con filtros rápidos -->
+      <ng-template pTemplate="caption">
+        <div class="flex justify-content-between align-items-center flex-wrap gap-2">
+          <span class="text-xl font-bold">Todas las tareas</span>
+          <button
+            pButton
+            pRipple
+            label="Nueva tarea"
+            icon="pi pi-plus"
+            class="p-button-primary p-button-sm"
+            (click)="createTask()">
+          </button>
+        </div>
+      </ng-template>
+
+      <!-- Columnas de la tabla -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+          <th pSortableColumn="type.type">Tipo <p-sortIcon field="type.type"></p-sortIcon></th>
+          <th pSortableColumn="title">Título <p-sortIcon field="title"></p-sortIcon></th>
+          <th pSortableColumn="state.state">Estado <p-sortIcon field="state.state"></p-sortIcon></th>
+          <th pSortableColumn="priority">Prioridad <p-sortIcon field="priority"></p-sortIcon></th>
+          <th pSortableColumn="assigned_to.name">Asignado a <p-sortIcon field="assigned_to.name"></p-sortIcon></th>
+          <th pSortableColumn="due_date">Fecha vencimiento <p-sortIcon field="due_date"></p-sortIcon></th>
+          <th pSortableColumn="created_at">Creado <p-sortIcon field="created_at"></p-sortIcon></th>
+          <th>Acciones</th>
+        </tr>
+
+        <!-- Fila de filtros - CORREGIDA con manejo de eventos tipado -->
+        <tr>
+          <th>
+            <input
+              pInputText
+              type="text"
+              (input)="dt.filter($any($event.target).value, 'id', 'equals')"
+              placeholder="ID"
+              class="p-column-filter w-full">
+          </th>
+          <th>
+            <p-dropdown
+              [options]="typeOptions"
+              optionLabel="label"
+              optionValue="value"
+              (onChange)="dt.filter($event.value, 'type.type', 'equals')"
+              placeholder="Tipo"
+              [showClear]="true"
+              class="w-full">
+            </p-dropdown>
+          </th>
+          <th>
+            <input
+              pInputText
+              type="text"
+              (input)="dt.filter($any($event.target).value, 'title', 'contains')"
+              placeholder="Buscar título"
+              class="p-column-filter w-full">
+          </th>
+          <th>
+            <p-multiSelect
+              [options]="columnOptions"
+              optionLabel="title"
+              optionValue="id"
+              (onChange)="dt.filter($event.value, 'state.id', 'in')"
+              placeholder="Estado"
+              [showHeader]="false"
+              class="w-full">
+            </p-multiSelect>
+          </th>
+          <th>
+            <p-multiSelect
+              [options]="priorityOptions"
+              optionLabel="label"
+              optionValue="value"
+              (onChange)="dt.filter($event.value, 'priority', 'in')"
+              placeholder="Prioridad"
+              [showHeader]="false"
+              class="w-full">
+            </p-multiSelect>
+          </th>
+          <th>
+            <p-multiSelect
+              [options]="assigneeOptions"
+              optionLabel="label"
+              optionValue="value"
+              (onChange)="dt.filter($event.value, 'assigned_to.id', 'in')"
+              placeholder="Asignado"
+              [showHeader]="false"
+              class="w-full">
+            </p-multiSelect>
+          </th>
+          <th>
+            <p-calendar
+              (onSelect)="dt.filter($event, 'due_date', 'equals')"
+              placeholder="Fecha"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              class="w-full">
+            </p-calendar>
+          </th>
+          <th>
+            <p-calendar
+              (onSelect)="dt.filter($event, 'created_at', 'equals')"
+              placeholder="Fecha"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              class="w-full">
+            </p-calendar>
+          </th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <!-- Cuerpo de la tabla -->
+      <ng-template pTemplate="body" let-task>
+        <tr [style]="{'border-left': '4px solid #' + getTaskAccentColor(task)}">
+          <td class="font-medium">#{{ task.id }}</td>
+          <td>
+            <div class="flex align-items-center gap-1">
+              <i [class]="getTypeIcon(task.type?.type || 'task')" class="text-sm"></i>
+              <span>{{ task.type?.type || 'task' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="flex flex-column">
+              <span class="font-medium">{{ task.title }}</span>
+              <span *ngIf="task.category?.name" class="text-xs text-color-secondary">{{ task.category.name }}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag
+              [value]="task.state?.state || ''"
+              [style]="{ 'background-color': '#' + task.state?.color }"
+              class="text-xs">
+            </p-tag>
+          </td>
+          <td>
+            <p-tag
+              [value]="getPriorityDisplay(task.priority)"
+              [severity]="getPrioritySeverity(task.priority)"
+              styleClass="text-xs">
+            </p-tag>
+          </td>
+          <td>
+            <div class="flex align-items-center gap-2">
+              <p-avatar
+                *ngIf="task.assigned_to"
+                [label]="task.assigned_to.name[0]"
+                shape="circle"
+                size="normal"
+                [style]="{ 'background-color': getAssigneeColor(task.assigned_to.name), color: 'white' }"
+                [pTooltip]="task.assigned_to.name">
+              </p-avatar>
+              <p-avatar
+                *ngIf="!task.assigned_to"
+                label="?"
+                shape="circle"
+                size="normal"
+                [style]="{ 'background-color': '#6b7280', color: 'white' }"
+                pTooltip="Sin asignar">
+              </p-avatar>
+              <span>{{ task.assigned_to?.name || 'Sin asignar' }}</span>
+            </div>
+          </td>
+          <td>
+            <span *ngIf="task.due_date"
+                  class="flex align-items-center gap-1"
+                  [class.text-orange-600]="isNearDueDate(task.due_date) && !isOverdue(task.due_date)"
+                  [class.text-red-600]="isOverdue(task.due_date)">
+              <i class="pi pi-calendar"></i>
+              {{ task.due_date | date:'dd/MM/yyyy' }}
+            </span>
+            <span *ngIf="!task.due_date" class="text-color-secondary">-</span>
+          </td>
+          <td>
+            <span class="flex align-items-center gap-1">
+              <i class="pi pi-user text-xs"></i>
+              {{ task.created_by?.name || 'Sistema' }}
+              <span class="text-xs text-color-secondary">({{ task.created_at | date:'dd/MM/yy' }})</span>
+            </span>
+          </td>
+          <td>
+            <div class="flex gap-1">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-eye"
+                class="p-button-text p-button-rounded p-button-sm"
+                (click)="viewTask(task.id)"
+                pTooltip="Ver detalles">
+              </button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-text p-button-rounded p-button-sm"
+                (click)="editTask(task.id)"
+                pTooltip="Editar">
+              </button>
+              <button
+                *ngIf="task.parent"
+                pButton
+                type="button"
+                icon="pi pi-sitemap"
+                class="p-button-text p-button-rounded p-button-sm"
+                (click)="viewParentTask(task.parent.id)"
+                pTooltip="Ver tarea padre">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty state -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9" class="text-center p-4">
+            <div class="flex flex-column align-items-center justify-content-center p-4">
+              <i class="pi pi-inbox text-4xl text-color-secondary mb-2"></i>
+              <p class="text-color-secondary">No se encontraron tareas</p>
+              <button
+                pButton
+                type="button"
+                label="Crear primera tarea"
+                icon="pi pi-plus"
+                class="p-button-text p-button-sm"
+                (click)="createTask()">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- Resumen de tareas -->
+    <div class="flex justify-content-between align-items-center mt-3 p-2 surface-card border-round">
+      <div class="flex gap-3 flex-wrap">
+        <div *ngFor="let column of columns" class="flex align-items-center gap-2">
+          <div class="w-2 h-2 border-round" [style.background]="'#' + column.color"></div>
+          <span class="text-sm">{{ column.title }}:</span>
+          <span class="font-medium text-sm">{{ column.tasks.length }}</span>
+        </div>
+      </div>
+      <span class="text-sm text-color-secondary">Total: {{ totalTasks }} tareas</span>
+    </div>
+  </div>
+</div>
+
+<!-- Panel de filtros (Sidebar) - IGUAL que en kanban -->
+<p-sidebar [(visible)]="showFiltersPanel" position="right" styleClass="w-25rem">
+  <ng-template pTemplate="header">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-filter"></i>
+      <span class="font-bold">Filtros</span>
+      <span *ngIf="getActiveFiltersCount() > 0" class="bg-red-500 text-white border-circle px-2 py-1 text-xs ml-2">
+        {{ getActiveFiltersCount() }}
+      </span>
+    </div>
+  </ng-template>
+
+  <div class="flex flex-column gap-4">
+    <!-- Filtro por prioridad -->
+    <div>
+      <label class="block font-medium mb-2">Prioridad</label>
+      <div class="flex flex-column gap-2">
+        <div *ngFor="let priority of priorityOptions" class="flex align-items-center">
+          <p-checkbox
+            [inputId]="'priority_' + priority.value"
+            [value]="priority.value"
+            [(ngModel)]="selectedPriorities"
+            (onChange)="applyPriorityFilter(priority.value)">
+          </p-checkbox>
+          <label [for]="'priority_' + priority.value" class="ml-2 flex align-items-center gap-1">
+            <i [class]="priority.icon + ' mr-1'"
+               [class.text-red-500]="priority.value === 'critical'"
+               [class.text-orange-500]="priority.value === 'high'"
+               [class.text-yellow-500]="priority.value === 'medium'"
+               [class.text-green-500]="priority.value === 'low'">
+            </i>
+            {{ getPriorityDisplay(priority.value) }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtro por tipo -->
+    <div>
+      <label class="block font-medium mb-2">Tipo</label>
+      <div class="flex flex-column gap-2">
+        <div *ngFor="let type of typeOptions" class="flex align-items-center">
+          <p-checkbox
+            [inputId]="'type_' + type.value"
+            [value]="type.value"
+            [(ngModel)]="selectedTypes"
+            (onChange)="applyTypeFilter(type.value)">
+          </p-checkbox>
+          <label [for]="'type_' + type.value" class="ml-2 flex align-items-center gap-1">
+            <i [class]="type.icon + ' mr-1'"></i>
+            {{ type.label }}
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtro por asignado -->
+    <div>
+      <label class="block font-medium mb-2">Asignado a</label>
+      <div class="flex flex-column gap-2 max-h-300px overflow-y-auto">
+        <div *ngFor="let member of members" class="flex align-items-center">
+          <p-checkbox
+            [inputId]="'assignee_' + member.user.id"
+            [value]="member.user.id"
+            [(ngModel)]="selectedAssignees"
+            (onChange)="applyAssigneeFilter(member.user.id)">
+          </p-checkbox>
+          <label [for]="'assignee_' + member.user.id" class="ml-2 flex align-items-center gap-2 cursor-pointer">
+            <p-avatar
+              [label]="member.user.name[0]"
+              shape="circle"
+              size="normal"
+              [style]="{ 'background-color': getAssigneeColor(member.user.name), color: 'white' }">
+            </p-avatar>
+            <span>{{ member.user.name }}</span>
+            <span class="text-xs text-color-secondary ml-1">({{ member.role.type }})</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="flex gap-2 mt-4">
+      <button
+        pButton
+        label="Limpiar filtros"
+        icon="pi pi-filter-slash"
+        class="p-button-outlined p-button-sm flex-1"
+        (click)="clearFilters()">
+      </button>
+      <button
+        pButton
+        label="Aplicar"
+        icon="pi pi-check"
+        class="p-button-sm flex-1"
+        (click)="applyFilters()">
+      </button>
+    </div>
+  </div>
+</p-sidebar>

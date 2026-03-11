@@ -66,19 +66,18 @@ export class ProjectListComponent implements OnInit {
     this.loading = true;
 
     this.projectService.getAll().subscribe({
-      next: (response: ApiListResponse<Project>) => {
-        this.projects = response.data;
-        console.log('Proyectos cargados:', this.projects);
-        this.loading = false;
+      next: (projects: Project[]) => {
+        this.projects = projects;
 
-        if (response.meta?.pagination) {
-          console.log('Total de proyectos:', response.meta.total);
-        }
+        console.log('Proyectos cargados:', this.projects);
+        console.log('Total de proyectos:', this.projects.length);
+
+        this.loading = false;
       },
       error: error => {
         console.error('Error cargando proyectos:', error);
         this.loading = false;
-      },
+      }
     });
   }
 }

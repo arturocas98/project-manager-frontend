@@ -21,6 +21,8 @@ import {unassignedUsersData} from "../../../../../shared/models/auth";
 import {ProjectMember} from "../../../../../shared/models/kanban.models";
 import {KanbanService} from "../../../../../core/service/kanban-service";
 import {TooltipModule} from "primeng/tooltip";
+import {Option} from "../../../../../shared/models/general";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-project-settings',
@@ -38,11 +40,30 @@ import {TooltipModule} from "primeng/tooltip";
     DropdownModule,
     DialogModule,
     TooltipModule,
-    NgForOf
+    NgForOf,
+    TranslateModule
   ],
   templateUrl: './project-settings.component.html',
 })
 export class ProjectSettingsComponent implements OnInit {
+  state_options: Option[] = [
+    {
+      id: 1,
+      name: 'abierto',
+    },
+    {
+      id: 2,
+      name: 'En proceso',
+    },
+    {
+      id: 3,
+      name: 'finalizado',
+    },
+    {
+      id: 3,
+      name: 'suspendido',
+    },
+  ];
   @ViewChild('cd') confirmDialog: any;
 
   projectForm: FormGroup;
@@ -76,10 +97,10 @@ export class ProjectSettingsComponent implements OnInit {
   // Opciones de roles
 
   roleOptions = [
-    { label: 'Leader', value: 'LDR' },
-    { label: 'Developer', value: 'DEV' },
-    { label: 'Tester', value: 'TST' },
-    { label: 'Documenter', value: 'DOC' }
+    { label: 'Lider', value: 'LDR' },
+    { label: 'Desarrollador', value: 'DEV' },
+      { label: 'Ensayador', value: 'TST' },
+    { label: 'Documentador', value: 'DOC' }
   ];
 
   // Formularios
@@ -98,8 +119,24 @@ export class ProjectSettingsComponent implements OnInit {
     private kanbanService: KanbanService
   ) {
     this.projectForm = this.fb.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required]
+      ContractNo: ['', Validators.required],
+      client: ['', Validators.required],
+      project_type: ['', Validators.required],
+
+      start_date: ['', Validators.required],
+
+      duration_days: [null],
+      end_date: [''],
+
+      administrator_email: [''],
+
+      contracted_company: [''],
+
+      last_phase: [''],
+
+      project_state_id: [null, Validators.required],
+
+      objectContract: ['']
     });
 
     this.addMemberForm = this.fb.group({
@@ -130,14 +167,25 @@ export class ProjectSettingsComponent implements OnInit {
     this.loading = true;
     this.projectService.getProject(this.projectId).subscribe({
       next: (project) => {
-        this.projectForm.patchValue({
-          name: project.name ?? '',
-          description: project.description ?? ''
-        });
+        console.log(project);
+          this.projectForm.patchValue({
+          ContractNo: project.ContractNo ?? '',
+          client: project.client ?? '',
+          project_type: project.project_type ?? '',
 
-        this.projectKey = project.key;
-        this.createdAt = project.created_at ? new Date(project.created_at) : null;
-        this.updatedAt = project.updated_at ? new Date(project.updated_at) : null;
+          start_date: project.start_date ?? '',
+          end_date: project.end_date ?? '',
+          duration_days: project.duration_days ?? null,
+
+          administrator_email: project.administrator?.email ?? '',
+
+          contracted_company: project.contracted_company ?? '',
+          last_phase: project.last_phase ?? '',
+
+          project_state_id: project.state?.id ?? null,
+
+          objectContract: project.objectContract ?? ''
+        });
 
         this.loading = false;
       },
@@ -384,8 +432,24 @@ export class ProjectSettingsComponent implements OnInit {
       this.errorMessage = null;
 
       const projectData: UpdateProjectRequest = {
-        name: this.projectForm.value.name,
-        description: this.projectForm.value.description
+        ContractNo: this.projectForm.value.ContractNo,
+        client: this.projectForm.value.client,
+        project_type: this.projectForm.value.project_type,
+
+        start_date: this.projectForm.value.start_date,
+
+        duration_days: this.projectForm.value.duration_days,
+        end_date: this.projectForm.value.end_date,
+
+        administrator_email: this.projectForm.value.administrator_email,
+
+        contracted_company: this.projectForm.value.contracted_company,
+
+        last_phase: this.projectForm.value.last_phase,
+
+        project_state_id: this.projectForm.value.project_state_id,
+
+        objectContract: this.projectForm.value.objectContract
       };
 
       this.projectService.updateProject(projectData, this.projectId).subscribe({

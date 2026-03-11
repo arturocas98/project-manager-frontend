@@ -50,15 +50,21 @@ export class ViewProjectComponent implements OnInit {
       icon: 'pi pi-calendar',
       command: () => this.router.navigate([
         '/project-management/projects/kanban',
-        this.projectId,
+        this.projectId,project-listkanban
         'project-timeline'
       ])
     },
+    */
     {
-      label: 'List',
+      label: 'lista kanban',
       icon: 'pi pi-list',
-      command: () => this.router.navigate(['backlog'])
+      command: () => this.router.navigate([
+        '/project-management/projects/kanban',
+        this.projectId,
+        'project-listkanban'
+      ])
     },
+    /*
     {
       label: 'Reports',
       icon: 'pi pi-chart-bar',
@@ -75,7 +81,7 @@ export class ViewProjectComponent implements OnInit {
       ])
     },
     {
-      label: 'Settings',
+      label: 'Configuracion',
       icon: 'pi pi-cog',
       command: () => this.router.navigate([
         '/project-management/projects/kanban',

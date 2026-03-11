@@ -66,6 +66,19 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     { label: 'Bug', value: 'bug' }
   ];
 
+  categories = [
+    { label: 'Desarrollo', value: 1 },
+    { label: 'Diseño', value: 2 },
+    { label: 'Documentación', value: 3 },
+    { label: 'Pruebas', value: 4 },
+    { label: 'Despliegue', value: 5 },
+    { label: 'Capacitación', value: 6 },
+    { label: 'Soporte/Validación', value: 7 },
+    { label: 'Corrección de errores', value: 8 },
+    { label: 'Reunión/Coordinación', value: 9 },
+    { label: 'Migración', value: 10 }
+  ];
+
   private readonly stateMap: Record<number, string> = {
     1: 'Asignado',
     2: 'Ejecutando',
@@ -90,6 +103,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     description: ['', Validators.required],
     priority: ['', Validators.required],
     type: ['', Validators.required],
+    category: ['', Validators.required],
     assigned_user_id: [null],
     parent_id: [null],
     start_date: [null], // Nuevo campo
@@ -421,6 +435,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       description: formValue.description || '',
       incidence_priority_id: this.getPriorityId(formValue.priority || 'medium'),
       incidence_type_id: this.getTypeId(formValue.type || 'task'),
+      incidence_category_id: formValue.category,
       incidence_state_id: this.stateId,
       assigned_user_id: formValue.assigned_user_id || null,
       start_date: formatDate(formValue.start_date) || new Date().toISOString().split('T')[0],
@@ -525,7 +540,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     const taskData = this.prepareTaskData();
-
+    console.log(taskData);
     this.projectService.createTask(taskData, this.projectId).subscribe({
       next: (response) => {
         this.loading = false;

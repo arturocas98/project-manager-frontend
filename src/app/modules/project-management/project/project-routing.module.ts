@@ -28,11 +28,11 @@ const routes: Routes = [
     children: [
       { path: "", redirectTo: "project-summary", pathMatch: "full" },
       {
-        path: "project-timeline",
-        data: { breadcrumb: "timeline" },
+        path: "project-listkanban",
+        data: { breadcrumb: "listkanban" },
         loadComponent: () =>
-          import("./pages/timeline/timeline.component").then(
-            (m) => m.TimelineComponent,
+          import("./pages/list-kanban/list-kanban.component").then(
+            (m) => m.ListKanbanComponent,
           ),
       },
       {

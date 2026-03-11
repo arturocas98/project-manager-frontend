@@ -2,14 +2,26 @@ export interface ProjectResponse {
   id: number;
   name: string;
   key: string;
-  description?: string;
-  created_at: string;
-  updated_at: string;
+  objectContract?: string;
+  ContractNo?: string;
+  start_date: string;
+  client: string;
+  contracted_company: string;
+  project_type: string;
+  last_phase: string;
+  end_date: string;
+  duration_days: string;
 
-  created_by: {
+  administrator: {
     id: number;
     name: string;
     email: string;
+  };
+
+
+  state: {
+    id: number;
+    name: string;
   };
 
   user_role: {

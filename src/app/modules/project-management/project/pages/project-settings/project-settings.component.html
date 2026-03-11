@@ -38,120 +38,190 @@
         <!-- Formulario de actualización -->
         <form [formGroup]="projectForm" (ngSubmit)="onUpdate()" class="flex flex-column gap-5" *ngIf="!loading">
 
-          <!-- Sección: Información General -->
           <div>
             <h3 class="text-lg font-semibold text-color mb-4 flex align-items-center gap-2">
               <i class="pi pi-info-circle text-indigo-500"></i>
               Información General
             </h3>
 
-            <!-- Nombre -->
+            <!-- ContractNo -->
             <div class="mb-4">
               <label class="block text-color font-medium mb-2">
-                Nombre del Proyecto
+                Número de Contrato
               </label>
 
               <div class="p-inputgroup">
-                <span class="p-inputgroup-addon">
-                  <i class="pi pi-folder"></i>
-                </span>
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-tag"></i>
+        </span>
                 <input
                   pInputText
-                  formControlName="name"
+                  formControlName="ContractNo"
                   class="w-full"
-                  placeholder="Ej: Sistema de Gestión Interna"
-                  [ngClass]="{'p-invalid': projectForm.get('name')?.invalid && projectForm.get('name')?.touched}">
+                  placeholder="Ej: CONT-003-2006">
               </div>
+            </div>
 
-              <small *ngIf="projectForm.get('name')?.invalid && projectForm.get('name')?.touched"
-                     class="p-error block mt-2">
-                El nombre es obligatorio
-              </small>
+            <!-- Tipo de Proyecto -->
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">
+                Tipo de Proyecto
+              </label>
+
+              <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-folder"></i>
+        </span>
+                <input
+                  pInputText
+                  formControlName="project_type"
+                  class="w-full"
+                  placeholder="Ej: Sistema Registral">
+              </div>
+            </div>
+
+            <!-- Cliente -->
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">
+                Cliente
+              </label>
+
+              <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-building"></i>
+        </span>
+                <input
+                  pInputText
+                  formControlName="client"
+                  class="w-full"
+                  placeholder="Ej: TECHTOGO">
+              </div>
+            </div>
+
+            <!-- Empresa contratada -->
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">
+                Empresa Contratada
+              </label>
+
+              <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">
+          <i class="pi pi-briefcase"></i>
+        </span>
+                <input
+                  pInputText
+                  formControlName="contracted_company"
+                  class="w-full">
+              </div>
             </div>
 
             <!-- Descripción -->
             <div class="mb-4">
               <label class="block text-color font-medium mb-2">
-                Descripción
+                Objeto del Contrato
               </label>
 
               <textarea
                 pInputTextarea
                 rows="4"
-                formControlName="description"
+                formControlName="objectContract"
                 class="w-full"
-                placeholder="Describe el propósito del proyecto"
-                [ngClass]="{'p-invalid': projectForm.get('description')?.invalid && projectForm.get('description')?.touched}">
-              </textarea>
-
-              <small *ngIf="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"
-                     class="p-error block mt-2">
-                La descripción es obligatoria
-              </small>
+                placeholder="Descripción del contrato">
+      </textarea>
             </div>
 
-            <!-- Key (solo lectura) -->
-            <div class="mb-4">
-              <label class="block text-color font-medium mb-2">
-                Key del Proyecto
-              </label>
-              <div class="p-inputgroup">
-                <span class="p-inputgroup-addon">
-                  <i class="pi pi-tag"></i>
-                </span>
+          </div>
+
+          <!-- Separador -->
+          <div class="border-top-1 surface-border my-2"></div>
+
+          <!-- Sección: Fechas -->
+          <div>
+            <h3 class="text-lg font-semibold text-color mb-4 flex align-items-center gap-2">
+              <i class="pi pi-calendar text-indigo-500"></i>
+              Fechas del Proyecto
+            </h3>
+
+            <div class="grid">
+
+              <div class="col-12 md:col-4">
+                <label class="block text-color font-medium mb-2">Inicio</label>
                 <input
                   pInputText
-                  [value]="projectKey"
-                  class="w-full surface-card"
-                  readonly
-                  disabled>
+                  type="date"
+                  formControlName="start_date"
+                  class="w-full">
               </div>
-              <small class="text-color-secondary block mt-2">
-                * El key se genera automáticamente y no puede modificarse
-              </small>
+
+              <div class="col-12 md:col-4">
+                <label class="block text-color font-medium mb-2">Fin</label>
+                <input
+                  pInputText
+                  type="date"
+                  formControlName="end_date"
+                  class="w-full">
+              </div>
+
+              <div class="col-12 md:col-4">
+                <label class="block text-color font-medium mb-2">Duración (días)</label>
+                <input
+                  pInputText
+                  type="number"
+                  formControlName="duration_days"
+                  class="w-full">
+              </div>
+
             </div>
           </div>
 
           <!-- Separador -->
           <div class="border-top-1 surface-border my-2"></div>
 
-          <!-- Sección: Fechas (solo lectura) -->
+          <!-- Sección: Administración -->
           <div>
             <h3 class="text-lg font-semibold text-color mb-4 flex align-items-center gap-2">
-              <i class="pi pi-calendar text-indigo-500"></i>
-              Información de Creación
+              <i class="pi pi-user text-indigo-500"></i>
+              Administración
             </h3>
 
             <div class="grid">
+
               <div class="col-12 md:col-6">
-                <label class="block text-color font-medium mb-2">Fecha de Creación</label>
-                <div class="p-inputgroup">
-                  <span class="p-inputgroup-addon">
-                    <i class="pi pi-calendar-plus"></i>
-                  </span>
-                  <input
-                    pInputText
-                    [value]="createdAt | date:'dd/MM/yyyy HH:mm'"
-                    class="w-full surface-card"
-                    readonly
-                    disabled>
-                </div>
+                <label class="block text-color font-medium mb-2">
+                  Email del Administrador
+                </label>
+                <input
+                  pInputText
+                  formControlName="administrator_email"
+                  class="w-full">
               </div>
+
               <div class="col-12 md:col-6">
-                <label class="block text-color font-medium mb-2">Última Actualización</label>
-                <div class="p-inputgroup">
-                  <span class="p-inputgroup-addon">
-                    <i class="pi pi-calendar-clock"></i>
-                  </span>
-                  <input
-                    pInputText
-                    [value]="updatedAt | date:'dd/MM/yyyy HH:mm'"
-                    class="w-full surface-card"
-                    readonly
-                    disabled>
-                </div>
+                <label class="block text-color font-medium mb-2">
+                  Estado del Proyecto
+                </label>
+                <p-dropdown
+                  [options]="state_options"
+                  optionLabel="name"
+                  optionValue="id"
+                  id="role"
+                  formControlName="project_state_id"
+                  [placeholder]="'Selecciona un estado'"
+                ></p-dropdown>
               </div>
+
+              <div class="col-12">
+                <label class="block text-color font-medium mb-2">
+                  Fase Actual
+                </label>
+                <input
+                  pInputText
+                  formControlName="last_phase"
+                  class="w-full">
+              </div>
+
             </div>
+
           </div>
 
           <!-- Separador -->
