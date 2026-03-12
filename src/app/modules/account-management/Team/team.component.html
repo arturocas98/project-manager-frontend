@@ -1,0 +1,354 @@
+<!-- team.component.html -->
+<div class="p-4">
+  <!-- Toast para notificaciones -->
+  <p-toast></p-toast>
+
+  <!-- Confirm Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Toolbar Principal -->
+  <p-toolbar class="mb-4 shadow-md rounded-lg">
+    <div class="p-toolbar-group-start flex gap-2">
+      <h1 class="text-2xl font-bold text-gray-800 m-0">Gestión de Equipos</h1>
+    </div>
+    <div class="p-toolbar-group-end">
+      <button
+        pButton
+        label="Nuevo Equipo"
+        icon="pi pi-plus"
+        class="p-button-success"
+        (click)="showTeamDialog()">
+      </button>
+    </div>
+  </p-toolbar>
+
+  <!-- Filtros -->
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
+    <span class="p-input-icon-left w-full">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        [(ngModel)]="filters.search"
+        (input)="onFilterChange()"
+        placeholder="Buscar por nombre..."
+        class="w-full"/>
+    </span>
+
+    <p-dropdown
+      [options]="typeOptions"
+      [(ngModel)]="filters.type"
+      (onChange)="loadTeams()"
+      placeholder="Todos los tipos"
+      optionLabel="label"
+      optionValue="value"
+      class="w-full">
+    </p-dropdown>
+
+    <p-dropdown
+      [options]="sortByOptions"
+      [(ngModel)]="filters.sort_by"
+      (onChange)="loadTeams()"
+      placeholder="Ordenar por"
+      optionLabel="label"
+      optionValue="value"
+      class="w-full">
+    </p-dropdown>
+
+    <p-dropdown
+      [options]="sortOrderOptions"
+      [(ngModel)]="filters.sort_order"
+      (onChange)="loadTeams()"
+      placeholder="Orden"
+      optionLabel="label"
+      optionValue="value"
+      class="w-full">
+    </p-dropdown>
+
+    <p-dropdown
+      [options]="perPageOptions"
+      [(ngModel)]="filters.per_page"
+      (onChange)="loadTeams()"
+      placeholder="Por página"
+      optionLabel="label"
+      optionValue="value"
+      class="w-full">
+    </p-dropdown>
+  </div>
+
+  <!-- Tabla de Equipos -->
+  <p-card class="shadow-md">
+    <p-table
+      #dt
+      [value]="teams"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="filters.per_page || 10"
+      [totalRecords]="totalRecords"
+      [lazy]="true"
+      (onLazyLoad)="loadTeamsLazy($event)"
+      dataKey="id"
+      styleClass="p-datatable-striped">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nombre</th>
+          <th>Tipo</th>
+          <th>Miembros</th>
+          <th>Creador</th>
+          <th>Fecha Creación</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-team>
+        <tr>
+          <td class="font-medium">{{ team.name }}</td>
+          <td>
+            <p-tag
+              [value]="team.type"
+              [severity]="getTagSeverity(team.type)">
+            </p-tag>
+          </td>
+          <td>
+            <div class="flex items-center gap-2">
+              <p-avatarGroup>
+                <p-avatar
+                  *ngFor="let member of team.members.slice(0, 3)"
+                  [label]="member.name.charAt(0)"
+                  shape="circle"
+                  size="normal">
+                </p-avatar>
+              </p-avatarGroup>
+              <span *ngIf="team.members.length > 3" class="text-sm text-gray-500">
+                +{{ team.members.length - 3 }}
+              </span>
+            </div>
+          </td>
+          <td>
+            <div class="flex items-center gap-2">
+              <p-avatar
+                [label]="team.created_by.name.charAt(0)"
+                shape="circle"
+                size="normal">
+              </p-avatar>
+              <span>{{ team.created_by.name }}</span>
+            </div>
+          </td>
+          <td>{{ team.created_at | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="flex gap-2">
+              <button
+                pButton
+                icon="pi pi-user-plus"
+                class="p-button-rounded p-button-success p-button-text"
+                (click)="openAddMemberDialog(team)"
+                pTooltip="Agregar miembro">
+              </button>
+              <button
+                pButton
+                icon="pi pi-eye"
+                class="p-button-rounded p-button-info p-button-text"
+                (click)="viewTeamDetails(team)"
+                pTooltip="Ver detalles">
+              </button>
+              <button
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-warning p-button-text"
+                (click)="editTeam(team)"
+                pTooltip="Editar">
+              </button>
+              <button
+                pButton
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-danger p-button-text"
+                (click)="confirmDeleteTeam(team)"
+                pTooltip="Eliminar">
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center p-4 text-gray-500">
+            No se encontraron equipos
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Dialog para crear/editar equipo -->
+  <p-dialog
+    [(visible)]="teamDialogVisible"
+    [style]="{width: '450px'}"
+    [header]="editingTeam ? 'Editar Equipo' : 'Nuevo Equipo'"
+    [modal]="true"
+    styleClass="p-fluid">
+
+    <div class="field mb-4">
+      <label for="name" class="font-medium block mb-2">Nombre del Equipo</label>
+      <input
+        id="name"
+        pInputText
+        [(ngModel)]="teamFormData.name"
+        required
+        class="w-full"
+        autofocus />
+    </div>
+
+    <div class="field mb-4">
+      <label for="type" class="font-medium block mb-2">Tipo</label>
+      <p-dropdown
+        id="type"
+        [options]="typeOptions"
+        [(ngModel)]="teamFormData.type"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecciona un tipo"
+        class="w-full">
+      </p-dropdown>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancelar" icon="pi pi-times" (click)="hideTeamDialog()" class="p-button-text"></button>
+      <button
+        pButton
+        [label]="editingTeam ? 'Actualizar' : 'Crear'"
+        icon="pi pi-check"
+        (click)="saveTeam()"
+        [disabled]="!teamFormData.name"
+        class="p-button-success">
+      </button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Dialog para agregar miembros -->
+  <p-dialog
+    [(visible)]="memberDialogVisible"
+    [style]="{width: '500px'}"
+    header="Agregar Miembro"
+    [modal]="true"
+    styleClass="p-fluid"
+    (onHide)="closeMemberDialog()">
+
+    <div class="mb-4">
+      <span class="p-input-icon-left w-full">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          [(ngModel)]="memberSearchTerm"
+          (input)="filterProfiles()"
+          placeholder="Buscar usuario..."
+          class="w-full"/>
+      </span>
+    </div>
+
+    <div *ngIf="loadingProfiles" class="flex justify-center p-4">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+
+    <div *ngIf="!loadingProfiles" class="overflow-auto" style="max-height: 400px;">
+      <div *ngFor="let profile of filteredProfiles" class="border-b border-gray-200 p-3 hover:bg-gray-50">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <p-avatar
+              [label]="profile.name.charAt(0)"
+              shape="circle"
+              size="normal">
+            </p-avatar>
+            <div>
+              <div class="font-medium">{{ profile.name }}</div>
+              <div class="text-sm text-gray-600">{{ profile.email }}</div>
+              <p-tag [value]="profile.role" [severity]="getRoleSeverity(profile.role)" styleClass="mt-1"></p-tag>
+            </div>
+          </div>
+          <button
+            pButton
+            icon="pi pi-plus"
+            class="p-button-rounded p-button-success"
+            (click)="addMemberToTeam(profile.id)"
+            [disabled]="isUserInTeam(profile.id)"
+            pTooltip="Agregar al equipo">
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="filteredProfiles.length === 0" class="text-center p-4 text-gray-500">
+        No se encontraron usuarios
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Cerrar" icon="pi pi-times" (click)="closeMemberDialog()" class="p-button-text"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Dialog de detalles del equipo -->
+  <p-dialog
+    [(visible)]="detailsDialogVisible"
+    [style]="{width: '600px'}"
+    [header]="selectedTeam?.name"
+    [modal]="true"
+    styleClass="p-fluid"
+    (onHide)="closeDetailsDialog()">
+
+    <div *ngIf="selectedTeam" class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="font-medium text-gray-600">Tipo:</label>
+          <p-tag [value]="selectedTeam.type" [severity]="getTagSeverity(selectedTeam.type)" class="ml-2"></p-tag>
+        </div>
+        <div>
+          <label class="font-medium text-gray-600">Creado:</label>
+          <span class="ml-2">{{ selectedTeam.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      </div>
+
+      <div>
+        <label class="font-medium text-gray-600">Creado por:</label>
+        <div class="flex items-center gap-2 mt-1">
+          <p-avatar [label]="selectedTeam.created_by.name.charAt(0)" shape="circle"></p-avatar>
+          <div>
+            <div>{{ selectedTeam.created_by.name }}</div>
+            <div class="text-sm text-gray-500">{{ selectedTeam.created_by.email }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="font-medium text-gray-600 mb-2 block">Miembros ({{ selectedTeam.members.length }}):</label>
+        <div class="space-y-2">
+          <div *ngFor="let member of selectedTeam.members" class="flex items-center justify-between p-2 bg-gray-50 rounded">
+            <div class="flex items-center gap-2">
+              <p-avatar [label]="member.name.charAt(0)" shape="circle" size="normal"></p-avatar>
+              <div>
+                <div>{{ member.name }}</div>
+                <div class="text-xs text-gray-500">{{ member.email }}</div>
+              </div>
+            </div>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-text"
+              (click)="confirmRemoveMember(member.id)"
+              pTooltip="Eliminar miembro">
+            </button>
+          </div>
+
+          <div *ngIf="selectedTeam.members.length === 0" class="text-center p-4 text-gray-500">
+            No hay miembros en este equipo
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Cerrar" icon="pi pi-times" (click)="closeDetailsDialog()" class="p-button-text"></button>
+    </ng-template>
+  </p-dialog>
+</div>

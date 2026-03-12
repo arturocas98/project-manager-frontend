@@ -11,6 +11,7 @@ import { RouterModule } from "@angular/router";
         loadChildren: () =>
           import("./project/project.module").then((m) => m.ProjectModule),
       },
+
       { path: "**", redirectTo: "/notfound" },
     ]),
   ],

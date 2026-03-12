@@ -32,11 +32,9 @@ import {TranslateModule} from "@ngx-translate/core";
     ConfirmDialogModule,
     ToastModule,
     InputTextareaModule,
-    NgClass,
     ReactiveFormsModule,
     NgIf,
     InputTextModule,
-    DatePipe,
     DropdownModule,
     DialogModule,
     TooltipModule,
@@ -68,9 +66,6 @@ export class ProjectSettingsComponent implements OnInit {
 
   projectForm: FormGroup;
   projectId!: number;
-  projectKey: string = '';
-  createdAt: Date | null = null;
-  updatedAt: Date | null = null;
 
   loading = false;
   updateLoading = false;

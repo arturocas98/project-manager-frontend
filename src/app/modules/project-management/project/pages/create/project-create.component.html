@@ -31,18 +31,81 @@
         <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--indigo-600)"></i>
       </div>
 
-      <!-- Available Roles (se muestran después de crear) -->
-      <div *ngIf="availableRoles.length > 0 && !loading" class="mb-4">
-        <h3 class="text-lg font-semibold text-color mb-3">Roles Disponibles</h3>
-        <div class="grid">
-          <div *ngFor="let role of availableRoles" class="col-12">
-            <div class="surface-ground border-round p-3">
-              <p-tag [value]="role.type" severity="info" class="mb-2"></p-tag>
-              <p class="text-sm text-color-secondary mt-2">{{ role.description }}</p>
-            </div>
-          </div>
+      <!-- Sección de Miembros del Equipo -->
+      <div class="mb-4 surface-ground p-3 border-round">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <h3 class="text-lg font-semibold text-color m-0">Miembros del Equipo</h3>
+          <button
+            pButton
+            type="button"
+            label="Añadir Miembro"
+            icon="pi pi-user-plus"
+            class="p-button-sm p-button-outlined"
+            (click)="openAddMemberDialog()"
+            [disabled]="loading"
+          ></button>
         </div>
-      </div>
+
+        <!-- Lista de miembros seleccionados -->
+        <div *ngIf="selectedMembers.length === 0" class="text-center py-4 text-color-secondary border-round border-1 border-dashed">
+          <i class="pi pi-users text-3xl mb-2 block opacity-50"></i>
+          <span>No hay miembros seleccionados</span>
+        </div>
+
+        <div *ngFor="let member of selectedMembers"
+             class="flex flex-column sm:flex-row sm:align-items-center gap-3 p-3 border-bottom-1 surface-border">
+
+          <!-- Avatar + Info -->
+          <div class="flex align-items-center gap-3 flex-1">
+
+            <p-avatar
+              [label]="getInitials(member.name)"
+              shape="circle"
+              size="large"
+              styleClass="bg-indigo-500 text-white">
+            </p-avatar>
+
+            <div>
+              <div class="font-medium">{{ member.name }}</div>
+              <div class="text-sm text-color-secondary">
+                {{ member.email }}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Rol -->
+          <div class="flex align-items-center gap-2">
+            <p-tag
+              [value]="member.role_label"
+              [severity]="getRoleSeverity(member.role_type)">
+            </p-tag>
+          </div>
+
+          <!-- Acciones -->
+          <div class="flex align-items-center gap-2 justify-content-end">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-text p-button-sm"
+              (click)="openEditRoleDialog(member)"
+              pTooltip="Editar rol"
+              tooltipPosition="top">
+            </button>
+
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-sm p-button-danger"
+              (click)="removeMember(member.user_id)"
+              pTooltip="Eliminar"
+              tooltipPosition="top">
+            </button>
+          </div>
+
+        </div>
 
       <!-- Error Message -->
       <div *ngIf="errorMessage" class="bg-red-50 border-round p-3 flex align-items-center gap-2 mb-4">
@@ -214,8 +277,8 @@
           </div>
         </div>
 
-        <!-- Estado del Proyecto (oculto, se envía con valor por defecto) -->
-        <input type="hidden" formControlName="project_state_id" value="1" />
+        <!-- Estado del Proyecto (oculto) -->
+        <input type="hidden" formControlName="project_state_id" />
 
         <!-- Botones -->
         <div class="flex justify-content-end gap-3 mt-3">
@@ -232,29 +295,195 @@
       </form>
     </div>
   </div>
-
-  <!-- Diálogo de confirmación -->
-  <p-confirmDialog
-    [baseZIndex]="10000"
-    rejectButtonStyleClass="p-button-text"
-    acceptButtonStyleClass="p-button-success"
-  >
-    <ng-template pTemplate="header">
-      <div class="flex align-items-center gap-2 text-green-700">
-        <i class="pi pi-check-circle" style="font-size: 1.5rem"></i>
-        <span class="font-bold text-xl">Operación Exitosa</span>
-      </div>
-    </ng-template>
-
-    <ng-template pTemplate="footer">
-      <button
-        type="button"
-        pButton
-        label="Cerrar"
-        icon="pi pi-times"
-        (click)="confirmationService.close()"
-        class="p-button-text"
-      ></button>
-    </ng-template>
-  </p-confirmDialog>
+  <!-- Toast para notificaciones -->
+  <p-toast position="top-right"></p-toast>
 </div>
+<!-- Diálogo para añadir miembro -->
+<!-- Diálogo para añadir miembro -->
+<p-dialog
+  header="Añadir Miembro al Equipo"
+  [(visible)]="showAddMemberDialog"
+  [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '600px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [contentStyle]="{'overflow': 'visible'}"
+  [baseZIndex]="10000">
+
+  <form [formGroup]="addMemberForm" (ngSubmit)="addMemberToList()" class="flex flex-column gap-4 p-2">
+
+    <!-- Selector de Usuario -->
+    <div>
+      <label class="block text-color font-medium mb-2">
+        Usuario <span class="text-red-500">*</span>
+      </label>
+      <p-dropdown
+        formControlName="user_id"
+        [options]="availableUserOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Seleccionar usuario"
+      [filter]="true"
+      [showClear]="true"
+      [style]="{'width': '100%'}"
+      [panelStyle]="{'max-height': '300px'}"
+      appendTo="body">
+      </p-dropdown>
+      <small *ngIf="addMemberForm.get('user_id')?.invalid && addMemberForm.get('user_id')?.touched"
+             class="p-error block mt-2">
+        Debes seleccionar un usuario
+      </small>
+    </div>
+
+    <!-- Selector de Rol -->
+    <div>
+      <label class="block text-color font-medium mb-2">
+        Rol <span class="text-red-500">*</span>
+      </label>
+      <p-dropdown
+        formControlName="role_type"
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar rol"
+        [showClear]="true"
+        [style]="{'width': '100%'}"
+        [panelStyle]="{'max-height': '300px'}"
+        appendTo="body">
+      </p-dropdown>
+      <small *ngIf="addMemberForm.get('role_type')?.invalid && addMemberForm.get('role_type')?.touched"
+             class="p-error block mt-2">
+        Debes seleccionar un rol
+      </small>
+    </div>
+
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <button
+        pButton
+        label="Cancelar"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="showAddMemberDialog = false; addMemberForm.reset()">
+      </button>
+      <button
+        pButton
+        label="Añadir"
+        icon="pi pi-check"
+        class="p-button-raised p-button-success"
+        [disabled]="addMemberForm.invalid || addMemberLoading"
+        [loading]="addMemberLoading"
+        (click)="addMemberToList()"
+        type="button">
+      </button>
+    </div>
+  </ng-template>
+
+</p-dialog>
+
+<!-- Diálogo para editar rol -->
+<p-dialog
+  header="Editar Rol del Miembro"
+  [(visible)]="showEditRoleDialog"
+  [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+  [contentStyle]="{'overflow': 'visible'}"
+  [baseZIndex]="10000">
+
+  <div *ngIf="memberToEdit" class="flex flex-column gap-4 p-2">
+
+    <!-- Información del miembro -->
+    <div class="flex align-items-center gap-3 p-3 surface-ground border-round">
+      <p-avatar
+        [label]="getInitials(memberToEdit.name)"
+        shape="circle"
+        size="large"
+        styleClass="bg-indigo-500 text-white">
+      </p-avatar>
+      <div>
+        <div class="font-medium text-lg">{{ memberToEdit.name }}</div>
+        <div class="text-sm text-color-secondary">{{ memberToEdit.email }}</div>
+      </div>
+    </div>
+
+    <form [formGroup]="editRoleForm" (ngSubmit)="updateMemberRole()" class="flex flex-column gap-4">
+
+      <!-- Selector de Rol -->
+      <div>
+        <label class="block text-color font-medium mb-2">
+          Rol <span class="text-red-500">*</span>
+        </label>
+        <p-dropdown
+          formControlName="role_type"
+          [options]="roleOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar rol"
+          [showClear]="false"
+          [style]="{'width': '100%'}"
+          [panelStyle]="{'max-height': '300px'}"
+          appendTo="body">
+        </p-dropdown>
+        <small *ngIf="editRoleForm.get('role_type')?.invalid && editRoleForm.get('role_type')?.touched"
+               class="p-error block mt-2">
+          Debes seleccionar un rol
+        </small>
+      </div>
+
+      <div class="flex justify-content-end gap-2 mt-4">
+        <button
+          pButton
+          label="Cancelar"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="showEditRoleDialog = false; editRoleForm.reset()">
+        </button>
+        <button
+          pButton
+          label="Guardar Cambios"
+          icon="pi pi-save"
+          class="p-button-raised p-button-primary"
+          [disabled]="editRoleForm.invalid || editRoleLoading"
+          [loading]="editRoleLoading"
+          type="submit">
+        </button>
+      </div>
+    </form>
+  </div>
+</p-dialog>
+
+<!-- Diálogo de confirmación (éxito) -->
+<p-confirmDialog
+  [key]="'successDialog'"
+  [rejectVisible]="false"
+  [acceptVisible]="true"
+  [closable]="false"
+  [baseZIndex]="10000">
+
+  <ng-template let-message>
+    <div class="flex flex-column align-items-center p-5" style="min-width: 350px; max-width: 450px;">
+      <div class="rounded-full bg-green-100 flex align-items-center justify-content-center w-5rem h-5rem -mt-8 border-circle border-4 border-white shadow-2">
+        <i class="pi pi-check-circle text-4xl text-green-600"></i>
+      </div>
+
+      <h2 class="text-2xl font-bold text-green-700 mt-4 mb-2">{{ message.header || '¡Creado Correctamente!' }}</h2>
+
+      <p class="text-center text-color-secondary mb-4">{{ message.message }}</p>
+
+      <div class="flex gap-3">
+        <button
+          type="button"
+          pButton
+          label="Cerrar"
+          icon="pi pi-times"
+          (click)="confirmationService.close()"
+          class="p-button-text"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmDialog>

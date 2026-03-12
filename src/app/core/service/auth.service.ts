@@ -8,6 +8,13 @@ import { User } from 'src/app/shared/models/user';
 import { ApiSingleResponse } from '../../shared/models/api-response.model';
 import { Profile } from 'src/app/shared/models/auth';
 import { ApiService } from './api.service';
+import {
+  CreateTeamRequest,
+  TeamFilters,
+  TeamMemberRequest,
+  UpdateTeamRequest
+} from "../../shared/models/team-models/team-request.model";
+import {Team} from "../../shared/models/team-models/team.model";
 
 export interface LoginData {
   email: string;
@@ -28,7 +35,6 @@ export interface RegisterData {
   password: string;
 }
 
-// auth.service.ts
 @Injectable({
   providedIn: 'root',
 })
@@ -45,9 +51,7 @@ export class AuthService {
     this.loadProfileFromStorage();
   }
 
-  /**
-   * Login - usando ApiResponse
-   */
+
   login(data: LoginData): Observable<LoginResponse> {
     return this.http.post(`${environment.apiUrl}/auth/login`, data) as Observable<LoginResponse>;
   }
@@ -56,9 +60,7 @@ export class AuthService {
     return this.http.post<any>(`${environment.apiUrl}/auth/register`, data, { observe: 'response' });
   }
 
-  /**
-   * Obtener perfil - usando ApiResponse
-   */
+
   getProfile(): Observable<ApiSingleResponse<User>> {
     console.log('Getting user');
     return this.http.get<ApiSingleResponse<User>>(`${environment.apiUrl}/user/profile`).pipe(
@@ -75,17 +77,13 @@ export class AuthService {
     return this.apiService.get<Profile[]>('user/profiles');
   }
 
-  /**
-   * Actualizar estado del perfil (signal + localStorage)
-   */
+
   private updateProfileState(user: User): void {
     this._profile.set(user);
     localStorage.setItem(LOCAL_STORAGE_KEYS.profile, JSON.stringify(user));
   }
 
-  /**
-   * Obtener perfil desde localStorage
-   */
+
   getProfileLocal(): Profile {
     return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.profile)!) as Profile;
   }
@@ -126,13 +124,13 @@ export class AuthService {
     try {
       const user = JSON.parse(profileStr) as User;
       this._profile.set(user);
-      this.setRole(user); // ahora setRole
+      this.setRole(user);
     } catch (error) {
       console.error('Error parsing profile', error);
     }
   }
   setRole(user: User): void {
-    const role = user.role ?? null; // tomar el rol único
+    const role = user.role ?? null;
     this.role$.next(role);
   }
 
@@ -142,5 +140,37 @@ export class AuthService {
 
   get roleObservable$(): Observable<string | null> {
     return this.role$.asObservable();
+  }
+
+  getTeams(filters?: TeamFilters): Observable<Team[]> {
+    return this.apiService.get<Team[]>(`${environment.apiUrl}/auth/team`, filters);
+  }
+
+  getTeam(id: number): Observable<Team> {
+    return this.apiService.get<Team>(`${environment.apiUrl}/auth/team/${id}`);
+  }
+
+  createTeam(data: CreateTeamRequest): Observable<Team> {
+    return this.apiService.post<Team>(`${environment.apiUrl}/auth/team/`, data);
+  }
+
+  updateTeam(id: number, data: UpdateTeamRequest): Observable<Team> {
+    return this.apiService.put<Team>(`${environment.apiUrl}/auth/team/${id}`, data);
+  }
+
+  deleteTeam(id: number): Observable<any> {
+    return this.apiService.delete<any>(`${environment.apiUrl}/auth/team/${id}`);
+  }
+
+  addTeamMember(teamId: number, data: TeamMemberRequest): Observable<Team> {
+    return this.apiService.post<Team>(`${environment.apiUrl}/auth/team/${teamId}/members`, data);
+  }
+
+  removeTeamMember(teamId: number, data: TeamMemberRequest): Observable<Team> {
+    return this.apiService.delete<Team>(`${environment.apiUrl}/auth/team/${teamId}/members`, data);
+  }
+
+  removeTeamMemberByQuery(teamId: number, userId: number): Observable<Team> {
+    return this.apiService.delete<Team>(`${environment.apiUrl}/auth/team/${teamId}/members`, { user_id: userId });
   }
 }

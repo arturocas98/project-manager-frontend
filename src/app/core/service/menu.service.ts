@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class MenuService {
+export class    MenuService {
   constructor(private http: HttpClient) {}
 
   getLinks(): Observable<any> {
