@@ -1,219 +1,268 @@
-<!-- team-management.component.html -->
-<div class="p-6 bg-gray-50 min-h-screen">
-  <!-- Resumen Ejecutivo -->
-  <div class="mb-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-    <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-      <span class="w-1 h-6 bg-blue-600 rounded-full mr-2"></span>
-      Resumen
-    </h2>
+<div class="p-6 surface-ground min-h-screen">
 
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-      <div class="text-center">
-        <p class="text-2xl font-bold text-gray-800">{{ executiveSummary.activeTeams }}</p>
-        <p class="text-xs text-gray-500">Equipos Activos</p>
+  <!-- RESUMEN -->
+  <div class="surface-card border-round shadow-1 p-5 mb-5">
+
+    <div class="flex align-items-center gap-2 mb-4">
+      <i class="ph ph-chart-line text-xl text-primary"></i>
+      <h2 class="text-lg font-semibold text-800">
+        Resumen Ejecutivo
+      </h2>
+    </div>
+
+    <div class="grid">
+
+      <div class="col-6 md:col-3 lg:col-1 text-center">
+        <i class="ph ph-users text-xl text-primary"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.activeTeams }}</p>
+        <p class="text-xs text-500">Equipos</p>
       </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold text-gray-800">{{ executiveSummary.totalCollaborators }}</p>
-        <p class="text-xs text-gray-500">Total Colab.</p>
+
+      <div class="col-6 md:col-3 lg:col-1 text-center">
+        <i class="ph ph-user-list text-xl text-primary"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.totalCollaborators }}</p>
+        <p class="text-xs text-500">Colaboradores</p>
       </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold text-gray-800">{{ executiveSummary.totalTasks }}</p>
-        <p class="text-xs text-gray-500">Total Tareas</p>
+
+      <div class="col-6 md:col-3 lg:col-1 text-center">
+        <i class="ph ph-list-checks text-xl text-primary"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.totalTasks }}</p>
+        <p class="text-xs text-500">Tareas</p>
       </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold text-gray-800">{{ executiveSummary.tasksExecuting }}</p>
-        <p class="text-xs text-gray-500">Ejecutando</p>
+
+      <div class="col-6 md:col-3 lg:col-1 text-center">
+        <i class="ph ph-play-circle text-xl text-primary"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.tasksExecuting }}</p>
+        <p class="text-xs text-500">Ejecutando</p>
       </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold text-red-600">{{ executiveSummary.overdueTasks }}</p>
-        <p class="text-xs text-gray-500">Atrasadas</p>
+
+      <div class="col-6 md:col-3 lg:col-1 text-center text-red-500">
+        <i class="ph ph-warning-circle text-xl"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.overdueTasks }}</p>
+        <p class="text-xs text-500">Atrasadas</p>
       </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold text-gray-800">{{ executiveSummary.avgProgress }}</p>
-        <p class="text-xs text-gray-500">% Avance Global</p>
+
+      <div class="col-6 md:col-3 lg:col-1 text-center">
+        <i class="ph ph-chart-bar text-xl text-primary"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.avgProgress }}</p>
+        <p class="text-xs text-500">Avance</p>
       </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold text-gray-800">{{ executiveSummary.completedTasks }}</p>
-        <p class="text-xs text-gray-500">Finalizadas</p>
+
+      <div class="col-6 md:col-3 lg:col-1 text-center">
+        <i class="ph ph-check-circle text-xl text-primary"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.completedTasks }}</p>
+        <p class="text-xs text-500">Finalizadas</p>
       </div>
-      <div class="text-center">
-        <p class="text-2xl font-bold text-orange-600">{{ executiveSummary.contractsUnder30Days }}</p>
-        <p class="text-xs text-gray-500">Contratos &#60; 30d</p>
+
+      <div class="col-6 md:col-3 lg:col-1 text-center text-orange-500">
+        <i class="ph ph-clock text-xl"></i>
+        <p class="text-2xl font-bold mt-1">{{ executiveSummary.contractsUnder30Days }}</p>
+        <p class="text-xs text-500">Contratos &lt; 30d</p>
       </div>
+
     </div>
   </div>
 
-  <!-- Barra de búsqueda y acciones -->
-  <div class="mb-4 flex justify-between items-center">
+
+  <!-- BUSQUEDA -->
+  <div class="flex justify-content-between align-items-center mb-4">
+
     <div class="relative">
-      <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-        <i class="pi pi-search text-gray-400"></i>
-      </span>
+      <i class="ph ph-magnifying-glass absolute left-0 ml-3 mt-2 text-400"></i>
+
       <input
         pInputText
         type="text"
         [value]="searchValue"
         (input)="onSearch($event)"
-        placeholder="Buscar por contrato, cliente o equipo..."
-        class="pl-10 pr-10 py-2 border border-gray-300 rounded-lg w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Buscar contrato, cliente o equipo..."
+        class="pl-6 pr-6"
+        style="width:320px"
       />
+
       <button
         *ngIf="searchValue"
         (click)="clearSearch()"
-        class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+        class="absolute right-0 mr-3 mt-2 text-400 hover:text-700"
       >
-        <i class="pi pi-times"></i>
+        <i class="ph ph-x"></i>
       </button>
     </div>
 
     <button
       pButton
-      icon="pi pi-refresh"
       label="Actualizar"
+      icon="ph ph-arrows-clockwise"
+      class="p-button-sm p-button-outlined"
       (click)="refreshData()"
-      class="p-button-outlined p-button-sm"
     ></button>
+
   </div>
 
-  <!-- Tabla Principal -->
-  <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+
+  <!-- TABLA -->
+  <div class="surface-card border-round shadow-1">
+
     <p-table
       [value]="teamData"
       [loading]="loading"
       [paginator]="true"
       [rows]="10"
-      [rowsPerPageOptions]="[10, 25, 50]"
-      [globalFilterFields]="['contract_number', 'client', 'object_contract', 'team_name']"
-      [filterDelay]="300"
+      [rowsPerPageOptions]="[10,25,50]"
       [(first)]="first"
       styleClass="p-datatable-sm"
     >
-      <!-- Header de la tabla -->
+
+      <!-- CAPTION -->
       <ng-template pTemplate="caption">
-        <div class="flex items-center justify-between bg-gray-50 px-4 py-2">
-          <span class="text-sm font-medium text-gray-700">
+        <div class="flex justify-content-between align-items-center p-3 surface-100">
+
+          <span class="text-sm text-600">
             Total registros: {{ teamData.length }}
           </span>
-          <span class="text-xs text-gray-500">
-            * Los porcentajes mostrados son por equipo-proyecto
+
+          <span class="text-xs text-500">
+            Porcentajes calculados por equipo
           </span>
+
         </div>
       </ng-template>
 
-      <!-- Columnas -->
+
+      <!-- HEADER -->
       <ng-template pTemplate="header">
-        <tr class="bg-gray-100">
-          <th class="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">Nro. Contrato</th>
-          <th class="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">Cliente</th>
-          <th class="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">Objeto del Contrato</th>
-          <th class="text-left text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">Nombre Equipo</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4"># Miembros</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">Fecha Creación</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">Estado</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">% Avance</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">📊 Total Tareas</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">⚠️ Atrasadas</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">⏳ Días Rest.</th>
-          <th class="text-center text-xs font-semibold text-gray-600 uppercase tracking-wider py-3 px-4">📋 Gestionar Tareas</th>
+        <tr>
+          <th>Contrato</th>
+          <th>Cliente</th>
+          <th>Objeto</th>
+          <th>Equipo</th>
+          <th class="text-center">Miembros</th>
+          <th class="text-center">Creación</th>
+          <th class="text-center">Estado</th>
+          <th class="text-center">Progreso</th>
+          <th class="text-center">Tareas</th>
+          <th class="text-center">Atrasadas</th>
+          <th class="text-center">Días</th>
+          <th class="text-center">Gestión</th>
         </tr>
       </ng-template>
 
-      <!-- Body de la tabla -->
+
+      <!-- BODY -->
       <ng-template pTemplate="body" let-team>
-        <tr class="hover:bg-gray-50 transition-colors border-b border-gray-200">
-          <td class="py-3 px-4">
-            <span class="text-sm font-medium text-gray-900">{{ team.contract_number }}</span>
+        <tr>
+
+          <td class="font-medium">
+            {{ team.contract_number }}
           </td>
-          <td class="py-3 px-4">
-            <div class="text-sm text-gray-900 max-w-xs truncate" [pTooltip]="team.client" tooltipPosition="top">
-              {{ team.client }}
-            </div>
+
+          <td class="max-w-20rem text-overflow-ellipsis overflow-hidden">
+            {{ team.client }}
           </td>
-          <td class="py-3 px-4">
-            <div class="text-sm text-gray-600 max-w-xs truncate" [pTooltip]="team.object_contract" tooltipPosition="top">
-              {{ team.object_contract }}
-            </div>
+
+          <td class="text-600 max-w-20rem text-overflow-ellipsis overflow-hidden">
+            {{ team.object_contract }}
           </td>
-          <td class="py-3 px-4">
-            <span class="text-sm font-medium text-gray-900">{{ team.team_name }}</span>
+
+          <td class="font-medium">
+            {{ team.team_name }}
           </td>
-          <td class="py-3 px-4 text-center">
-            <span class="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+
+          <td class="text-center">
+            <span class="bg-blue-100 text-blue-700 border-round px-2 py-1 text-sm font-semibold">
               {{ team.members_count }}
             </span>
           </td>
-          <td class="py-3 px-4 text-center text-sm text-gray-600">
-            {{ team.created_at | date:'dd/MM/yyyy' }}
+
+          <td class="text-center text-600">
+            {{ formatDate(team.created_at) }}
           </td>
-          <td class="py-3 px-4 text-center">
+
+          <td class="text-center">
             <p-tag
               [value]="team.state"
               [severity]="getSeverity(team.state)"
               [rounded]="true"
             ></p-tag>
           </td>
-          <td class="py-3 px-4">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-medium w-12">{{ team.progress }}</span>
-              <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+
+
+          <!-- PROGRESO -->
+          <td>
+            <div class="flex align-items-center gap-2">
+
+              <span class="text-sm w-3rem">
+                {{ team.progress }}
+              </span>
+
+              <div class="flex-1 bg-gray-200 border-round h-1rem overflow-hidden">
+
                 <div
-                  class="h-full rounded-full transition-all duration-300"
+                  class="h-full border-round"
                   [class]="getProgressColor(team.progress)"
-                  [style.width]="team.progress"
+                  [style.width.%]="getProgressValue(team.progress)"
                 ></div>
+
               </div>
+
             </div>
           </td>
-          <td class="py-3 px-4 text-center">
-            <span class="text-sm font-semibold text-gray-900">{{ team.total_tasks }}</span>
+
+
+          <td class="text-center font-semibold">
+            {{ team.total_tasks }}
           </td>
-          <td class="py-3 px-4 text-center">
-            <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+
+
+          <td class="text-center">
+            <span class="bg-red-100 text-red-700 border-round px-2 py-1 text-sm font-bold">
               {{ team.overdue_tasks }}
             </span>
           </td>
-          <td class="py-3 px-4 text-center">
+
+
+          <td class="text-center">
             <span [class]="getDaysRemainingColor(team.days_remaining)">
               {{ team.days_remaining }}
             </span>
           </td>
-          <td class="py-3 px-4 text-center">
+
+
+          <td class="text-center">
+
             <button
               pButton
               type="button"
-              icon="pi pi-list"
+              icon="ph ph-list-checks"
               class="p-button-rounded p-button-text p-button-sm"
-              [pTooltip]="'Gestionar tareas: ' + team.manage_tasks"
-              tooltipPosition="top"
               (click)="navigateToTasks(team)"
             ></button>
+
           </td>
+
         </tr>
       </ng-template>
 
-      <!-- Empty state -->
+
+      <!-- EMPTY -->
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="12" class="text-center py-8">
-            <div class="flex flex-col items-center justify-center text-gray-400">
-              <i class="pi pi-inbox text-4xl mb-2"></i>
-              <p>No hay datos de gestión de equipos disponibles</p>
+          <td colspan="12">
+
+            <div class="flex flex-column align-items-center justify-content-center p-6 text-400">
+
+              <i class="ph ph-database text-4xl mb-3"></i>
+
+              <p>No hay información disponible</p>
+
             </div>
+
           </td>
         </tr>
       </ng-template>
 
-      <!-- Loading state -->
-      <ng-template pTemplate="loadingbody">
-        <tr>
-          <td colspan="12">
-            <div class="flex items-center justify-center py-8">
-              <i class="pi pi-spin pi-spinner text-2xl text-blue-600 mr-2"></i>
-              <span class="text-gray-600">Cargando datos...</span>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
     </p-table>
+
   </div>
+
 </div>
