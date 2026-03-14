@@ -14,7 +14,7 @@ import {
   TeamMemberRequest,
   UpdateTeamRequest
 } from "../../shared/models/team-models/team-request.model";
-import {Team} from "../../shared/models/team-models/team.model";
+import {Team, TeamManagement} from "../../shared/models/team-models/team.model";
 
 export interface LoginData {
   email: string;
@@ -144,21 +144,21 @@ export class AuthService {
 
   getTeams(filters?: TeamFilters): Observable<Team[]> {
     return this.apiService
-      .get<any[]>(`${environment.apiUrl}/auth/team`, filters)
+      .get<any[]>('auth/team', filters)
       .pipe(
-        map(response =>
-          response.map(item => ({
-            id: item.data.id,
-            name: item.data.name,
-            type: item.data.type,
-            created_by: item.data.created_by,
-            members: item.data.members ?? [],
-            created_at: item.meta?.created_at,
-            updated_at: item.meta?.updated_at
-          }))
-        )
+        map(response => response.map(item => item.data))
       );
   }
+
+
+  getTeamManagement(): Observable<TeamManagement[]> {
+    return this.apiService
+      .get<any[]>(`${environment.apiUrl}/auth/team/management`)
+      .pipe(
+        map(response => response.map(item => item.data))
+      );
+  }
+
 
   getTeam(id: number): Observable<Team> {
     return this.apiService.get<Team>(`${environment.apiUrl}/auth/team/${id}`);
