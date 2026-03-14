@@ -25,6 +25,7 @@ import {Team} from "../../../shared/models/team-models/team.model";
 import {Profile} from "../../../shared/models/auth";
 import {CreateTeamRequest, TeamFilters} from "../../../shared/models/team-models/team-request.model";
 import {TooltipModule} from "primeng/tooltip";
+import {TeamManagementComponent} from "../team-management/team-management.component";
 
 interface PageEvent {
   first: number;
@@ -55,7 +56,8 @@ interface PageEvent {
     SkeletonModule,
     ProgressSpinnerModule,
     MessageModule,
-    TooltipModule
+    TooltipModule,
+    TeamManagementComponent
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: 'team.component.html',
