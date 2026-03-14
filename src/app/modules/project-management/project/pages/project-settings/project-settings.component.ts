@@ -94,7 +94,7 @@ export class ProjectSettingsComponent implements OnInit {
   roleOptions = [
     { label: 'Lider', value: 'LDR' },
     { label: 'Desarrollador', value: 'DEV' },
-      { label: 'Ensayador', value: 'TST' },
+      { label: 'Tester', value: 'TST' },
     { label: 'Documentador', value: 'DOC' }
   ];
 

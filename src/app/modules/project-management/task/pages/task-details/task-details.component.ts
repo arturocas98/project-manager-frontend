@@ -1,4 +1,4 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, OnInit, OnDestroy, LOCALE_ID} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {ButtonModule} from 'primeng/button';
@@ -48,9 +48,23 @@ import {MenuModule} from "primeng/menu";
     MenuModule,
   ],
   templateUrl: './task-details.component.html',
-  providers: [MessageService]
+  providers: [MessageService,
+    { provide: LOCALE_ID, useValue: 'es' } ]
 })
 export class TaskDetailsComponent implements OnInit, OnDestroy {
+  readonly roleMap: Record<string, string> = {
+    'administrator': 'Administrador',
+    'leader': 'Líder',
+    'developer': 'Desarrollador',
+    'tester': 'Tester',
+    'documenter': 'Documentador'
+  };
+  getRoleNameInSpanish(roleName: string | null | undefined): string {
+    if (!roleName) return 'Sin rol';
+
+    const roleLower = roleName.toLowerCase();
+    return this.roleMap[roleLower] || roleName; // Si no encuentra el mapeo, devuelve el original
+  }
   loading = true;
   projectId!: number;
   taskId!: number;

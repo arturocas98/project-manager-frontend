@@ -1,111 +1,34 @@
-<div class="flex align-items-center justify-content-center px-4">
-  <div
-    class="w-full max-w-6xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl"
-  >
+<div class="flex align-items-center justify-content-center min-h-screen p-4">
+  <div class="w-full max-w-7xl flex flex-column md:flex-row surface-card surface-border border-1 border-round-3xl shadow-2xl overflow-hidden">
+
     <!-- Imagen / Panel Decorativo -->
-    <div class="w-full md:w-6 flex flex-column p-5 align-items-center justify-content-center relative">
-      <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
+    <div class="w-full md:w-4 flex flex-column p-6 align-items-center justify-content-center">
+      <div class="flex align-items-center justify-content-center mb-4">
         <img
           src="assets/General/Cartoon-project-create.png"
           alt="Crear Proyecto"
-          class="w-22rem z-1 h-22rem sm:w-25rem sm:h-25rem object-fit-cover mt-8 sm:mt-0"
+          class="w-18rem h-18rem object-fit-contain"
         />
       </div>
 
-      <div class="text-center z-1 text-white px-4 py-4">
-        <h3 class="text-2xl font-bold">Organiza tu equipo</h3>
-        <p class="text-primary">Crea proyectos y asigna miembros fácilmente</p>
+      <div class="text-center">
+        <h3 class="text-2xl font-bold text-indigo-800 mb-2">¡Nuevo Proyecto!</h3>
+        <p class="text-indigo-600">Completa los datos para comenzar</p>
       </div>
     </div>
 
     <!-- Formulario -->
-    <div class="w-full md:w-6 p-6 md:p-8">
+    <div class="w-full md:w-8 p-6 md:p-8">
       <!-- Header -->
-      <div class="mb-6 text-center">
+      <div class="mb-6">
         <h2 class="text-3xl font-bold text-color mb-2">Crear Proyecto</h2>
         <p class="text-color-secondary">Completa la información para registrar un nuevo proyecto</p>
       </div>
 
       <!-- Loading State -->
-      <div *ngIf="loading" class="flex justify-content-center my-4">
-        <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--indigo-600)"></i>
+      <div *ngIf="loading" class="flex justify-content-center my-6">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2.5rem; color: var(--indigo-600)"></i>
       </div>
-
-      <!-- Sección de Miembros del Equipo -->
-      <div class="mb-4 surface-ground p-3 border-round">
-        <div class="flex align-items-center justify-content-between mb-3">
-          <h3 class="text-lg font-semibold text-color m-0">Miembros del Equipo</h3>
-          <button
-            pButton
-            type="button"
-            label="Añadir Miembro"
-            icon="pi pi-user-plus"
-            class="p-button-sm p-button-outlined"
-            (click)="openAddMemberDialog()"
-            [disabled]="loading"
-          ></button>
-        </div>
-
-        <!-- Lista de miembros seleccionados -->
-        <div *ngIf="selectedMembers.length === 0" class="text-center py-4 text-color-secondary border-round border-1 border-dashed">
-          <i class="pi pi-users text-3xl mb-2 block opacity-50"></i>
-          <span>No hay miembros seleccionados</span>
-        </div>
-
-        <div *ngFor="let member of selectedMembers"
-             class="flex flex-column sm:flex-row sm:align-items-center gap-3 p-3 border-bottom-1 surface-border">
-
-          <!-- Avatar + Info -->
-          <div class="flex align-items-center gap-3 flex-1">
-
-            <p-avatar
-              [label]="getInitials(member.name)"
-              shape="circle"
-              size="large"
-              styleClass="bg-indigo-500 text-white">
-            </p-avatar>
-
-            <div>
-              <div class="font-medium">{{ member.name }}</div>
-              <div class="text-sm text-color-secondary">
-                {{ member.email }}
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Rol -->
-          <div class="flex align-items-center gap-2">
-            <p-tag
-              [value]="member.role_label"
-              [severity]="getRoleSeverity(member.role_type)">
-            </p-tag>
-          </div>
-
-          <!-- Acciones -->
-          <div class="flex align-items-center gap-2 justify-content-end">
-            <button
-              pButton
-              type="button"
-              icon="pi pi-pencil"
-              class="p-button-rounded p-button-text p-button-sm"
-              (click)="openEditRoleDialog(member)"
-              pTooltip="Editar rol"
-              tooltipPosition="top">
-            </button>
-
-            <button
-              pButton
-              type="button"
-              icon="pi pi-trash"
-              class="p-button-rounded p-button-text p-button-sm p-button-danger"
-              (click)="removeMember(member.user_id)"
-              pTooltip="Eliminar"
-              tooltipPosition="top">
-            </button>
-          </div>
-
-        </div>
 
       <!-- Error Message -->
       <div *ngIf="errorMessage" class="bg-red-50 border-round p-3 flex align-items-center gap-2 mb-4">
@@ -113,189 +36,276 @@
         <span class="text-red-700">{{ errorMessage }}</span>
       </div>
 
-      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-4">
-        <!-- Número de Contrato -->
-        <div>
-          <label class="block text-color font-medium mb-2">Número de Contrato *</label>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-file"></i>
-            </span>
-            <input
-              pInputText
-              formControlName="ContractNo"
-              class="w-full"
-              placeholder="Ej: CONT-2024-001"
-              [ngClass]="{ 'p-invalid': projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched }"
-            />
-          </div>
-          <small *ngIf="projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched" class="p-error block mt-2">
-            El número de contrato es obligatorio
-          </small>
-        </div>
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
 
-        <!-- Cliente -->
-        <div>
-          <label class="block text-color font-medium mb-2">Cliente *</label>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-user"></i>
-            </span>
-            <input
-              pInputText
-              formControlName="client"
-              class="w-full"
-              placeholder="Ej: Empresa ABC"
-              [ngClass]="{ 'p-invalid': projectForm.get('client')?.invalid && projectForm.get('client')?.touched }"
-            />
-          </div>
-          <small *ngIf="projectForm.get('client')?.invalid && projectForm.get('client')?.touched" class="p-error block mt-2">
-            El cliente es obligatorio
-          </small>
-        </div>
-
-        <!-- Tipo de Proyecto -->
-        <div>
-          <label class="block text-color font-medium mb-2">Tipo de Proyecto *</label>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-tag"></i>
-            </span>
-            <input
-              pInputText
-              formControlName="project_type"
-              class="w-full"
-              placeholder="Ej: Desarrollo de Software"
-              [ngClass]="{ 'p-invalid': projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched }"
-            />
-          </div>
-          <small *ngIf="projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched" class="p-error block mt-2">
-            El tipo de proyecto es obligatorio
-          </small>
-        </div>
-
-        <!-- Objeto del Contrato -->
-        <div>
-          <label class="block text-color font-medium mb-2">Objeto del Contrato</label>
-          <textarea
-            pInputTextarea
-            rows="3"
-            formControlName="objectContract"
-            class="w-full"
-            placeholder="Describe el objeto del contrato..."
-          ></textarea>
-        </div>
-
-        <!-- Fecha de Inicio y Duración -->
+        <!-- Grid de 2 columnas -->
         <div class="grid">
-          <div class="col-12 md:col-6">
-            <label class="block text-color font-medium mb-2">Fecha de Inicio *</label>
-            <div class="p-inputgroup">
-              <span class="p-inputgroup-addon">
-                <i class="pi pi-calendar"></i>
-              </span>
-              <input
-                pInputText
-                type="date"
-                formControlName="start_date"
-                class="w-full"
-                [ngClass]="{ 'p-invalid': projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched }"
-              />
+
+          <!-- Columna Izquierda -->
+          <div class="col-12 lg:col-6">
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Número de Contrato *</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-file"></i>
+                </span>
+                <input
+                  pInputText
+                  formControlName="ContractNo"
+                  class="w-full"
+                  placeholder="Ej: CONT-2024-001"
+                  [ngClass]="{ 'p-invalid': projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched }"
+                />
+              </div>
+              <small *ngIf="projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched" class="p-error block mt-2">
+                El número de contrato es obligatorio
+              </small>
             </div>
-            <small *ngIf="projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched" class="p-error block mt-2">
-              La fecha de inicio es obligatoria
-            </small>
+
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Cliente *</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-building"></i>
+                </span>
+                <input
+                  pInputText
+                  formControlName="client"
+                  class="w-full"
+                  placeholder="Ej: Empresa ABC"
+                  [ngClass]="{ 'p-invalid': projectForm.get('client')?.invalid && projectForm.get('client')?.touched }"
+                />
+              </div>
+              <small *ngIf="projectForm.get('client')?.invalid && projectForm.get('client')?.touched" class="p-error block mt-2">
+                El cliente es obligatorio
+              </small>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Tipo de Proyecto *</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-tag"></i>
+                </span>
+                <input
+                  pInputText
+                  formControlName="project_type"
+                  class="w-full"
+                  placeholder="Ej: Desarrollo de Software"
+                  [ngClass]="{ 'p-invalid': projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched }"
+                />
+              </div>
+              <small *ngIf="projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched" class="p-error block mt-2">
+                El tipo de proyecto es obligatorio
+              </small>
+            </div>
           </div>
 
-          <div class="col-12 md:col-6">
-            <label class="block text-color font-medium mb-2">Duración (días)</label>
-            <div class="p-inputgroup">
-              <span class="p-inputgroup-addon">
-                <i class="pi pi-clock"></i>
-              </span>
-              <input
-                pInputText
-                type="number"
-                formControlName="duration_days"
-                class="w-full"
-                placeholder="Ej: 90"
-              />
+          <!-- Columna Derecha -->
+          <div class="col-12 lg:col-6">
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Fecha de Inicio *</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-calendar-plus"></i>
+                </span>
+                <input
+                  pInputText
+                  type="date"
+                  formControlName="start_date"
+                  class="w-full"
+                  [ngClass]="{ 'p-invalid': projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched }"
+                />
+              </div>
+              <small *ngIf="projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched" class="p-error block mt-2">
+                La fecha de inicio es obligatoria
+              </small>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Duración (días)</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-clock"></i>
+                </span>
+                <input
+                  pInputText
+                  type="number"
+                  formControlName="duration_days"
+                  class="w-full"
+                  placeholder="Ej: 90"
+                />
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Email del Administrador</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-envelope"></i>
+                </span>
+                <input
+                  pInputText
+                  type="email"
+                  formControlName="administrator_email"
+                  class="w-full"
+                  placeholder="admin@empresa.com"
+                  [ngClass]="{ 'p-invalid': projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched }"
+                />
+              </div>
+              <small *ngIf="projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched" class="p-error block mt-2">
+                Ingrese un email válido
+              </small>
+            </div>
+          </div>
+
+          <!-- Fila completa para campos largos -->
+          <div class="col-12">
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Compañía Contratada</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-briefcase"></i>
+                </span>
+                <input
+                  pInputText
+                  formControlName="contracted_company"
+                  class="w-full"
+                  placeholder="Ej: Constructora XYZ"
+                />
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Última Fase</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-sitemap"></i>
+                </span>
+                <input
+                  pInputText
+                  formControlName="last_phase"
+                  class="w-full"
+                  placeholder="Ej: Fase de Desarrollo"
+                />
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-color font-medium mb-2">Objeto del Contrato</label>
+              <div class="p-inputgroup">
+                <span class="p-inputgroup-addon">
+                  <i class="pi pi-file-edit"></i>
+                </span>
+                <textarea
+                  pInputTextarea
+                  rows="3"
+                  formControlName="objectContract"
+                  class="w-full"
+                  placeholder="Describe el objeto del contrato..."
+                ></textarea>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Email del Administrador -->
-        <div>
-          <label class="block text-color font-medium mb-2">Email del Administrador</label>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-envelope"></i>
-            </span>
-            <input
-              pInputText
-              type="email"
-              formControlName="administrator_email"
-              class="w-full"
-              placeholder="admin@empresa.com"
-              [ngClass]="{ 'p-invalid': projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched }"
-            />
+        <!-- Sección de Miembros del Equipo -->
+        <div class="surface-ground p-4 border-round-lg mb-4">
+          <div class="flex align-items-center justify-content-between mb-4">
+            <h3 class="text-lg font-semibold text-color m-0 flex align-items-center gap-2">
+              <i class="pi pi-users text-primary"></i>
+              Miembros del Equipo
+            </h3>
+            <button
+              pButton
+              type="button"
+              label="Añadir Miembro"
+              icon="pi pi-user-plus"
+              class="p-button-sm p-button-outlined"
+              (click)="openAddMemberDialog()"
+              [disabled]="loading"
+            ></button>
           </div>
-          <small *ngIf="projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched" class="p-error block mt-2">
-            Ingrese un email válido
-          </small>
+
+          <!-- Lista de miembros -->
+          <div *ngIf="selectedMembers.length === 0"
+               class="text-center py-5 text-color-secondary border-round border-1 border-dashed">
+            <i class="pi pi-users text-4xl mb-3 block opacity-50"></i>
+            <span>No hay miembros seleccionados</span>
+          </div>
+
+          <div *ngFor="let member of selectedMembers; let last = last"
+               class="flex flex-column md:flex-row md:align-items-center gap-3 p-3"
+               [ngClass]="{ 'border-bottom-1 surface-border': !last }">
+
+            <div class="flex align-items-center gap-3 flex-1">
+              <p-avatar
+                [label]="getInitials(member.name)"
+                shape="circle"
+                size="large"
+                styleClass="bg-indigo-500 text-white">
+              </p-avatar>
+
+              <div>
+                <div class="font-medium">{{ member.name }}</div>
+                <div class="text-sm text-color-secondary">{{ member.email }}</div>
+              </div>
+            </div>
+
+            <div class="flex align-items-center gap-2">
+              <p-tag
+                [value]="member.role_label"
+                [severity]="getRoleSeverity(member.role_type)">
+              </p-tag>
+
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm"
+                (click)="openEditRoleDialog(member)"
+                pTooltip="Editar rol">
+              </button>
+
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-sm p-button-danger"
+                (click)="removeMember(member.user_id)"
+                pTooltip="Eliminar">
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- Compañía Contratada -->
-        <div>
-          <label class="block text-color font-medium mb-2">Compañía Contratada</label>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-building"></i>
-            </span>
-            <input
-              pInputText
-              formControlName="contracted_company"
-              class="w-full"
-              placeholder="Ej: Constructora XYZ"
-            />
-          </div>
-        </div>
-
-        <!-- Última Fase (opcional) -->
-        <div>
-          <label class="block text-color font-medium mb-2">Última Fase</label>
-          <div class="p-inputgroup">
-            <span class="p-inputgroup-addon">
-              <i class="pi pi-sitemap"></i>
-            </span>
-            <input
-              pInputText
-              formControlName="last_phase"
-              class="w-full"
-              placeholder="Ej: Fase de Desarrollo"
-            />
-          </div>
-        </div>
-
-        <!-- Estado del Proyecto (oculto) -->
+        <!-- Campo oculto -->
         <input type="hidden" formControlName="project_state_id" />
 
         <!-- Botones -->
-        <div class="flex justify-content-end gap-3 mt-3">
+        <div class="flex justify-content-end gap-3 pt-4 border-top-1 surface-border">
+          <button
+            pButton
+            type="button"
+            label="Cancelar"
+            icon="pi pi-times"
+            class="p-button-text">
+          </button>
           <button
             pButton
             type="submit"
             label="Crear Proyecto"
             icon="pi pi-check"
-            class="p-button-raised"
+            class="p-button-raised p-button-success px-5"
             [disabled]="projectForm.invalid || loading"
-            [loading]="loading"
-          ></button>
+            [loading]="loading">
+          </button>
         </div>
       </form>
     </div>
   </div>
-  <!-- Toast para notificaciones -->
+
+  <!-- Toast -->
   <p-toast position="top-right"></p-toast>
 </div>
 <!-- Diálogo para añadir miembro -->

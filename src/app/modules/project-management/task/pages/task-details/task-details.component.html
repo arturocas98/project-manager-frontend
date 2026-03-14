@@ -331,8 +331,8 @@
                 <i class="pi pi-envelope"></i>
                 {{ task.assigned_to.email }}
               </span>
-              <span *ngIf="task.assigned_to.role_name" class="text-xs bg-primary-100 text-primary-700 px-2 py-1 border-round mt-1">
-                {{ task.assigned_to.role_name }}
+              <span *ngIf="task.assigned_to?.role_name" class="text-xs bg-primary-100 text-primary-700 px-2 py-1 border-round mt-1">
+                  {{ getRoleNameInSpanish(task.assigned_to.role_name) }}
               </span>
             </div>
           </div>

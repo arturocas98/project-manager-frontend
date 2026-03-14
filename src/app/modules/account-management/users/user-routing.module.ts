@@ -19,14 +19,6 @@ const routes: Routes = [
       ),
   },
   {
-    path: "teams",
-    data: { breadcrumb: "teams" },
-    loadComponent: () =>
-      import("../Team/team.component").then(
-        (m) => m.TeamComponent,
-      ),
-  },
-  {
     path: "edit/:id",
     data: { breadcrumb: "Edit" },
     loadComponent: () =>

@@ -12,6 +12,14 @@ import { RouterModule } from "@angular/router";
           import("./users/user.module").then((m) => m.UserModule),
       },
       {
+        path: "teams",
+        data: { breadcrumb: "teams" },
+        loadComponent: () =>
+          import("./Team/team.component").then(
+            (m) => m.TeamComponent,
+          ),
+      },
+      {
         path: "roles",
         data: { breadcrumb: "Roles" },
         loadChildren: () =>
