@@ -19,6 +19,7 @@
   import {TooltipModule} from "primeng/tooltip";
   import {Profile} from "../../../../../shared/models/auth";
   import {InputTextModule} from "primeng/inputtext";
+  import {Router} from "@angular/router";
 
   interface SelectedMember {
     user_id: number;
@@ -55,6 +56,9 @@
     templateUrl: './project-create.component.html',
   })
   export class ProjectCreateComponent implements OnInit {
+
+    showSuccessDialog = false;
+    successProjectName = '';
 
     projectForm = this.fb.group({
       ContractNo: ['', Validators.required],
@@ -123,7 +127,7 @@
       private projectService: ProjectService,
       private authService: AuthService,
       private messageService: MessageService,
-      public confirmationService: ConfirmationService
+      private router: Router
     ) {
       // Calcular end_date automáticamente cuando cambian start_date o duration_days
       this.setupEndDateCalculation();
@@ -449,38 +453,27 @@
      * Finaliza la creación del proyecto
      */
     finishProjectCreation(project: any): void {
+
       this.loading = false;
+
       this.projectForm.reset({
         project_state_id: 1,
         duration_days: 0
       });
 
-      // Limpiar la lista de miembros seleccionados
       this.selectedMembers = [];
-      this.updateAvailableUsers(); // <-- Actualizar usuarios disponibles
+      this.updateAvailableUsers();
 
-      // Mostrar diálogo de éxito
-      this.showSuccessDialog(project.client || project.ContractNo);
+      this.successProjectName = project.client || project.ContractNo;
+      this.showSuccessDialog = true;
     }
 
-    showSuccessDialog(projectName: string) {
-      this.confirmationService.confirm({
-        message: `El proyecto "${projectName}" ha sido creado exitosamente.`,
-        header: '¡Creado Correctamente!',
-        acceptLabel: 'Ver Proyecto',
-        rejectLabel: 'Cerrar',
-        acceptIcon: 'pi pi-eye',
-        rejectIcon: 'pi pi-times',
-        acceptButtonStyleClass: 'p-button-success p-button-raised',
-        rejectButtonStyleClass: 'p-button-text p-button-secondary',
-        defaultFocus: 'accept',
-        accept: () => {
-          // Aquí puedes navegar a la vista del proyecto si tienes el router
-          // this.router.navigate(['/projects', this.createdProject.id]);
-        },
-        reject: () => {
-          console.log('Diálogo cerrado');
-        },
-      });
+    closeSuccessDialog() {
+      this.showSuccessDialog = false;
+    }
+
+    goToProjects() {
+      this.showSuccessDialog = false;
+      this.router.navigate(['/project-management/projects/list']);
     }
   }
