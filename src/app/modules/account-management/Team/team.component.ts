@@ -137,6 +137,7 @@ export class TeamComponent implements OnInit {
       next: (response: any) => {
         // Asumiendo que ApiService ya extrajo el data
         this.teams = response.data || response;
+        console.log(this.teams);
         this.totalRecords = response.meta?.total || this.teams.length;
         this.loading = false;
       },

@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import {BehaviorSubject, map, Observable, tap} from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Constants, LOCAL_STORAGE_KEYS, ROLE } from 'src/app/shared/constants/constants';
 import { User } from 'src/app/shared/models/user';
@@ -143,7 +143,21 @@ export class AuthService {
   }
 
   getTeams(filters?: TeamFilters): Observable<Team[]> {
-    return this.apiService.get<Team[]>(`${environment.apiUrl}/auth/team`, filters);
+    return this.apiService
+      .get<any[]>(`${environment.apiUrl}/auth/team`, filters)
+      .pipe(
+        map(response =>
+          response.map(item => ({
+            id: item.data.id,
+            name: item.data.name,
+            type: item.data.type,
+            created_by: item.data.created_by,
+            members: item.data.members ?? [],
+            created_at: item.meta?.created_at,
+            updated_at: item.meta?.updated_at
+          }))
+        )
+      );
   }
 
   getTeam(id: number): Observable<Team> {
