@@ -1,19 +1,25 @@
-import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
-import { ConfirmationService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { RippleModule } from 'primeng/ripple';
-import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { Constants, NUMBERS } from 'src/app/shared/constants/constants';
+import { TranslateService } from '@ngx-translate/core';
+import { ConfirmationService, MenuItem } from 'primeng/api';
+import { LazyPaginator } from 'src/app/extends/lazy';
+import { UserService } from '../../services/user.service';
 import { User } from 'src/app/shared/models/user';
-import { UserCollectionResponse, UserService } from '../../services/user.service';
-import { ParamJson } from '../../../../../shared/models/params.model';
+import { Constants, USER } from 'src/app/shared/constants/constants';
 import { getRoleName } from 'src/app/shared/helpers/functions.helper';
-import { AuthService } from 'src/app/core/service/auth.service';
+import { CommonModule } from '@angular/common';
+import { TableModule } from 'primeng/table';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { InputTextModule } from 'primeng/inputtext';
+import { PaginatorModule } from 'primeng/paginator';
+import { TranslateModule } from '@ngx-translate/core';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
+import { NgIf } from '@angular/common';
+import { NgFor } from '@angular/common';
+import { PipeModule } from 'src/app/shared/Pipes/pipe.module';
 
 @Component({
   templateUrl: './user-list.component.html',
@@ -21,91 +27,114 @@ import { AuthService } from 'src/app/core/service/auth.service';
   standalone: true,
   imports: [
     CommonModule,
-    RippleModule,
-    ButtonModule,
-    InputTextModule,
     TableModule,
-    ConfirmDialogModule,
+    MenuModule,
+    ButtonModule,
+    MultiSelectModule,
+    InputTextModule,
+    PaginatorModule,
     TranslateModule,
+    ConfirmDialogModule,
+    ToastModule,
+    NgIf,
+    NgFor,
+    PipeModule,
   ],
 })
-export class UserListComponent {
-  loadingTable = signal<boolean>(false);
+export class UserListComponent extends LazyPaginator implements OnInit {
   users: User[] = [];
-  totalRecords: number = 0;
-  tableLazyLoadEvent?: TableLazyLoadEvent;
-  isAdmin: boolean = false;
+  loadingTable = false;
+  userRoleCol = USER.USER_ROLE_COLUMN;
+  userRolValue = USER.USER_ROLE_VALUE;
 
   constructor(
     private userService: UserService,
     private router: Router,
-    private confirmationService: ConfirmationService,
-    private authService: AuthService
+    private translateService: TranslateService,
+    private confirmationService: ConfirmationService
   ) {
-    this.isAdmin = this.authService.isAdmin;
+    super();
   }
 
-  onLazy(): void {
-    this.loadingTable.set(true);
-    const params = this.getParams();
-    this.userService.getUsers(params).subscribe({
-      next: (response: UserCollectionResponse) => {
+  ngOnInit() {
+    this.getColumns();
+    this.getUsers();
+  }
+
+  getUsers(): void {
+    this.loadingTable = true;
+    this.userService.getUsers(this.getParams()).subscribe({
+      next: (response): void => {
         this.users = response.data;
-        this.loadingTable.set(false);
+        this.paginator = response.meta;
+        this.loadingTable = false;
       },
       error: () => {
-        this.loadingTable.set(false);
+        this.loadingTable = false;
       },
     });
   }
 
-  getParams(): ParamJson {
-    let globalFilter: string | null | undefined = '';
-    if (Array.isArray(this.tableLazyLoadEvent?.globalFilter)) {
-      globalFilter = globalFilter[NUMBERS.ZERO] || '';
-    } else {
-      globalFilter = this.tableLazyLoadEvent?.globalFilter;
-    }
-    return {
-      'filter[search]': globalFilter || '',
+  getColumns(): void {
+    this.columns = this.userService.getTableColumns();
+    this.selectedColumns = this.columns;
+  }
+
+  getMenuItemsForItem(item: User): void {
+    const itemEdit: MenuItem = {
+      label: this.translateService.instant('general.edit'),
+      escape: false,
+      icon: Constants.icons.edit,
+      iconClass: 'text-xl',
+      command: () => this.router.navigate([Constants.routes.userEdit, item?.id]),
     };
+
+    const items: MenuItem[] = [itemEdit];
+
+    item.menu = [
+      {
+        label: this.translateService.instant('general.options'),
+        items,
+      },
+    ];
   }
 
-  onGlobalFilter(table: Table, event: Event): void {
-    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-  }
-
-  navigateToCreateUser(): void {
+  navigateToCreateUser() {
     this.router.navigate([Constants.routes.userCreate]);
   }
 
-  navigateToEditUser(id: number): void {
+  navigateToEditUser(id: number) {
     this.router.navigate([Constants.routes.userEdit, id]);
   }
 
-  deleteUser(id: number): void {
+  deleteUser(id: number) {
     this.userService.deleteUser(id).subscribe(() => {
       this.users = this.users.filter((user: User) => user.id !== id);
     });
   }
 
-  confirmDelete(key: string): void {
+  confirmDelete(key: string) {
     this.confirmationService.confirm({
       key,
-      message: 'Are you sure to perform this action?',
+      message: 'Estas seguro de querer eliminar este usuario?',
       accept: () => {
         this.deleteUser(Number.parseInt(key));
       },
     });
   }
 
-  navigateToDashboard(): void {
+  navigateToDashboard() {
     this.router.navigate([Constants.routes.dashboard]);
   }
 
-  loadUsersLazy(event: TableLazyLoadEvent): void {
-    this.tableLazyLoadEvent = event;
-    this.onLazy();
+  loadUsersLazy(event: any) {
+    this.userService.setGlobalFilter(event.globalFilter);
+    this.userService.setPage(event.first / event.rows + 1);
+  }
+
+  override onLazy(): void {
+    if (this.loadingTable) return;
+    this.getUsers();
   }
 
   protected readonly getRoleName = getRoleName;

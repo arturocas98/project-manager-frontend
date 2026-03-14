@@ -1,5 +1,6 @@
 {
   "general": {
+    "#": "#",
     "back": "Volver",
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -23,7 +24,17 @@
     "theme": "Tema",
     "light": "Ligero",
     "dim": "Tenue",
-    "dark": "Oscuro"
+    "dark": "Oscuro",
+    "options": "Opciones",
+    "createdAt": "Fecha de creación",
+    "updatedAt": "Fecha de actualización",
+    "desactivedAt": "Fecha desactivación",
+    "expiredAt": "Fecha expiración",
+    "created_by": "Creado por",
+    "updated_by": "Modificado por",
+    "columnsSelected": "{0} columnas seleccionadas",
+    "edit": "Editar",
+    "formCreateUserSucceful": "Se creo correctamente el usuario"
   },
   "notFound": {
     "oops": "¡Ups!",
@@ -107,7 +118,15 @@
     "role": "Rol",
     "modality": "Modalidad",
     "telephone": "Celular",
-    "address": "Direccion domiciliaria"
+    "address": "Direccion domiciliaria",
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "statusLabel": "Estado"
+  },
+  "modality": {
+    "rolePlaceholder": "Elige una modalidad para el usuario..."
   },
   "role": {
     "create": "Crear Rol",
@@ -144,5 +163,18 @@
     "benefit1": "Cuenta segura y protegida",
     "benefit2": "Acceso inmediato a todas las funciones",
     "benefit3": "Soporte 24/7 disponible"
+  },
+  "alertMessage": {
+    "success": "Proceso exitoso",
+    "successUpdate": "Registro actualizado exitosamente",
+    "errorUpdate": "Error al actualizar el registro",
+    "errorConnection": "No fue posible conectar con el servidor. Verifica tu conexión a internet e inténtalo nuevamente.",
+    "errorServer": "El servidor no responde. Por favor, inténtalo nuevamente más tarde.",
+    "errorClient": "Los datos enviados no son válidos. Por favor, verifica la información e inténtalo nuevamente.",
+    "confirmation": "Confirmación",
+    "error": "Error",
+    "delete": "Eliminar",
+    "deleteSuccess": "Registro eliminado exitosamente",
+    "errorDelete": "Error al eliminar el registro"
   }
 }

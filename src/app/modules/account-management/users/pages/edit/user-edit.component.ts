@@ -1,20 +1,29 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Constants, NUMBERS, SEVERITY } from 'src/app/shared/constants/constants';
+import { Role } from 'src/app/shared/models/role';
+import { UserResponse, UserService } from '../../services/user.service';
+import { RoleService } from '../../../roles/services/role.service';
+import { TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
+import * as moment from 'moment';
+import { ParamJson } from 'src/app/shared/models/response';
+import { User } from 'src/app/shared/models/user';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
+import { PasswordModule } from 'primeng/password';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { DropdownModule } from 'primeng/dropdown';
-import { FileUploadModule } from 'primeng/fileupload';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { CalendarModule } from 'primeng/calendar';
+import { ToastModule } from 'primeng/toast';
+import { KeyFilterModule } from 'primeng/keyfilter';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { RippleModule } from 'primeng/ripple';
-import { Constants } from 'src/app/shared/constants/constants';
-import { UserResponse, UserService } from '../../services/user.service';
 import { Option } from 'src/app/shared/models/general';
-import { RoleService } from '../../../roles/services/role.service';
-import { ParamJson } from 'src/app/shared/models/params.model';
-import { AuthService } from '../../../../../core/service/auth.service';
 
 @Component({
   templateUrl: './user-edit.component.html',
@@ -22,21 +31,28 @@ import { AuthService } from '../../../../../core/service/auth.service';
   imports: [
     CommonModule,
     FormsModule,
-    ButtonModule,
-    RippleModule,
-    InputTextModule,
-    DropdownModule,
-    FileUploadModule,
-    InputTextareaModule,
     ReactiveFormsModule,
     TranslateModule,
+    ButtonModule,
+    PasswordModule,
+    MultiSelectModule,
+    DropdownModule,
+    ToggleButtonModule,
+    CalendarModule,
+    ToastModule,
+    KeyFilterModule,
+    InputTextModule,
   ],
 })
 export class UserEditComponent implements OnInit {
-  ngForm: FormGroup;
-  private userId?: number;
-  roles: Option[] = [];
-
+  userForm: FormGroup;
+  roles: Role[] = [];
+  rolPartner = 'Partner';
+  isPartner = false;
+  isCustomRol = false;
+  shortFormatDate: string = Constants.shortFormatDate;
+  shortLocalFormatDate = Constants.shortLocalFormatDate;
+  private readonly userId?: number;
   modalities: Option[] = [
     {
       id: 1,
@@ -49,52 +65,113 @@ export class UserEditComponent implements OnInit {
   ];
 
   constructor(
-    private authService: AuthService,
     private userService: UserService,
+    private roleService: RoleService,
     private fb: FormBuilder,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private roleService: RoleService
+    private messageService: MessageService,
+    private translateService: TranslateService
   ) {
     const userId = this.activatedRoute.snapshot.paramMap.get('id');
     if (userId) {
       this.userId = +userId;
     }
 
-    // Inicializar el formulario
-    this.ngForm = this.fb.group({
+    this.userForm = this.fb.group({
       name: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
+      expires_at: [''],
+      rols: [''],
+      university_id: [''],
+      agreement_id: [''],
       password_confirmation: [''],
-      role_id: [null],
+      status: [false],
       modality_id: [''],
-      telephone: [''],
-      address: [''],
-    });
-
-    // Cargar opciones de roles desde el backend
-    const params: ParamJson = { ...Constants.pageParams.all };
-    this.roleService.getRoles(params).subscribe(res => {
-      this.roles = res.data;
+      address: ['', [Validators.required]],
+      telephone: ['', [Validators.required]],
     });
   }
 
   ngOnInit(): void {
+    this.getRoles();
     if (this.userId) {
       this.userService.getUser(this.userId).subscribe((response: UserResponse) => {
-        this.ngForm.patchValue(response.data);
+        const expires_at = response.data.expires_at ? moment(response.data.expires_at).toDate() : null;
+        const data = {
+          ...response.data,
+          expires_at,
+          rols: response.data.rols,
+          password: null,
+          status: !response.data.deleted_at,
+        };
+        this.userForm.patchValue(data);
+        this.userForm.updateValueAndValidity();
+        this.changeRol();
       });
     }
   }
 
+  changeRol(): void {
+    this.isPartner = false;
+  }
+
+  getRoles(): void {
+    const params: ParamJson = {
+      ...Constants.pageParams.all,
+    };
+    this.roleService.getRoles(params).subscribe(rols => {
+      this.roles = rols.data;
+    });
+  }
+
   onSubmit() {
-    if (this.ngForm.invalid || !this.userId) {
+    if (this.userForm.invalid || !this.userId) {
       return;
     }
 
-    this.userService.updateUser(this.ngForm.value, this.userId).subscribe(() => {
-      this.navigateToUserList();
+    const filteredFormValue = Object.keys(this.userForm.value).reduce((acc, key) => {
+      if (this.userForm.value[key]) {
+        acc[key] = this.userForm.value[key];
+      }
+      return acc;
+    }, {} as any);
+
+    const expires_at = this.userForm.value.expires_at
+      ? moment(this.userForm.value.expires_at).format(this.shortFormatDate)
+      : null;
+
+    const body = {
+      ...filteredFormValue,
+      status: this.userForm.value.status,
+      expires_at,
+      reset_password: Constants.zero,
+      rols: this.userForm.value.rols.map((rol: { name: string }) => ({ name: rol.name })),
+    } as User;
+
+    if (body.password !== body.password_confirmation) {
+      this.messageService.add({
+        life: NUMBERS.TEN_THOUSAND,
+        severity: SEVERITY.ERROR,
+        summary: Constants.alert.error,
+        detail: this.translateService.instant('password.notMatch'),
+      });
+      return;
+    }
+
+    this.userService.updateUser(body, this.userId).subscribe({
+      next: () => {
+        this.navigateToUserList();
+      },
+      error: err => {
+        this.messageService.add({
+          life: NUMBERS.TEN_THOUSAND,
+          severity: SEVERITY.ERROR,
+          summary: Constants.alert.error,
+          detail: err.error.message,
+        });
+      },
     });
   }
 

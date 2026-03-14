@@ -1,0 +1,13 @@
+/* Ilustración compacta en el encabezado: no domina la vista */
+.project-create-illustration {
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .project-create-illustration {
+    width: 6.5rem;
+    height: 6.5rem;
+  }
+}

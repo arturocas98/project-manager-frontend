@@ -36,9 +36,10 @@ export const Constants = {
 
     caretRight: 'ph ph-caret-right',
     arrowRightCircle: 'ph ph-arrow-circle-right',
+    edit: 'pi pi-pencil',
   },
 
-  defaultPaginator: { current_page: 1, total: 0, from: 0, to: 0 },
+  defaultPaginator: { current_page: 1, total: 0, from: 0, to: 0, last_page: 0 },
   emptyString: '',
   pageParams: {
     all: { perPage: 'all' },
@@ -56,6 +57,10 @@ export const Constants = {
     error: 'error',
     sticky: false,
   },
+  shortFormatDate: 'YYYY-MM-DD',
+  shortFormatDatePipe: 'YYYY-MM-dd',
+  shortLocalFormatDate: 'dd/mm/yy',
+  shortLocalFormatDatePipe: 'DD/MM/YYYY',
 };
 
 export const NUMBERS = {
@@ -192,3 +197,9 @@ export enum ROLE {
   DEVELOPER = 'Desarrollador',
   ADMINISTRATIVE = 'Administrativo',
 }
+
+export const USER = {
+  USER_ROLE_VALUE: 'rols',
+  USER_ROLE_COLUMN: 'user.role',
+  USER_SUBROLE_COLUMN: 'user.subrole',
+};

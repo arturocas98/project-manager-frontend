@@ -1,108 +1,124 @@
 <div class="card">
+  <div class="flex flex-wrap gap-2 justify-content-end mb-4">
+    <p-multiSelect
+      [options]="columns"
+      [(ngModel)]="selectedColumns"
+      optionLabel="name"
+      [maxSelectedLabels]="zero"
+      [filter]="true"
+      selectedItemsLabel="{{ 'general.columnsSelected' | translate }}"
+      placeholder="{{ 'general.chooseColumns' | translate }}"
+      (onChange)="onChangeSelectedColumns($event.value)"
+    >
+      <ng-template let-item pTemplate="item">
+        <div>{{ item.name | translate }}</div>
+      </ng-template>
+    </p-multiSelect>
+    <span class="p-input-icon-left w-full sm:w-20rem">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        (input)="onGlobalFilter(dt, $event)"
+        placeholder="{{ 'paginator.search' | translate }}"
+        class="w-full"
+      />
+    </span>
+    <button
+      (click)="navigateToCreateUser()"
+      pButton
+      class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1"
+      icon="pi pi-user-plus"
+      label="{{ 'general.addNew' | translate }}"
+    ></button>
+  </div>
   <p-table
+    styleClass="p-datatable-gridlines"
     #dt
     [value]="users"
-    [loading]="loadingTable()"
+    [columns]="selectedColumns"
     [lazy]="true"
-    [paginator]="true"
-    [rows]="10"
-    [showCurrentPageReport]="true"
     responsiveLayout="scroll"
-    currentPageReportTemplate="{{ 'paginator.showing' | translate }} {first} {{ 'paginator.to' | translate }} {last} {{
-      'paginator.of' | translate
-    }} {totalRecords} {{ 'paginator.entries' | translate }}"
-    (onLazyLoad)="loadUsersLazy($event)"
-    [totalRecords]="totalRecords"
+    [loading]="loadingTable"
+    (onLazyLoad)="lazyLoad($event)"
+    [sortField]="defaultSortField"
+    [sortOrder]="descOrder"
+    [scrollable]="true"
   >
-    <ng-template pTemplate="caption">
-      <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-        <div>
-          <button
-            pButton
-            class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1 p-button-secondary mr-4"
-            icon="pi pi-arrow-left"
-            label="{{ 'general.back' | translate }}"
-            (click)="navigateToDashboard()"
-          ></button>
-          <span class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0">
-            <i class="pi pi-search"></i>
-            <input
-              pInputText
-              type="text"
-              (input)="onGlobalFilter(dt, $event)"
-              placeholder="{{ 'paginator.search' | translate }}"
-              class="w-full"
-            />
-          </span>
-        </div>
-        <button
-          (click)="navigateToCreateUser()"
-          pButton
-          class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1"
-          icon="pi pi-user-plus"
-          label="{{ 'general.addNew' | translate }}"
-        ></button>
-      </div>
-    </ng-template>
-    <ng-template pTemplate="header">
+    <ng-template pTemplate="header" let-columns>
       <tr>
-        <th pSortableColumn="id" class="white-space-nowrap" style="width: 25%">
-          {{ 'user.id' | translate }} <p-sortIcon field="id"></p-sortIcon>
+        <th
+          *ngFor="let col of columns; let index = index"
+          [pSortableColumnDisabled]="!col.sort.show"
+          [pSortableColumn]="col.sort.field"
+          [class]="index === columns.length - one ? 'white-space-nowrap' : 'white-space-nowrap min-width'"
+          class="text-center"
+          [frozen]="col.action"
+          alignFrozen="right"
+          pFrozenColumn
+        >
+          {{ col.name | translate }}
+          <p-sortIcon *ngIf="col.sort.show" [field]="col.sort.field"></p-sortIcon>
         </th>
-        <th pSortableColumn="name" class="white-space-nowrap" style="width: 25%">
-          {{ 'user.name' | translate }} <p-sortIcon field="name"></p-sortIcon>
+      </tr>
+      <tr>
+        <th *ngFor="let col of columns" [frozen]="col.action" alignFrozen="right" pFrozenColumn>
+          <p-columnFilter *ngIf="col.filter" type="text" [field]="col.sort.field" [showMenu]="false"> </p-columnFilter>
         </th>
-        <th class="white-space-nowrap" style="width: 25%">
-          {{ 'user.email' | translate }}
-        </th>
-        <th class="white-space-nowrap" style="width: 25%">
-          {{ 'user.role' | translate }}
-        </th>
-        <th class="white-space-nowrap" style="width: 25%">
-          {{ 'user.modality' | translate }}
-        </th>
-        <th class="white-space-nowrap" style="width: 25%">
-          {{ 'user.telephone' | translate }}
-        </th>
-        <th pSortableColumn="date" class="white-space-nowrap" style="width: 25%">
-          {{ 'user.createdAt' | translate }}<p-sortIcon field="date"></p-sortIcon>
-        </th>
-        <th class="white-space-nowrap" style="width: 25%">{{ 'general.activity' | translate }}</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-user>
+    <ng-template pTemplate="body" let-data let-columns="columns" let-i="rowIndex">
       <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.name }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ getRoleName(user.rols) }}</td>
-        <td>{{ user.modality_id == 1 ? 'Presencial' : 'Teletrabajo' }}</td>
-        <td>{{ user.telephone }}</td>
-        <td>{{ user.created_at | date: 'MM/dd/yyyy' }}</td>
-        <td>
-          <a
-            (click)="navigateToEditUser(user.id)"
-            class="p-button-outlined p-button-rounded p-button-text p-button-sm cursor-pointer"
-          >
-            <i class="pi pi-pencil"></i>
-          </a>
-          <p-confirmDialog
-            header="Confirmation"
-            [key]="user.id"
-            icon="pi pi-exclamation-triangle"
-            message="{{ 'general.messageToAction' | translate }}"
-            [style]="{ width: '350px' }"
-            acceptButtonStyleClass="p-button-text"
-            rejectButtonStyleClass="p-button-text"
-          ></p-confirmDialog>
-          <a
-            (click)="confirmDelete(user.id)"
-            class="p-button-outlined p-button-rounded p-button-text p-button-sm cursor-pointer ml-4"
-          >
-            <i class="pi pi-trash text-red-500"></i>
-          </a>
+        <td *ngFor="let col of columns" [frozen]="col.action" alignFrozen="right" pFrozenColumn>
+          <div *ngIf="col.index" class="text-center">
+            {{ col.value }}
+          </div>
+          <div *ngIf="!col.action && !col.index" class="text-center">
+            <ng-container *ngIf="!!col.toDate">
+              {{ col.value | valueJson: data | date: col.toDate }}
+            </ng-container>
+            <ng-container *ngIf="!col.toDate && col.name === userRoleCol">
+              {{ getRoleName(data[userRolValue]) }}
+            </ng-container>
+            <ng-container *ngIf="!col.toDate && col.name !== userRoleCol">
+              {{ col.value | valueJson: data }}
+            </ng-container>
+          </div>
+          <div *ngIf="col.action" class="flex justify-content-center align-items-center">
+            <p-menu appendTo="body" #menu [model]="data.menu" [popup]="true"></p-menu>
+            <button
+              pButton
+              type="button"
+              (click)="getMenuItemsForItem(data); menu.toggle($event)"
+              class="p-button-outlined"
+              icon="pi pi-angle-down"
+              label="{{ 'general.options' | translate }}"
+              iconPos="right"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="selectedColumns.length">
+          <div class="flex justify-content-center align-items-center">
+            {{ 'paginator.empty' | translate }}
+          </div>
         </td>
       </tr>
     </ng-template>
   </p-table>
+  <p-paginator
+    [totalRecords]="paginator.total"
+    [rows]="rowPerPage"
+    [showCurrentPageReport]="true"
+    (onPageChange)="onPage($event)"
+    currentPageReportTemplate="{{ 'paginator.showing' | translate }} {{ paginator.from || zero }} {{
+      'paginator.to' | translate
+    }} {{ paginator.to || zero }} {{ 'paginator.of' | translate }} {{ paginator.total || zero }} {{
+      'paginator.entries' | translate
+    }}"
+  >
+  </p-paginator>
 </div>

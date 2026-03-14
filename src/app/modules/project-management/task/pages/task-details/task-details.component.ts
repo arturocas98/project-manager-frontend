@@ -1,29 +1,26 @@
-import {Component, OnInit, OnDestroy, LOCALE_ID} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {ButtonModule} from 'primeng/button';
-import {CardModule} from 'primeng/card';
-import {TagModule} from 'primeng/tag';
-import {AvatarModule} from 'primeng/avatar';
-import {DividerModule} from 'primeng/divider';
-import {ProgressSpinnerModule} from 'primeng/progressspinner';
-import {TooltipModule} from 'primeng/tooltip';
-import {ConfirmationService, MenuItem, MessageService, TreeNode} from 'primeng/api';
-import {ToastModule} from 'primeng/toast';
-import {Subscription} from 'rxjs';
-import {ProjectService} from "../../../../../core/service/project.service";
-import {
-  IncidenceDetail,
-  IncidenceDetailChild,
-} from "../../../../../shared/models/task-models/task-create-model";
-import {TreeModule} from "primeng/tree";
-import {TruncatePipe} from "../../../../../shared/Pipes/TruncatePipe";
-import {CommentResponse} from "../../../../../shared/models/task-models/CommentResponse";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
-import {InputTextareaModule} from "primeng/inputtextarea";
-import {FormsModule} from "@angular/forms";
-import {ScrollPanelModule} from "primeng/scrollpanel";
-import {MenuModule} from "primeng/menu";
+import { Component, OnInit, OnDestroy, LOCALE_ID } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { TagModule } from 'primeng/tag';
+import { AvatarModule } from 'primeng/avatar';
+import { DividerModule } from 'primeng/divider';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { Subscription } from 'rxjs';
+import { ProjectService } from '../../../../../core/service/project.service';
+import { IncidenceDetail, IncidenceDetailChild } from '../../../../../shared/models/task-models/task-create-model';
+import { TreeModule } from 'primeng/tree';
+import { TruncatePipe } from '../../../../../shared/Pipes/TruncatePipe';
+import { CommentResponse } from '../../../../../shared/models/task-models/CommentResponse';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { FormsModule } from '@angular/forms';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { MenuModule } from 'primeng/menu';
 
 @Component({
   selector: 'app-task-details',
@@ -48,16 +45,15 @@ import {MenuModule} from "primeng/menu";
     MenuModule,
   ],
   templateUrl: './task-details.component.html',
-  providers: [MessageService,
-    { provide: LOCALE_ID, useValue: 'es' } ]
+  providers: [MessageService, { provide: LOCALE_ID, useValue: 'es' }],
 })
 export class TaskDetailsComponent implements OnInit, OnDestroy {
   readonly roleMap: Record<string, string> = {
-    'administrator': 'Administrador',
-    'leader': 'Líder',
-    'developer': 'Desarrollador',
-    'tester': 'Tester',
-    'documenter': 'Documentador'
+    administrator: 'Administrador',
+    leader: 'Líder',
+    developer: 'Desarrollador',
+    tester: 'Tester',
+    documenter: 'Documentador',
   };
   getRoleNameInSpanish(roleName: string | null | undefined): string {
     if (!roleName) return 'Sin rol';
@@ -88,20 +84,20 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
   // Mapeo de prioridades a colores y etiquetas
   readonly priorityMap: Record<string, { label: string; severity: string; icon: string; color: string }> = {
-    'low': { label: 'Baja', severity: 'info', icon: 'pi-arrow-down', color: 'text-blue-600' },
-    'medium': { label: 'Media', severity: 'warning', icon: 'pi-minus', color: 'text-yellow-600' },
-    'high': { label: 'Alta', severity: 'danger', icon: 'pi-arrow-up', color: 'text-orange-600' },
-    'critical': { label: 'Crítica', severity: 'danger', icon: 'pi-exclamation-triangle', color: 'text-red-600' }
+    low: { label: 'Baja', severity: 'info', icon: 'pi-arrow-down', color: 'text-blue-600' },
+    medium: { label: 'Media', severity: 'warning', icon: 'pi-minus', color: 'text-yellow-600' },
+    high: { label: 'Alta', severity: 'danger', icon: 'pi-arrow-up', color: 'text-orange-600' },
+    critical: { label: 'Crítica', severity: 'danger', icon: 'pi-exclamation-triangle', color: 'text-red-600' },
   };
 
   // Mapeo de estados a colores
   readonly stateSeverityMap: Record<string, string> = {
-    'Open': 'info',
+    Open: 'info',
     'In Progress': 'warning',
-    'Review': 'help',
-    'Closed': 'success',
-    'Locked': 'danger',
-    'Finished': 'success'
+    Review: 'help',
+    Closed: 'success',
+    Locked: 'danger',
+    Finished: 'success',
   };
 
   constructor(
@@ -142,19 +138,19 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     this.error = null;
 
     const taskSub = this.projectService.getOneTask(this.projectId, this.taskId).subscribe({
-      next: (task) => {
+      next: task => {
         this.task = task;
         this.buildTreeData();
         this.buildAncestorsPath();
         this.loading = false;
         this.loadComments(); // Cargar comentarios después de la tarea
       },
-      error: (error) => {
+      error: error => {
         console.error('Error loading task details:', error);
         this.error = 'No se pudo cargar la información de la tarea';
         this.loading = false;
         this.showError('Error', 'Error al cargar la tarea');
-      }
+      },
     });
 
     this.subscriptions.push(taskSub);
@@ -168,19 +164,19 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
     this.loadingComments = true;
     const commentsSub = this.projectService.getComments(this.projectId, this.taskId).subscribe({
-      next: (comments) => {
-        this.comments = comments
+      next: comments => {
+        this.comments = comments;
 
         this.buildCommentMenuItems();
         this.loadingComments = false;
         console.log(this.comments);
         console.log(comments);
       },
-      error: (error) => {
+      error: error => {
         console.error('Error loading comments:', error);
         this.loadingComments = false;
         this.showError('Error', 'No se pudieron cargar los comentarios');
-      }
+      },
     });
 
     this.subscriptions.push(commentsSub);
@@ -195,8 +191,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
         {
           label: 'Eliminar',
           icon: 'pi pi-trash',
-          command: () => this.confirmDeleteComment(comment)
-        }
+          command: () => this.confirmDeleteComment(comment),
+        },
       ];
     });
   }
@@ -212,23 +208,19 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
     this.submittingComment = true;
 
-    const commentSub = this.projectService.createComment(
-      this.projectId,
-      this.taskId,
-      this.newComment
-    ).subscribe({
-      next: (newComment) => {
+    const commentSub = this.projectService.createComment(this.projectId, this.taskId, this.newComment).subscribe({
+      next: newComment => {
         this.comments = [newComment, ...this.comments];
         this.buildCommentMenuItems();
         this.newComment = '';
         this.submittingComment = false;
         this.showSuccess('Comentario agregado', 'El comentario se publicó correctamente');
       },
-      error: (error) => {
+      error: error => {
         console.error('Error creating comment:', error);
         this.submittingComment = false;
         this.showError('Error', 'No se pudo publicar el comentario');
-      }
+      },
     });
 
     this.subscriptions.push(commentSub);
@@ -252,7 +244,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.deleteComment(comment.id);
-      }
+      },
     });
   }
 
@@ -260,20 +252,16 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    * Elimina un comentario
    */
   deleteComment(commentId: number): void {
-    const deleteSub = this.projectService.deleteComment(
-      this.projectId,
-      this.taskId,
-      commentId
-    ).subscribe({
+    const deleteSub = this.projectService.deleteComment(this.projectId, this.taskId, commentId).subscribe({
       next: () => {
         this.comments = this.comments.filter(c => c.id !== commentId);
         this.buildCommentMenuItems();
         this.showSuccess('Comentario eliminado', 'El comentario se eliminó correctamente');
       },
-      error: (error) => {
+      error: error => {
         console.error('Error deleting comment:', error);
         this.showError('Error', 'No se pudo eliminar el comentario');
-      }
+      },
     });
 
     this.subscriptions.push(deleteSub);
@@ -295,7 +283,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       label: child.title,
       data: child,
       expanded: true,
-      children: child.children?.map(grandChild => this.mapToTreeNode(grandChild)) || []
+      children: child.children?.map(grandChild => this.mapToTreeNode(grandChild)) || [],
     };
     return node;
   }
@@ -340,19 +328,13 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    */
   navigateToTask(taskId: number) {
     if (taskId === this.taskId) return;
-    this.router.navigate(
-      ['/project-management/projects/kanban', this.projectId, 'task-details', taskId],
-      { queryParamsHandling: 'merge' }
-    );
+    this.router.navigate(['/project-management/projects/kanban', this.projectId, 'task-details', taskId], {
+      queryParamsHandling: 'merge',
+    });
   }
 
   createTask(columnId: number): void {
-    this.router.navigate([
-      '/project-management/projects/kanban',
-      this.projectId,
-      'create-task',
-      columnId
-    ]);
+    this.router.navigate(['/project-management/projects/kanban', this.projectId, 'create-task', columnId]);
   }
 
   /**
@@ -363,7 +345,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       severity: 'error',
       summary: summary,
       detail: detail,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -375,7 +357,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       severity: 'success',
       summary: summary,
       detail: detail,
-      life: 3000
+      life: 3000,
     });
   }
 
@@ -384,12 +366,14 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    */
   getPriorityInfo(priority: string | null) {
     if (!priority) return { label: 'No definida', severity: 'secondary', icon: 'pi-question', color: '' };
-    return this.priorityMap[priority.toLowerCase()] || {
-      label: priority,
-      severity: 'secondary',
-      icon: 'pi-tag',
-      color: ''
-    };
+    return (
+      this.priorityMap[priority.toLowerCase()] || {
+        label: priority,
+        severity: 'secondary',
+        icon: 'pi-tag',
+        color: '',
+      }
+    );
   }
 
   /**
@@ -420,11 +404,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    * Navega de regreso al kanban
    */
   goBack() {
-    this.router.navigate([
-      '/project-management/projects/kanban',
-      this.projectId,
-      'project-kanban',
-    ]);
+    this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-kanban']);
   }
 
   /**
@@ -432,12 +412,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    */
   editTask(taskId: number | undefined): void {
     if (!taskId) return;
-    this.router.navigate([
-      '/project-management/projects/kanban',
-      this.projectId,
-      'task-update',
-      taskId
-    ]);
+    this.router.navigate(['/project-management/projects/kanban', this.projectId, 'task-update', taskId]);
   }
 
   /**

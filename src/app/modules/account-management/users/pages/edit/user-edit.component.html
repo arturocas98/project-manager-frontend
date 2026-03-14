@@ -1,8 +1,8 @@
 <div class="card">
-  <div class="flex justify-center align-items-center mb-4">
+  <div class="flex justify-start align-items-start mb-4">
     <button
       pButton
-      class="p-button-outlined w-full sm:w-auto flex-order-0 p-button-secondary mr-4"
+      class="p-button-outlined w-full sm:w-auto flex-order-0 p-button-primary mr-4"
       icon="pi pi-arrow-left"
       label="{{ 'general.back' | translate }}"
       (click)="navigateToUserList()"
@@ -14,33 +14,65 @@
       <div class="text-900 font-medium text-xl mb-3">{{ 'user.profile' | translate }}</div>
     </div>
     <div class="col-12 lg:col-10">
-      <form [formGroup]="ngForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
         <div class="grid formgrid p-fluid">
-          <div class="field mb-4 col-12">
+          <div class="field mb-4 col-6">
             <label for="name" class="font-medium text-900">{{ 'user.username' | translate }}</label>
             <input formControlName="name" id="name" type="text" pInputText />
           </div>
-          <div class="field mb-4 col-12">
+          <div class="field mb-4 col-6">
             <label for="email" class="font-medium text-900">{{ 'user.email' | translate }}</label>
             <input formControlName="email" id="email" type="email" pInputText />
           </div>
-          <div class="field mb-4 col-12">
-            <label for="password" class="font-medium text-900">{{ 'user.password' | translate }}</label>
-            <input formControlName="password" id="password" type="password" pInputText />
+          <div class="field mb-4 col-6">
+            <label for="new_password" class="font-medium text-900">{{ 'user.password' | translate }}</label>
+            <p-password formControlName="password" id="new_password" [toggleMask]="true"></p-password>
           </div>
-          <div class="field mb-4 col-12">
+          <div class="field mb-4 col-6">
             <label for="password_confirmation" class="font-medium text-900">{{
               'user.passwordConfirmation' | translate
             }}</label>
-            <input formControlName="password_confirmation" id="password_confirmation" type="password" pInputText />
+            <p-password
+              formControlName="password_confirmation"
+              id="password_confirmation"
+              [toggleMask]="true"
+            ></p-password>
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="status" class="font-medium text-900">{{ 'user.statusLabel' | translate }}</label>
+            <p-toggleButton
+              formControlName="status"
+              id="status"
+              [onLabel]="'user.status.active' | translate"
+              [offLabel]="'user.status.inactive' | translate"
+              [onIcon]="'pi pi-lock-open'"
+              [offIcon]="'pi pi-lock'"
+              class="w-[10em] block"
+            ></p-toggleButton>
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="role" class="font-medium text-900">{{ 'general.expiredAt' | translate }}</label>
+            <p-calendar formControlName="expires_at" appendTo="body" [dateFormat]="shortLocalFormatDate" />
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="role" class="font-medium text-900">{{ 'user.role' | translate }}</label>
+            <p-multiSelect
+              (onChange)="changeRol()"
+              dataKey="id"
+              [options]="roles"
+              optionLabel="name"
+              id="role"
+              formControlName="rols"
+              [placeholder]="'role.rolePlaceholder' | translate"
+            >
+            </p-multiSelect>
           </div>
 
-          <div class="field mb-4 col-12">
+          <div class="field mb-4 col-6">
             <label for="telephone" class="font-medium text-900">{{ 'user.telephone' | translate }}</label>
             <input pKeyFilter="int" formControlName="telephone" id="telephone" type="text" pInputText maxlength="12" />
           </div>
-
-          <div class="field mb-4 col-12">
+          <div class="field mb-4 col-6">
             <label for="address" class="font-medium text-900">{{ 'user.address' | translate }}</label>
             <input formControlName="address" id="address" type="text" pInputText />
           </div>
@@ -58,19 +90,6 @@
             </p-dropdown>
           </div>
 
-          <div class="field mb-4 col-6">
-            <label for="role" class="font-medium text-900">{{ 'user.role' | translate }}</label>
-            <p-dropdown
-              [options]="roles"
-              optionLabel="name"
-              optionValue="id"
-              id="role"
-              formControlName="role_id"
-              [placeholder]="'role.rolePlaceholder' | translate"
-            >
-            </p-dropdown>
-          </div>
-
           <div class="col-12">
             <button pButton pRipple label="{{ 'user.update' | translate }}" class="w-auto mt-3"></button>
           </div>
@@ -79,3 +98,4 @@
     </div>
   </div>
 </div>
+<p-toast></p-toast>

@@ -1,3 +1,4 @@
+import { MenuItem } from 'primeng/api';
 import { Permission } from './role';
 
 export interface User {
@@ -12,6 +13,12 @@ export interface User {
   modality_id: string;
   address: string;
   telephone: string;
+  menu?: MenuItem[];
+  expires_at?: string;
+  rols?: string[];
+  password?: string;
+  password_confirmation?: string;
+  deleted_at?: string;
 }
 export interface UserData {
   id: number;
