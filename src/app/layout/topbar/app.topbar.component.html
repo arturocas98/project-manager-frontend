@@ -1,25 +1,18 @@
 <div class="layout-topbar">
   <div class="topbar-start w-3rem">
-    <button
-      #menubutton
-      type="button"
-      class="topbar-menubutton p-link w-3rem h-3rem p-trigger"
-      (click)="onMenuButtonClick()"
-    >
+    <button #menubutton type="button" class="topbar-menubutton p-link w-3rem h-3rem p-trigger"
+      (click)="onMenuButtonClick()">
       <i class="ph ph-sidebar-simple text-3xl"></i>
     </button>
   </div>
   <div>
     <ul class="flex mt-4 sm:gap-4 font-medium flex-row align-items-center space-x-2 list-none p-0 m-0">
       <li class="hidden sm:flex">
-        <a
-          [routerLink]="['/pages/dashboard']"
+        <a [routerLink]="['/pages/dashboard']"
           routerLinkActive="text-white bg-indigo-500 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
           [routerLinkActiveOptions]="{ exact: true }"
           class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-indigo-500 hover:text-white transition-all duration-300 group"
-          style="border-radius: 20px"
-          role="menuitem"
-        >
+          style="border-radius: 20px" role="menuitem">
           <i class="ph ph-house text-xl"></i>
           <span class="text-xl">Inicio</span>
         </a>
@@ -34,14 +27,24 @@
       </li>
       <li class="hidden sm:flex">
         <a
-          [routerLink]="['/project-management/projects/create']"
+          [routerLink]="['/project-management/projects/notifications']"
           routerLinkActive="text-white bg-green-700 from-purple-600 to-purple-700 dark:from-purple-700 dark:to-purple-800 lg:bg-transparent lg:text-purple-700 lg:dark:text-purple-400 lg:font-semibold"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-green-700 hover:text-white transition-all duration-300 group"
+          class="flex align-items-center gap-3 py-3 pl-4 pr-4 p-text-secondary hover:bg-green-700 hover:text-white transition-all duration-300 group relative"
           style="border-radius: 20px"
           role="menuitem"
         >
           <i class="ph ph-bell text-xl"></i>
+
+          <!-- Badge de notificaciones -->
+          <span
+            *ngIf="unreadCount > 0"
+            class="absolute flex align-items-center justify-content-center bg-red-500 text-white font-bold border-circle"
+            style="min-width: 1.25rem; height: 1.25rem; font-size: 0.70rem; top: 0.5rem; left: 1.8rem; padding: 2px;"
+          >
+            {{ unreadCount > 99 ? '99+' : unreadCount }}
+          </span>
+
           <span class="text-xl">Notificaciones</span>
         </a>
       </li>
@@ -52,12 +55,8 @@
     <button type="button" class="p-link" (click)="onProfileButtonClick()">
       <div class="topbar-end flex align-items-center justify-center relative">
         <button type="button" class="p-link" (click)="onProfileButtonClick()">
-          <p-avatar
-            [label]="userInitials()"
-            shape="circle"
-            size="large"
-            styleClass="bg-primary text-white w-3rem h-3rem relative text-lg"
-          ></p-avatar>
+          <p-avatar [label]="userInitials()" shape="circle" size="large"
+            styleClass="bg-primary text-white w-3rem h-3rem relative text-lg"></p-avatar>
         </button>
       </div>
     </button>

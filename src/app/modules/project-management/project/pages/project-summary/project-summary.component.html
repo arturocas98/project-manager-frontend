@@ -1,278 +1,240 @@
-<div class="min-h-screen space-y-6">
-  <!-- CONTENEDOR PRINCIPAL FLEX COLUMN -->
-  <div class="p-3 surface-ground min-h-screen flex flex-column gap-6">
+<div class="min-h-screen p-3 md:p-5 surface-card">
+  <!-- LOADING -->
+  <div *ngIf="loading" class="flex flex-column align-items-center justify-content-center h-screen">
+    <i class="pi pi-spin pi-spinner text-6xl text-primary mb-4"></i>
+    <h2 class="text-xl font-medium text-color-secondary">Cargando métricas del proyecto...</h2>
+  </div>
 
-    <!-- HEADER CON TÍTULO Y FILTROS -->
-    <div class="flex flex-column md:flex-row md:align-items-center md:justify-content-between gap-4">
+  <!-- ERROR -->
+  <div *ngIf="!loading && error" class="flex flex-column align-items-center justify-content-center h-screen">
+    <i class="pi pi-exclamation-circle text-6xl text-red-500 mb-4"></i>
+    <h2 class="text-xl font-medium text-color-secondary">{{error}}</h2>
+    <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="refresh()" styleClass="mt-4 p-button-outlined"></p-button>
+  </div>
+
+  <!-- DASHBOARD CONTENT -->
+  <div *ngIf="!loading && !error" class="flex flex-column gap-4 md:gap-5">
+
+    <!-- HEADER -->
+    <div class="flex flex-column md:flex-row md:align-items-center justify-content-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-color">Dashboard Analítico</h1>
-        <p class="text-sm text-color mt-1">Visión general del rendimiento y métricas del proyecto</p>
+        <h1 class="text-3xl font-bold text-color m-0">Dashboard Analítico</h1>
+        <p class="text-base text-color-secondary mt-2 m-0">Visión general del rendimiento y métricas del proyecto</p>
       </div>
       <div class="flex align-items-center gap-3">
-      <span class="px-3 py-2 surface-card border-round-lg text-sm text-color flex align-items-center gap-2 shadow-1 border-1 border-gray-200">
-        <i class="pi pi-calendar text-color"></i>
-        Últimos 30 días
-        <i class="pi pi-chevron-down text-xs ml-2 text-color"></i>
-      </span>
+        <span class="px-3 py-2 surface-card border-round-lg text-sm text-color-secondary flex align-items-center gap-2 shadow-1 border-1 surface-border cursor-pointer hover:surface-hover transition-colors">
+          <i class="pi pi-calendar text-primary"></i>
+          <span>Últimos 30 días</span>
+        </span>
         <p-button
           label="Actualizar"
           icon="pi pi-refresh"
-          styleClass="bg-blue-600 border-none hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium"
-          (onClick)="refresh()">
+          (onClick)="refresh()"
+          styleClass="p-button-primary shadow-2">
         </p-button>
       </div>
     </div>
 
-    <!-- ================= KPI ROW FLEX ================= -->
-    <div class="flex flex-wrap gap-4 p-4">
-      <ng-container *ngFor="let kpi of kpis">
-        <div class="flex-1 min-w-260px">
-          <div class="surface-card border-round-2xl shadow-2 hover:shadow-6 transition-all duration-300 p-4 flex align-items-center justify-content-between border-left-4 border-top-1 border-right-1 border-bottom-1 border-gray-200 hover:border-blue-200 cursor-pointer bg-gradient-to-br from-white to-gray-50">
-            <div class="flex flex-column gap-2">
-          <span class="text-xs font-semibold text-600 uppercase tracking-wider flex align-items-center gap-1">
-            <i class="pi pi-circle-fill text-blue-500" style="font-size: 0.4rem"></i>
-            {{ kpi.label }}
-          </span>
-
-              <span class="text-3xl font-bold text-900 flex align-items-baseline gap-2">
-            {{ kpi.value }}
-                <span *ngIf="kpi.trend"
-                      class="text-sm font-medium px-2 py-1 border-round-xl"
-                      [ngClass]="{
-                    'bg-green-100 text-green-700': kpi.trend > 0,
-                    'bg-red-100 text-red-700': kpi.trend < 0
-                  }">
-              <i [class]="kpi.trend > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"
-                 class="text-xs mr-1"></i>
-                  {{ Math.abs(kpi.trend) }}%
-            </span>
-          </span>
-
-              <span *ngIf="kpi.trend" class="text-xs text-500">
-            vs. mes anterior
-          </span>
+    <!-- KPIs -->
+    <div class="grid">
+      <div class="col-12 md:col-6 xl:col" *ngFor="let kpi of kpis">
+        <div class="surface-card border-round-xl shadow-1 p-4 transition-all transition-duration-300 hover:shadow-3 border-1 surface-border hover:border-primary cursor-pointer h-full flex flex-column justify-content-between relative overflow-hidden">
+          <div class="flex justify-content-between align-items-start mb-4">
+            <div>
+              <span class="block text-500 font-semibold text-sm mb-2 uppercase tracking-wide">{{kpi.label}}</span>
+              <div class="text-900 font-bold text-3xl">{{kpi.value}}</div>
             </div>
-
-            <div class="w-14 h-14 border-round-2xl flex align-items-center justify-content-center shadow-sm"
-                 [ngClass]="kpi.bgClass || 'bg-blue-50'">
-              <i [class]="kpi.icon + ' text-3xl'"
-                 [ngClass]="kpi.iconClass || 'text-blue-600'"></i>
+            <div class="flex align-items-center justify-content-center border-round-xl shadow-1" [ngClass]="kpi.bgClass" style="width: 3rem; height: 3rem">
+              <i [class]="kpi.icon + ' text-xl'" [ngClass]="kpi.iconClass"></i>
             </div>
           </div>
-        </div>
-      </ng-container>
-    </div>
-
-    <!-- ================= GRÁFICOS SUPERIORES FLEX ================= -->
-    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
-      <!-- ESTADO CON DONUT CHART -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Estado</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Estado actual de las tareas</p>
-          </div>
-          <div class="flex align-items-center gap-2">
-            <span class="w-2 h-2 bg-green-500 border-circle"></span>
-          </div>
-        </div>
-        <div class="p-5">
-          <p-chart type="doughnut"
-                   [data]="statusData"
-                   [options]="doughnutOptions"
-                   class="h-64 w-full block text-color">
-          </p-chart>
-        </div>
-      </div>
-
-      <!-- PRIORIDAD CON BARRAS HORIZONTALES -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-6 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Distribución por Prioridad</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Clasificación de tareas por urgencia</p>
-          </div>
-        </div>
-        <div class="p-5">
-          <p-chart type="bar"
-                   [data]="priorityData"
-                   [options]="horizontalBarOptions"
-                   class="h-64 w-full block">
-          </p-chart>
-        </div>
-        <div class="flex align-items-center justify-content-center">
-          <div class="sm:w-30rem sm:h-30rem flex align-items-center justify-content-center">
-            <img
-              src="assets/General/Cartoon_Projects_dark.png"
-              alt="Crear Proyecto"
-              class="w-20rem z-1 h-20rem mb-4 sm:w-25rem sm:h-25rem object-fit-cover mt-8 sm:mt-0">
+          <div class="flex align-items-center gap-2 mt-auto">
+             <span *ngIf="kpi.trend !== null" class="font-bold text-sm px-2 py-1 border-round flex align-items-center gap-1"
+                   [ngClass]="kpi.trend > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'">
+               <i [class]="kpi.trend > 0 ? 'pi pi-arrow-up' : 'pi pi-arrow-down'" class="text-xs"></i>
+               {{ Math.abs(kpi.trend) }}%
+             </span>
+             <span *ngIf="kpi.trend !== null" class="text-500 text-sm font-medium">vs mes anterior</span>
+             <span *ngIf="kpi.trend === null" class="text-500 text-sm font-medium">Prioridad alta</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ================= GRÁFICOS INFERIORES FLEX ================= -->
-    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
+    <!-- GRÁFICOS SUPERIORES -->
+    <div class="grid">
+      <!-- DISTRIBUCIÓN POR ESTADO -->
+      <div class="col-12 lg:col-5 xl:col-4 flex">
+        <div class="surface-card border-round-xl shadow-1 border-1 surface-border w-full flex flex-column">
+          <div class="p-4 border-bottom-1 surface-border flex justify-content-between align-items-center">
+            <div>
+              <h2 class="text-base font-bold text-color m-0">Distribución por Estado</h2>
+              <p class="text-sm text-color-secondary mt-1 m-0">Estado de las tareas</p>
+            </div>
+          </div>
+          <div class="p-4 flex-grow-1 flex align-items-center justify-content-center">
+            <p-chart type="doughnut" [data]="statusData" [options]="doughnutOptions" class="w-full flex align-items-center justify-content-center" style="min-height: 250px;"></p-chart>
+          </div>
+        </div>
+      </div>
+
+      <!-- DISTRIBUCIÓN POR PRIORIDAD -->
+      <div class="col-12 lg:col-7 xl:col-8 flex">
+        <div class="surface-card border-round-xl shadow-1 border-1 surface-border w-full flex flex-column">
+          <div class="p-4 border-bottom-1 surface-border">
+            <h2 class="text-base font-bold text-color m-0">Distribución por Prioridad</h2>
+            <p class="text-sm text-color-secondary mt-1 m-0">Clasificación de urgencia en el proyecto</p>
+          </div>
+          <div class="p-4 flex-grow-1 flex align-items-center justify-content-center relative">
+            <div class="w-full lg:w-7">
+               <p-chart type="bar" [data]="priorityData" [options]="horizontalBarOptions" class="w-full block" style="max-height: 250px;"></p-chart>
+            </div>
+            <!-- Imágen decorativa a la derecha -->
+            <div class="hidden lg:flex w-5 justify-content-center align-items-center">
+              <img src="assets/General/Cartoon_Projects_dark.png" alt="Projects Illustration" class="w-10rem xl:w-16rem object-contain opacity-90 transition-transform duration-500 hover:scale-110" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS INFERIORES -->
+    <div class="grid">
       <!-- CARGA POR USUARIO -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border">
-          <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Carga por Usuario</h2>
-          <p class="text-xs text-color-secondary mt-0.5">Distribución de tareas asignadas</p>
-        </div>
-        <div class="p-3">
-          <p-chart type="bar"
-                   [data]="userLoadData"
-                   [options]="verticalBarOptions"
-                   class="h-64 w-full block">
-          </p-chart>
+      <div class="col-12 lg:col-6 flex">
+        <div class="surface-card border-round-xl shadow-1 border-1 surface-border w-full flex flex-column">
+          <div class="p-4 border-bottom-1 surface-border">
+            <h2 class="text-base font-bold text-color m-0">Carga por Usuario</h2>
+            <p class="text-sm text-color-secondary mt-1 m-0">Distribución de tareas asignadas</p>
+          </div>
+          <div class="p-4 flex-grow-1">
+            <p-chart type="bar" [data]="userLoadData" [options]="verticalBarOptions" class="w-full block" style="max-height: 300px;"></p-chart>
+          </div>
         </div>
       </div>
 
-      <!-- TENDENCIA -->
-      <div class="sm:flex-1 min-w-400px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Tendencia de Actividad</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Últimos 7 días</p>
+      <!-- TENDENCIA SEMANAL -->
+      <div class="col-12 lg:col-6 flex">
+        <div class="surface-card border-round-xl shadow-1 border-1 surface-border w-full flex flex-column">
+          <div class="p-4 border-bottom-1 surface-border flex justify-content-between align-items-center">
+            <div>
+              <h2 class="text-base font-bold text-color m-0">Tendencia de Actividad</h2>
+              <p class="text-sm text-color-secondary mt-1 m-0">Últimos 7 días</p>
+            </div>
+            <div class="flex gap-3">
+              <span class="flex align-items-center gap-2">
+                <span class="w-1rem h-1rem border-round-sm bg-green-500"></span>
+                <span class="text-xs text-color-secondary font-semibold">Completadas</span>
+              </span>
+              <span class="flex align-items-center gap-2">
+                <span class="w-1rem h-1rem border-round-sm bg-gray-400"></span>
+                <span class="text-xs text-color-secondary font-semibold">Creadas</span>
+              </span>
+            </div>
           </div>
-          <div class="flex gap-3">
-          <span class="flex align-items-center gap-1">
-            <span class="w-2 h-2 bg-blue-500 border-circle"></span>
-            <span class="text-xs text-color-secondary">Completadas</span>
-          </span>
-            <span class="flex align-items-center gap-1">
-            <span class="w-2 h-2 bg-gray-300 border-circle"></span>
-            <span class="text-xs text-color-secondary">Creadas</span>
-          </span>
+          <div class="p-4 flex-grow-1">
+            <p-chart type="line" [data]="trendData" [options]="lineOptions" class="w-full block" style="max-height: 300px;"></p-chart>
           </div>
-        </div>
-        <div class="p-3">
-          <p-chart type="line"
-                   [data]="trendData"
-                   [options]="lineOptions"
-                   class="h-64 w-full block">
-          </p-chart>
         </div>
       </div>
     </div>
 
-    <!-- ================= SECCIÓN INFERIOR FLEX ================= -->
-    <div class="flex flex-column sm:flex-row sm:flex-wrap gap-6">
-      <!-- TABLA DE ISSUES CRÍTICAS (FLEX GROW 2) -->
-      <div class="flex-2 min-w-500px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Issues Críticas</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Tareas bloqueadas o de alta prioridad</p>
+    <!-- SECCIÓN INFERIOR -->
+    <div class="grid">
+      <!-- ISSUES CRÍTICAS -->
+      <div class="col-12 xl:col-8 flex">
+        <div class="surface-card border-round-xl shadow-1 border-1 surface-border w-full flex flex-column">
+          <div class="p-4 border-bottom-1 surface-border flex justify-content-between align-items-center">
+            <div>
+              <h2 class="text-base font-bold text-color m-0">Tareas Críticas y Prioridad Alta</h2>
+              <p class="text-sm text-color-secondary mt-1 m-0">Tareas que requieren atención inmediata</p>
+            </div>
+            <p-button label="Ver todas" icon="pi pi-arrow-right" iconPos="right" [text]="true" styleClass="p-button-danger p-button-sm font-medium"></p-button>
           </div>
-          <div class="flex gap-2">
-            <p-button
-              label="Ver todas"
-              size="small"
-              styleClass="bg-red-50 text-red-600 border-none hover:bg-red-100">
-            </p-button>
+          <div class="p-0 flex-grow-1">
+            <p-table [value]="criticalIssues" sortField="priority" [sortOrder]="-1" [paginator]="true" [rows]="5" responsiveLayout="scroll" styleClass="p-datatable-sm p-datatable-gridlines border-none">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="text-sm font-bold uppercase text-600 surface-50 px-4 py-3">ID</th>
+                  <th class="text-sm font-bold uppercase text-600 surface-50 px-4 py-3">Título</th>
+                  <th class="text-sm font-bold uppercase text-600 surface-50 px-4 py-3">Prioridad</th>
+                  <th class="text-sm font-bold uppercase text-600 surface-50 px-4 py-3">Responsable</th>
+                  <th class="text-sm font-bold uppercase text-600 surface-50 px-4 py-3">Estado</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-issue>
+                <tr class="transition-colors hover:surface-hover">
+                  <td class="px-4 py-3 font-mono text-sm text-primary font-bold">#{{ issue.id }}</td>
+                  <td class="px-4 py-3">
+                    <span class="text-sm font-bold text-color block">{{ issue.title }}</span>
+                    <span class="text-xs text-color-secondary block mt-1"><i class="pi pi-briefcase text-xs mr-1"></i>{{ issue.project_name }}</span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <p-tag [value]="issue.priority | uppercase" [severity]="getPrioritySeverity(issue.priority)"></p-tag>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="flex align-items-center gap-2">
+                       <p-avatar [label]="(issue.assigned_user_name?.[0] || '?') | uppercase" shape="circle" size="normal" styleClass="bg-primary-100 text-primary font-bold shadow-1"></p-avatar>
+                       <span class="text-sm font-bold text-color">{{ issue.assigned_user_name || 'Sin asignar' }}</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <p-tag [value]="issue.status | uppercase" [severity]="getStatusSeverity(issue.status)"></p-tag>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="5" class="text-center p-5">
+                    <div class="flex flex-column align-items-center justify-content-center text-color-secondary">
+                      <i class="pi pi-check-circle text-5xl text-green-400 mb-3"></i>
+                      <p class="m-0 font-medium text-lg text-color">No hay issues críticas pendientes</p>
+                      <p class="m-0 text-sm mt-1 text-color-secondary">¡Buen trabajo manteniendo todo al día!</p>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
           </div>
-        </div>
-
-        <div class="p-3">
-          <p-table
-            [value]="criticalIssues"
-            sortField="priority"
-            [sortOrder]="-1"
-            [paginator]="true"
-            [rows]="4"
-            responsiveLayout="scroll"
-            styleClass="p-datatable-sm">
-
-            <ng-template pTemplate="header">
-              <tr class="surface-ground text-xs uppercase text-color-secondary">
-                <th class="px-4 py-3 font-semibold">ID</th>
-                <th class="px-4 py-3 font-semibold">Título</th>
-                <th class="px-4 py-3 font-semibold">Proyecto</th>
-                <th class="px-4 py-3 font-semibold">Prioridad</th>
-                <th class="px-4 py-3 font-semibold">Responsable</th>
-                <th class="px-4 py-3 font-semibold">Estado</th>
-              </tr>
-            </ng-template>
-
-            <ng-template pTemplate="body" let-issue>
-              <tr class="hover:surface-ground transition text-sm border-bottom-1 surface-border">
-                <td class="px-4 py-3 font-mono text-xs text-blue-600">#{{ issue.id }}</td>
-                <td class="px-4 py-3 font-medium text-color">{{ issue.title }}</td>
-                <td class="px-4 py-3 text-color-secondary">{{ issue.project_name }}</td>
-                <td class="px-4 py-3">
-                  <p-tag [value]="issue.priority"
-                         [severity]="getPrioritySeverity(issue.priority)"
-                         class="text-xs">
-                  </p-tag>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex align-items-center gap-2">
-                    <p-avatar
-                      [label]="issue.assigned_user_name?.[0] || '?'"
-                      shape="circle"
-                      size="normal" class="w-6 h-6">
-                    </p-avatar>
-                    <span class="text-xs text-color-secondary">{{ issue.assigned_user_name }}</span>
-                  </div>
-                </td>
-                <td class="px-4 py-3">
-                  <p-tag [value]="issue.status"
-                         [severity]="getStatusSeverity(issue.status)"
-                         class="text-xs">
-                  </p-tag>
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
         </div>
       </div>
 
-      <!-- ACTIVIDAD RECIENTE (FLEX 1) -->
-      <div class="flex-1 min-w-300px surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
-        <div class="px-3 py-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
-          <div>
-            <h2 class="text-sm font-semibold text-color uppercase tracking-wider">Actividad Reciente</h2>
-            <p class="text-xs text-color-secondary mt-0.5">Últimas actualizaciones</p>
+      <!-- ACTIVIDAD RECIENTE -->
+      <div class="col-12 xl:col-4 flex">
+        <div class="surface-card border-round-xl shadow-1 border-1 surface-border w-full flex flex-column">
+          <div class="p-4 border-bottom-1 surface-border flex justify-content-between align-items-center">
+            <div>
+              <h2 class="text-base font-bold text-color m-0">Actividad Reciente</h2>
+              <p class="text-sm text-color-secondary mt-1 m-0">Registros del sistema</p>
+            </div>
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full border-circle bg-green-400 opacity-75"></span>
+              <span class="relative inline-flex border-circle h-3 w-3 bg-green-500"></span>
+            </span>
           </div>
-          <span class="w-2 h-2 bg-green-500 border-circle animate-pulse"></span>
-        </div>
-
-        <div class="p-2 flex flex-column gap-3 max-h-320px overflow-y-auto">
-          <div *ngFor="let act of activity"
-               class="flex align-items-start gap-3 p-3 hover:surface-ground border-round transition border-1 border-transparent hover:surface-border">
-            <p-avatar
-              [label]="act.user[0]"
-              shape="circle"
-              size="normal"
-              class="text-blue-600 font-semibold">
-            </p-avatar>
-            <div class="flex-1">
-              <p class="text-sm">
-                <span class="font-semibold text-color">{{ act.user }}</span>
-                <span class="text-color-secondary ml-1">{{ act.action }}</span>
-              </p>
-              <div class="flex align-items-center gap-2 mt-1.5">
-                <span class="text-xs surface-ground px-2 py-0.5 border-round-full text-color-secondary">{{ act.project }}</span>
-                <span class="text-xs text-color-secondary flex align-items-center gap-1">
-                <i class="pi pi-clock text-xxs"></i>
-                  {{ act.time }}
-              </span>
+          <div class="p-0 flex-grow-1 overflow-y-auto" style="max-height: 400px; min-height: 250px;">
+            <div *ngIf="activity.length === 0" class="p-5 text-center text-color-secondary flex flex-column align-items-center h-full justify-content-center">
+              <i class="pi pi-inbox text-4xl mb-3 text-300"></i>
+              <p class="m-0 font-medium">No hay actividad reciente</p>
+            </div>
+            <div *ngFor="let act of activity; let last = last; let first = first"
+                 class="p-4 transition-colors hover:surface-hover border-bottom-1 surface-border"
+                 [class.border-transparent]="last">
+              <div class="flex align-items-start gap-3">
+                 <p-avatar [label]="(act.user[0] || 'S') | uppercase" shape="circle" size="large" styleClass="bg-indigo-100 text-indigo-700 font-bold shadow-1"></p-avatar>
+                 <div class="flex-1">
+                   <p class="m-0 text-sm line-height-3">
+                     <span class="font-bold text-color">{{ act.user }}</span>
+                     <span class="text-color-secondary ml-1">{{ act.action }}</span>
+                   </p>
+                   <div class="flex align-items-center gap-2 mt-2">
+                     <span class="text-xs bg-blue-50 text-blue-700 px-2 py-1 border-round-xl font-bold"><i class="pi pi-folder mr-1 text-xs"></i>{{ act.project }}</span>
+                     <span class="text-xs font-semibold text-500 ml-auto flex align-items-center"><i class="pi pi-clock mr-1"></i>{{ act.time }}</span>
+                   </div>
+                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- PIE DE ACTIVIDAD -->
-        <div class="px-3 py-3 surface-ground border-top-1 surface-border">
-          <p-button
-            label="Ver toda la actividad"
-            icon="pi pi-arrow-right"
-            iconPos="right"
-            [text]="true"
-            size="small"
-            styleClass="bg-blue-50 text-xs text-blue-600 hover:text-white hover:bg-blue-600 font-medium flex align-items-center gap-1">
-          </p-button>
         </div>
       </div>
     </div>

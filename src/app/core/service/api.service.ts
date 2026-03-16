@@ -277,6 +277,10 @@ export class ApiService {
     return this.request<T>(endPoint, HttpMethodType.GET, undefined, extraKeys);
   }
 
+  pat<T>(endPoint: string, extraKeys?: ExtraKeys): Observable<T> {
+    return this.request<T>(endPoint, HttpMethodType.PATCH, undefined, extraKeys);
+  }
+
   /**
    * GET request - Retorna la respuesta COMPLETA
    */

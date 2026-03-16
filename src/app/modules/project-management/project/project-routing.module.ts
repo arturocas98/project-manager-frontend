@@ -19,6 +19,14 @@ const routes: Routes = [
       ),
   },
   {
+    path: "notifications",
+    data: { breadcrumb: "notifications" },
+    loadComponent: () =>
+      import("./pages/notification-list/notification-list.component").then(
+        (m) => m.NotificationListComponent,
+      ),
+  },
+  {
     path: "kanban/:id",
     data: { breadcrumb: "Create" },
     loadComponent: () =>

@@ -5,7 +5,7 @@ import {ChartModule} from "primeng/chart";
 import {AvatarModule} from "primeng/avatar";
 import {TagModule} from "primeng/tag";
 import {TableModule} from "primeng/table";
-import {NgClass, NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf, UpperCasePipe} from "@angular/common";
 import {ButtonModule} from "primeng/button";
 import {CalendarModule} from "primeng/calendar";
 import {FormsModule} from "@angular/forms";
@@ -33,7 +33,8 @@ import {
     ButtonModule,
     CalendarModule,
     FormsModule,
-    NgIf
+    NgIf,
+    UpperCasePipe
   ],
   templateUrl: './project-summary.component.html',
 })
@@ -188,39 +189,39 @@ export class ProjectSummaryComponent implements OnInit {
         label: 'Total Tareas',
         value: this.summaryData.kpis.total_tasks.value,
         icon: 'pi pi-briefcase',
-        bgClass: 'surfarce-card',
-        iconClass: 'text-blue-500',
+        bgClass: 'bg-blue-100',
+        iconClass: 'text-blue-600',
         trend: this.extractTrendValue(this.summaryData.kpis.total_tasks.comparison)
       },
       {
         label: 'En Progreso',
         value: this.summaryData.kpis.in_progress_tasks.value,
         icon: 'pi pi-clock',
-        bgClass: 'surfarce-card',
-        iconClass: 'text-gray-900',
+        bgClass: 'bg-indigo-100',
+        iconClass: 'text-indigo-600',
         trend: this.extractTrendValue(this.summaryData.kpis.in_progress_tasks.comparison)
       },
       {
         label: 'Finalizadas',
         value: this.summaryData.kpis.finished_tasks.value,
         icon: 'pi pi-check-circle',
-        bgClass: 'surfarce-card',
-        iconClass: 'text-green-500',
+        bgClass: 'bg-green-100',
+        iconClass: 'text-green-600',
         trend: this.extractTrendValue(this.summaryData.kpis.finished_tasks.comparison)
       },
       {
-        label: 'Por vencer esta semana',
+        label: 'Por vencer',
         value: this.summaryData.kpis.expiring_this_week,
         icon: 'pi pi-calendar-times',
-        bgClass: 'surfarce-card',
-        iconClass: 'text-yellow-500',
+        bgClass: 'bg-orange-100',
+        iconClass: 'text-orange-600',
         trend: null
       },
       {
         label: 'Críticas activas',
         value: this.summaryData.kpis.critical_priority_tasks.value,
         icon: 'pi pi-exclamation-triangle',
-        bgClass: 'surfarce-card',
+        bgClass: 'bg-red-100',
         iconClass: 'text-red-600',
         trend: this.extractTrendValue(this.summaryData.kpis.critical_priority_tasks.comparison)
       }
@@ -231,8 +232,8 @@ export class ProjectSummaryComponent implements OnInit {
 
     // Transformar actividad reciente
     this.activity = this.summaryData.recent_incidences.map(inc => ({
-      user: inc.created_by_name,
-      action: `creó la issue ${inc.title}`,
+      user: inc.created_by_name || 'Sistema',
+      action: `creó la tarea #${inc.id}`,
       project: inc.title || 'Proyecto actual',
       time: this.getRelativeTime(inc.created_at),
       priority: inc.priority,

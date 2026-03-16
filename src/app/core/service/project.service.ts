@@ -1,10 +1,6 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import {Project} from "src/app/shared/models/project";
-import { Role } from "src/app/shared/models/role";
-import { environment } from "src/environments/environment";
-import {ApiSingleResponse} from "../../shared/models/api-response.model";
-import {map, Observable} from "rxjs";
+import {map, Observable, BehaviorSubject, tap} from "rxjs";
 import {ApiService} from "./api.service";
 import {ProjectSummaryData} from "../../shared/models/summary-response";
 import {
@@ -22,22 +18,112 @@ import {
 } from "../../shared/models/task-models/task-create-model";
 import {unassignedUsersData} from "../../shared/models/auth";
 import {CommentResponse} from "../../shared/models/task-models/CommentResponse";
+import {Notification} from "../../shared/models/notification-models/Notification-model";
 
 @Injectable({
   providedIn: "root",
 })
 export class ProjectService {
-  constructor(private http: HttpClient, private apiService: ApiService) {}
+  private projectsSubject = new BehaviorSubject<Project[]>([]);
+  projects$ = this.projectsSubject.asObservable();
+  private notificationsSubject = new BehaviorSubject<Notification[]>([]);
+  notifications$ = this.notificationsSubject.asObservable();
+  private projectSummaryCache = new Map<number, BehaviorSubject<ProjectSummaryData | null>>();
+
+  constructor(private apiService: ApiService) {}
 
   getAll(): Observable<Project[]> {
-    return this.apiService
-      .get<any[]>('projects')
-      .pipe(
-        map(response => response.map(item => item.data))
-      );
+
+    if (this.projectsSubject.value.length === 0) {
+
+      this.apiService
+        .get<any[]>('projects')
+        .pipe(
+          map(response => response.map(item => item.data)),
+          tap(projects => this.projectsSubject.next(projects))
+        )
+        .subscribe();
+
+    } else {
+
+      // refresco en segundo plano
+      this.apiService
+        .get<any[]>('projects')
+        .pipe(
+          map(response => response.map(item => item.data)),
+          tap(projects => this.projectsSubject.next(projects))
+        )
+        .subscribe();
+
+    }
+
+    return this.projects$;
   }
-  getProjectSummary(projectId: number): Observable<ProjectSummaryData> {
-    return this.apiService.get<ProjectSummaryData>(`projects/${projectId}/summary`);
+
+  getAllNotification(): Observable<Notification[]> {
+
+    if (this.notificationsSubject.value.length === 0) {
+
+      // primera carga
+      this.apiService
+        .get<Notification[]>(`notification`)
+        .pipe(
+          tap(notifications => this.notificationsSubject.next(notifications))
+        )
+        .subscribe();
+
+    } else {
+
+      // refresco en segundo plano
+      this.apiService
+        .get<Notification[]>(`notification`)
+        .pipe(
+          tap(notifications => this.notificationsSubject.next(notifications))
+        )
+        .subscribe();
+
+    }
+
+    return this.notifications$;
+  }
+
+  getNotification(idNotification:number): Observable<Notification> {
+    return this.apiService.get<Notification>(`notification/${idNotification}`);
+  }
+
+  UpdateNotification(idNotification:number): Observable<Notification> {
+    return this.apiService.pat<Notification>(`notification/${idNotification}/read`);
+  }
+
+  getProjectSummary(projectId: number): Observable<ProjectSummaryData | null> {
+
+    if (!this.projectSummaryCache.has(projectId)) {
+
+      const subject = new BehaviorSubject<ProjectSummaryData | null>(null);
+      this.projectSummaryCache.set(projectId, subject);
+
+      this.apiService
+        .get<ProjectSummaryData>(`projects/${projectId}/summary`)
+        .pipe(
+          tap(summary => subject.next(summary))
+        )
+        .subscribe();
+
+    } else {
+
+      const subject = this.projectSummaryCache.get(projectId)!;
+
+      // refresco en segundo plano
+      this.apiService
+        .get<ProjectSummaryData>(`projects/${projectId}/summary`)
+        .pipe(
+          tap(summary => subject.next(summary))
+        )
+        .subscribe();
+
+    }
+
+    return this.projectSummaryCache.get(projectId)!.asObservable();
   }
 
   getProject(projectId: number): Observable<ProjectResponse> {
