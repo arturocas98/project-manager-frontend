@@ -1,27 +1,33 @@
-import { Component, OnInit, OnDestroy, LOCALE_ID } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { TagModule } from 'primeng/tag';
-import { AvatarModule } from 'primeng/avatar';
-import { DividerModule } from 'primeng/divider';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { Subscription } from 'rxjs';
-import { ProjectService } from '../../../../../core/service/project.service';
-import { IncidenceDetail, IncidenceDetailChild } from '../../../../../shared/models/task-models/task-create-model';
-import { TreeModule } from 'primeng/tree';
-import { TruncatePipe } from '../../../../../shared/Pipes/TruncatePipe';
-import { CommentResponse } from '../../../../../shared/models/task-models/CommentResponse';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { InputTextareaModule } from 'primeng/inputtextarea';
-import { FormsModule } from '@angular/forms';
-import { ScrollPanelModule } from 'primeng/scrollpanel';
-import { MenuModule } from 'primeng/menu';
+import {Component, OnInit, OnDestroy, LOCALE_ID} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {TagModule} from 'primeng/tag';
+import {AvatarModule} from 'primeng/avatar';
+import {DividerModule} from 'primeng/divider';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {TooltipModule} from 'primeng/tooltip';
+import {ConfirmationService, MenuItem, MessageService, TreeNode} from 'primeng/api';
+import {ToastModule} from 'primeng/toast';
+import {Subscription} from 'rxjs';
+import {ProjectService} from "../../../../../core/service/project.service";
+import {
+  IncidenceDetail,
+  IncidenceDetailChild,
+} from "../../../../../shared/models/task-models/task-create-model";
+import {TreeModule} from "primeng/tree";
+import {TruncatePipe} from "../../../../../shared/Pipes/TruncatePipe";
+import {CommentResponse} from "../../../../../shared/models/task-models/CommentResponse";
+import {ConfirmDialogModule} from "primeng/confirmdialog";
+import {InputTextareaModule} from "primeng/inputtextarea";
+import {FormsModule} from "@angular/forms";
+import {ScrollPanelModule} from "primeng/scrollpanel";
+import {MenuModule} from "primeng/menu";
+import localeEs from '@angular/common/locales/es';
+import { registerLocaleData } from '@angular/common';
 
+registerLocaleData(localeEs);
 @Component({
   selector: 'app-task-details',
   standalone: true,

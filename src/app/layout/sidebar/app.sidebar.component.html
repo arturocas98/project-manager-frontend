@@ -1,44 +1,23 @@
 <div
-  class="layout-sidebar w-25rem surface-section"
+  class="layout-sidebar surface-section shadow-2 h-screen flex flex-column select-none"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()">
 
-  <a [routerLink]="['/']" class="app-logo">
-    <div class="flex flex-row align-items-center justify-content-start">
-      <div
-        class="h-5rem flex flex-row align-items-center justify-content-start px-4 border-bottom-1 surface-border gap-3">
-
-        <div class="w-3rem h-3rem flex align-items-center justify-content-center">
-          <img
-            src="assets/General/SGR.png"
-            alt="Logo SmartGob"
-            class="w-4rem h-4rem object-contain rounded-lg block" />
-        </div>
-
-        <!-- Quitamos text-black -->
-        <p class="text-color font-semibold" style="font-size:1.5rem;">
-          SmartGob
-        </p>
+  <!-- NAVBAR / BRANDING (FIJO) -->
+  <div class="flex align-items-center justify-content-between px-4 py-3 border-bottom-1 surface-border flex-shrink-0 bg-transparent">
+    <a [routerLink]="['/']" class="flex align-items-center gap-3 no-underline cursor-pointer outline-none transition-colors hover:surface-hover border-round-xl p-2 -ml-2">
+      <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-primary-50 border-round-lg shadow-1 border-1 border-primary-100">
+        <img src="assets/General/SGR.png" alt="Logo SmartGob" class="w-2rem h-2rem object-contain block"/>
       </div>
-
-      <!-- Icono adaptado -->
-      <i class="ph ph-layout text-color-secondary ml-auto p-4"
-         style="font-size:2rem;"></i>
-    </div>
-
-    <!-- Línea compatible con tema -->
-    <hr class="border-top-1 surface-border my-0" />
-
-    <button
-      class="layout-sidebar-anchor p-link"
-      type="button"
-      (click)="anchor()">
-    </button>
-  </a>
-
-  <div class="layout-menu-container px-3 py-0">
-    <app-menu></app-menu>
+      <div>
+        <p class="text-color font-bold text-xl m-0 tracking-wide line-height-2">SmartGob</p>
+        <p class="text-500 font-medium text-sm m-0">Project Manager</p>
+      </div>
+    </a>
   </div>
 
-  <hr class="border-top-1 surface-border my-0" />
+  <!-- MENU SCROLLABLE -->
+  <div class="layout-menu-container flex-grow-1 overflow-y-auto px-3 py-4">
+    <app-menu></app-menu>
+  </div>
 </div>

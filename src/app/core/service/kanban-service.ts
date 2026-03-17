@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay, tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { KanbanColumn, KanbanFilters, KanbanTask, ProjectMember } from '../../shared/models/kanban.models';
 
@@ -8,6 +8,7 @@ import { KanbanColumn, KanbanFilters, KanbanTask, ProjectMember } from '../../sh
   providedIn: 'root',
 })
 export class KanbanService {
+  private projectTasksCache = new Map<number, BehaviorSubject<KanbanTask[]>>();
   private filtersSubject = new BehaviorSubject<KanbanFilters>({
     search: '',
     priority: [],
@@ -34,7 +35,35 @@ export class KanbanService {
    * Obtiene todas las tareas del proyecto
    */
   getProjectTasks(projectId: number): Observable<KanbanTask[]> {
-    return this.apiService.get<KanbanTask[]>(`projects/${projectId}/incidences`).pipe(shareReplay(1));
+
+    if (!this.projectTasksCache.has(projectId)) {
+
+      const subject = new BehaviorSubject<KanbanTask[]>([]);
+      this.projectTasksCache.set(projectId, subject);
+
+      // primera carga
+      this.apiService
+        .get<KanbanTask[]>(`projects/${projectId}/incidences`)
+        .pipe(
+          tap(tasks => subject.next(tasks))
+        )
+        .subscribe();
+
+    } else {
+
+      const subject = this.projectTasksCache.get(projectId)!;
+
+      // refresco en segundo plano
+      this.apiService
+        .get<KanbanTask[]>(`projects/${projectId}/incidences`)
+        .pipe(
+          tap(tasks => subject.next(tasks))
+        )
+        .subscribe();
+
+    }
+
+    return this.projectTasksCache.get(projectId)!.asObservable();
   }
 
   /**

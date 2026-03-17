@@ -1,70 +1,83 @@
-<ul class="layout-menu">
+<ul class="layout-menu list-none p-0 m-0">
   <ng-container *ngFor="let item of model; let i = index">
-    <li *ngFor="let child of item.items" class="menu-item-wrapper">
+
+    <!-- Título de sección si existe -->
+    <li *ngIf="item.label" class="px-3 pt-3 pb-2">
+      <span class="text-xs font-bold text-500 uppercase tracking-widest">{{ item.label }}</span>
+    </li>
+
+    <li *ngFor="let child of item.items" class="mb-1">
       <!-- Item con subitems -->
       <a
         *ngIf="child.items && child.items.length > 0"
-        class="flex align-items-center gap-4 px-5 py-2 border-round-2xl text-color text-xl hover:surface-hover transition-colors"
+        class="flex align-items-center gap-3 px-3 py-2 border-round-xl text-color hover:surface-hover transition-colors select-none outline-none"
         style="cursor: pointer"
         (click)="toggleSubmenu(child)"
-        [class.text-primary]="child['expanded']"
-        [class.surface-hover]="child['expanded']"
+        [ngClass]="{
+          'text-primary bg-primary-50 font-semibold': child['expanded'],
+          'font-medium text-700': !child['expanded']
+        }"
       >
-        <i *ngIf="child.icon" [class]="child.icon"></i>
-        <span style="font-size: 1.3rem">{{ child.label }}</span>
-        <i class="ph ph-caret-right ml-auto" [ngClass]="{ 'rotate-90': child['expanded'] }"></i>
+        <i *ngIf="child.icon" [class]="child.icon" class="text-xl"></i>
+        <span class="text-lg line-height-3">{{ child.label }}</span>
+        <i class="ph ph-caret-down ml-auto text-sm transition-transform transition-duration-200 text-500"
+           [ngClass]="{ 'rotate-180 text-primary': child['expanded'] }"></i>
       </a>
 
       <!-- Item tipo "more" -->
       <a
         *ngIf="child['more']"
         [routerLink]="child.routerLink"
-        routerLinkActive="surface-hover text-primary"
+        routerLinkActive="surface-hover text-primary bg-primary-50 font-semibold"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color hover:surface-hover transition-colors"
+        class="flex align-items-center gap-3 px-3 py-2 border-round-xl text-700 hover:surface-hover transition-colors font-medium select-none outline-none mt-2 shadow-1 surface-card border-1 surface-border hover:border-primary-200"
         style="cursor: pointer"
       >
-        <div
-          class="w-3rem h-2rem border-round-2xl surface-card flex align-items-center justify-content-center text-primary"
-        >
-          <i [class]="child.icon || 'ph ph-person-simple-run'" class="text-2xl"></i>
+        <div class="w-2rem h-2rem border-round-lg bg-primary-100 flex align-items-center justify-content-center text-primary">
+          <i [class]="child.icon || 'ph ph-squares-four'" class="text-lg font-bold"></i>
         </div>
-
-        <span style="font-size: 1.3rem">{{ child.label }}</span>
-        <i class="ph ph-arrow-circle-right ml-auto text-3xl text-color-secondary"></i>
+        <span class="text-sm line-height-3">{{ child.label }}</span>
+        <i class="ph ph-arrow-right ml-auto text-lg text-color-secondary transition-transform hover:translate-x-1"></i>
       </a>
 
       <!-- Item simple -->
       <a
         *ngIf="(!child.items || child.items.length === 0) && !child['more']"
         [routerLink]="child.routerLink"
-        routerLinkActive="surface-hover text-primary"
+        routerLinkActive="text-primary bg-primary-50 font-semibold shadow-1"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color hover:surface-hover transition-colors"
+        class="flex align-items-center gap-3 px-3 py-2 border-round-xl transition-colors select-none outline-none"
+        [ngClass]="child['active'] ? 'text-primary bg-primary-50 font-semibold shadow-1' : 'text-700 hover:surface-hover font-medium'"
         style="cursor: pointer"
       >
-        <i *ngIf="child.icon" [class]="child.icon" class="text-3xl"></i>
-        <span style="font-size: 1.3rem">{{ child.label }}</span>
+        <i *ngIf="child.icon" [class]="child.icon" class="text-xl" [ngClass]="{'text-primary': child['active']}"></i>
+        <span class="text-lg line-height-3">{{ child.label }}</span>
       </a>
 
       <!-- Submenu -->
-      <ul *ngIf="child.items && child.items.length > 0 && child.expanded" class="submenu pl-4 mt-1">
-        <li *ngFor="let subItem of child.items">
-          <a
-            [routerLink]="subItem.routerLink"
-            routerLinkActive="surface-hover text-primary"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="flex align-items-center gap-3 px-3 py-2 border-round-2xl text-color-secondary hover:surface-hover transition-colors"
-            style="cursor: pointer"
-          >
-            <i *ngIf="subItem.icon" [class]="subItem.icon" class="text-3xl"></i>
-            <span style="font-size: 1.3rem">{{ subItem.label }}</span>
-          </a>
-        </li>
-      </ul>
+      <div *ngIf="child.items && child.items.length > 0 && child['expanded']" class="overflow-hidden transition-all transition-duration-300 origin-top">
+        <ul class="list-none p-0 m-0 pl-3 mt-1 ml-3 border-left-1 border-300">
+          <li *ngFor="let subItem of child.items" class="mb-1 py-1">
+            <a
+              [routerLink]="subItem.routerLink"
+              routerLinkActive="text-primary font-bold bg-primary-50"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="flex align-items-center gap-2 px-3 py-2 border-round-xl text-600 hover:text-color hover:surface-hover transition-colors text-sm font-medium select-none outline-none relative"
+              style="cursor: pointer"
+            >
+              <!-- Conector visual para el item activo -->
+              <div class="absolute left-0 top-50 w-1rem border-top-1 border-300" style="margin-top: -1px; margin-left: -1rem;"></div>
+
+              <i *ngIf="subItem.icon" [class]="subItem.icon" class="text-lg"></i>
+              <i *ngIf="!subItem.icon" class="ph-fill ph-circle text-400" style="font-size: 0.4rem;"></i>
+              <span>{{ subItem.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
     </li>
 
     <!-- Separador -->
-    <li *ngIf="item.separator" class="menu-separator my-2 border-top-1 surface-border"></li>
+    <li *ngIf="item.separator" class="menu-separator my-3 border-top-1 surface-border"></li>
   </ng-container>
 </ul>
