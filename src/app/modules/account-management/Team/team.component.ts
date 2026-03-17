@@ -291,7 +291,7 @@ export class TeamComponent implements OnInit {
   }
 
   isUserInTeam(userId: number): boolean {
-    return this.selectedTeam?.members.some(m => m.id === userId) || false;
+    return this.selectedTeam?.members?.some(m => m.id === userId) || false;
   }
 
   addMemberToTeam(userId: number) {
@@ -331,7 +331,7 @@ export class TeamComponent implements OnInit {
     this.confirmationService.confirm({
       message: '¿Estás seguro de eliminar este miembro?',
       header: 'Confirmar eliminación',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'ph-bold ph-warning text-yellow-500 text-2xl mr-3',
       accept: () => {
         this.removeMember(userId);
       }
@@ -384,7 +384,7 @@ export class TeamComponent implements OnInit {
     this.confirmationService.confirm({
       message: `¿Estás seguro de eliminar el equipo "${team.name}"?`,
       header: 'Confirmar eliminación',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'ph-bold ph-warning text-yellow-500 text-2xl mr-3',
       accept: () => {
         this.deleteTeam(team.id);
       }

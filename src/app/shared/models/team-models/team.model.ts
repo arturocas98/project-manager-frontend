@@ -16,6 +16,7 @@ export interface TeamMember {
 
 export interface Team {
   id: number;
+  members_count: number;
   name: string;
   type: string;
   members: TeamMember[];

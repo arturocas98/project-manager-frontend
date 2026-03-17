@@ -6,6 +6,7 @@ import {TableModule} from "primeng/table";
 import {InputTextModule} from "primeng/inputtext";
 import {TeamManagement} from "../../../shared/models/team-models/team.model";
 import {AuthService} from "../../../core/service/auth.service";
+import {NgClass, UpperCasePipe} from "@angular/common";
 
 @Component({
   selector: 'app-team-management',
@@ -15,7 +16,9 @@ import {AuthService} from "../../../core/service/auth.service";
     TooltipModule,
     TagModule,
     TableModule,
-    InputTextModule
+    InputTextModule,
+    UpperCasePipe,
+    NgClass
   ],
   templateUrl: './team-management.component.html',
 })

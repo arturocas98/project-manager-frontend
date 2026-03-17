@@ -1,108 +1,117 @@
-<div class="p-6 surface-ground min-h-screen">
+<div class="p-4 fadein animation-duration-500">
 
-  <!-- RESUMEN -->
-  <div class="surface-card border-round shadow-1 p-5 mb-5">
-
-    <div class="flex align-items-center gap-2 mb-4">
-      <i class="ph ph-chart-line text-xl text-primary"></i>
-      <h2 class="text-lg font-semibold text-800">
+  <!-- Header Section -->
+  <div class="flex flex-column md:flex-row md:align-items-center justify-content-between mb-5 gap-3">
+    <div>
+      <h1 class="text-3xl font-bold text-color m-0 flex align-items-center gap-2">
+        <i class="ph ph-chart-line-up text-primary text-4xl"></i>
         Resumen Ejecutivo
-      </h2>
+      </h1>
+      <p class="text-color-secondary mt-2 mb-0">Métricas principales y estado general de los equipos y contratos.</p>
     </div>
-
-    <div class="grid">
-
-      <div class="col-6 md:col-3 lg:col-1 text-center">
-        <i class="ph ph-users text-xl text-primary"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.activeTeams }}</p>
-        <p class="text-xs text-500">Equipos</p>
-      </div>
-
-      <div class="col-6 md:col-3 lg:col-1 text-center">
-        <i class="ph ph-user-list text-xl text-primary"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.totalCollaborators }}</p>
-        <p class="text-xs text-500">Colaboradores</p>
-      </div>
-
-      <div class="col-6 md:col-3 lg:col-1 text-center">
-        <i class="ph ph-list-checks text-xl text-primary"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.totalTasks }}</p>
-        <p class="text-xs text-500">Tareas</p>
-      </div>
-
-      <div class="col-6 md:col-3 lg:col-1 text-center">
-        <i class="ph ph-play-circle text-xl text-primary"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.tasksExecuting }}</p>
-        <p class="text-xs text-500">Ejecutando</p>
-      </div>
-
-      <div class="col-6 md:col-3 lg:col-1 text-center text-red-500">
-        <i class="ph ph-warning-circle text-xl"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.overdueTasks }}</p>
-        <p class="text-xs text-500">Atrasadas</p>
-      </div>
-
-      <div class="col-6 md:col-3 lg:col-1 text-center">
-        <i class="ph ph-chart-bar text-xl text-primary"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.avgProgress }}</p>
-        <p class="text-xs text-500">Avance</p>
-      </div>
-
-      <div class="col-6 md:col-3 lg:col-1 text-center">
-        <i class="ph ph-check-circle text-xl text-primary"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.completedTasks }}</p>
-        <p class="text-xs text-500">Finalizadas</p>
-      </div>
-
-      <div class="col-6 md:col-3 lg:col-1 text-center text-orange-500">
-        <i class="ph ph-clock text-xl"></i>
-        <p class="text-2xl font-bold mt-1">{{ executiveSummary.contractsUnder30Days }}</p>
-        <p class="text-xs text-500">Contratos &lt; 30d</p>
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- BUSQUEDA -->
-  <div class="flex justify-content-between align-items-center mb-4">
-
-    <div class="relative">
-      <i class="ph ph-magnifying-glass absolute left-0 ml-3 mt-2 text-400"></i>
-
-      <input
-        pInputText
-        type="text"
-        [value]="searchValue"
-        (input)="onSearch($event)"
-        placeholder="Buscar contrato, cliente o equipo..."
-        class="pl-6 pr-6"
-        style="width:320px"
-      />
-
-      <button
-        *ngIf="searchValue"
-        (click)="clearSearch()"
-        class="absolute right-0 mr-3 mt-2 text-400 hover:text-700"
-      >
-        <i class="ph ph-x"></i>
-      </button>
-    </div>
-
     <button
       pButton
-      label="Actualizar"
-      icon="ph ph-arrows-clockwise"
-      class="p-button-sm p-button-outlined"
-      (click)="refreshData()"
-    ></button>
+      label="Actualizar Datos"
+      icon="ph-bold ph-arrows-clockwise"
+      class="p-button-outlined p-button-secondary border-round-xl font-bold px-4 py-3 transition-colors transition-duration-200"
+      (click)="refreshData()">
+    </button>
+  </div>
 
+  <!-- RESUMEN EN TARJETAS GLOBALES -->
+  <div class="grid mb-5">
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="surface-card p-4 shadow-1 border-round-xl border-1 surface-border h-full flex flex-column justify-content-center">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <span class="text-color-secondary font-medium">Equipos Activos</span>
+          <div class="w-2.5rem h-2.5rem border-round-circle surface-card shadow-1 border-1 surface-border flex align-items-center justify-content-center text-primary">
+            <i class="ph-bold ph-users text-xl"></i>
+          </div>
+        </div>
+        <span class="text-3xl font-bold text-color">{{ executiveSummary.activeTeams }}</span>
+        <span class="text-sm text-color-secondary mt-2 flex align-items-center gap-1">
+          <i class="ph ph-user-list"></i>
+          {{ executiveSummary.totalCollaborators }} colaboradores totales
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="surface-card p-4 shadow-1 border-round-xl border-1 surface-border h-full flex flex-column justify-content-center">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <span class="text-color-secondary font-medium">Estado de Tareas</span>
+          <div class="w-2.5rem h-2.5rem border-round-circle surface-card shadow-1 border-1 surface-border flex align-items-center justify-content-center text-blue-500">
+            <i class="ph-bold ph-list-checks text-xl"></i>
+          </div>
+        </div>
+        <span class="text-3xl font-bold text-color">{{ executiveSummary.totalTasks }}</span>
+        <div class="flex gap-3 mt-2">
+          <span class="text-xs text-color-secondary flex align-items-center gap-1">
+            <i class="ph-fill ph-check-circle text-green-500"></i>
+            {{ executiveSummary.completedTasks }} fin.
+          </span>
+          <span class="text-xs text-color-secondary flex align-items-center gap-1">
+            <i class="ph-fill ph-warning-circle text-red-500"></i>
+            {{ executiveSummary.overdueTasks }} atrasadas
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="surface-card p-4 shadow-1 border-round-xl border-1 surface-border h-full flex flex-column justify-content-center">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <span class="text-color-secondary font-medium">Avance Promedio</span>
+          <div class="w-2.5rem h-2.5rem border-round-circle surface-card shadow-1 border-1 surface-border flex align-items-center justify-content-center text-green-500">
+            <i class="ph-bold ph-chart-bar text-xl"></i>
+          </div>
+        </div>
+        <span class="text-3xl font-bold text-color">{{ executiveSummary.avgProgress }}</span>
+        <span class="text-sm text-color-secondary mt-2 flex align-items-center gap-1">
+          <i class="ph ph-trend-up"></i>
+          En todos los contratos
+        </span>
+      </div>
+    </div>
+
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="surface-card p-4 shadow-1 border-round-xl border-1 surface-border h-full flex flex-column justify-content-center">
+        <div class="flex align-items-center justify-content-between mb-3">
+          <span class="text-color-secondary font-medium">Alertas de Contratos</span>
+          <div class="w-2.5rem h-2.5rem border-round-circle surface-card shadow-1 border-1 surface-border flex align-items-center justify-content-center text-orange-500">
+            <i class="ph-bold ph-clock text-xl"></i>
+          </div>
+        </div>
+        <span class="text-3xl font-bold text-orange-500">{{ executiveSummary.contractsUnder30Days }}</span>
+        <span class="text-sm text-color-secondary mt-2 flex align-items-center gap-1">
+          <i class="ph ph-info"></i>
+          Por vencer en &lt; 30 días
+        </span>
+      </div>
+    </div>
   </div>
 
 
-  <!-- TABLA -->
-  <div class="surface-card border-round shadow-1">
+  <!-- Filters Section -->
+  <div class="surface-card p-4 shadow-1 border-round-xl mb-5 border-1 surface-border">
+    <div class="grid formgrid p-fluid">
+      <div class="col-12 md:col-6">
+        <span class="p-input-icon-left w-full custom-search">
+          <input
+            pInputText
+            type="text"
+            [value]="searchValue"
+            (input)="onSearch($event)"
+            placeholder="Buscar por contrato, cliente, objeto o equipo..."
+            class="w-full border-round-lg pl-5" />
+          <i *ngIf="searchValue" class="ph-bold ph-x text-color-secondary cursor-pointer absolute right-0 mr-3 top-50" style="transform: translateY(-50%)" (click)="clearSearch()"></i>
+        </span>
+      </div>
+    </div>
+  </div>
 
+  <!-- Data Table -->
+  <div class="surface-card shadow-1 border-round-xl overflow-hidden border-1 surface-border">
     <p-table
       [value]="teamData"
       [loading]="loading"
@@ -110,159 +119,141 @@
       [rows]="10"
       [rowsPerPageOptions]="[10,25,50]"
       [(first)]="first"
-      styleClass="p-datatable-sm"
+      [rowHover]="true"
+      styleClass="p-datatable-lg border-none custom-table"
     >
-
-      <!-- CAPTION -->
       <ng-template pTemplate="caption">
-        <div class="flex justify-content-between align-items-center p-3 surface-100">
-
-          <span class="text-sm text-600">
-            Total registros: {{ teamData.length }}
+        <div class="flex justify-content-between align-items-center px-4 py-3 surface-50 border-bottom-1 border-border">
+          <span class="text-sm font-bold text-color">
+            <i class="ph-bold ph-list-dashes mr-2 text-primary"></i>
+            {{ teamData.length }} registros en total
           </span>
-
-          <span class="text-xs text-500">
-            Porcentajes calculados por equipo
+          <span class="text-xs text-color-secondary flex align-items-center gap-1">
+            <i class="ph ph-info"></i> Porcentajes consolidados
           </span>
-
         </div>
       </ng-template>
-
 
       <!-- HEADER -->
       <ng-template pTemplate="header">
         <tr>
-          <th>Contrato</th>
-          <th>Cliente</th>
-          <th>Objeto</th>
-          <th>Equipo</th>
-          <th class="text-center">Miembros</th>
-          <th class="text-center">Creación</th>
-          <th class="text-center">Estado</th>
-          <th class="text-center">Progreso</th>
-          <th class="text-center">Tareas</th>
-          <th class="text-center">Atrasadas</th>
-          <th class="text-center">Días</th>
-          <th class="text-center">Gestión</th>
+          <th class="surface-50 text-color-secondary font-semibold py-3 border-y-1 border-x-none border-border">Contrato & Cliente</th>
+          <th class="surface-50 text-color-secondary font-semibold py-3 border-y-1 border-x-none border-border">Equipo Asignado</th>
+          <th class="surface-50 text-color-secondary font-semibold py-3 border-y-1 border-x-none border-border text-center">Planificación</th>
+          <th class="surface-50 text-color-secondary font-semibold py-3 border-y-1 border-x-none border-border text-center">Estado</th>
+          <th class="surface-50 text-color-secondary font-semibold py-3 border-y-1 border-x-none border-border">Progreso</th>
+          <th class="surface-50 text-color-secondary font-semibold py-3 border-y-1 border-x-none border-border text-center">Acciones</th>
         </tr>
       </ng-template>
-
 
       <!-- BODY -->
       <ng-template pTemplate="body" let-team>
-        <tr>
+        <tr class="transition-colors transition-duration-200">
 
-          <td class="font-medium">
-            {{ team.contract_number }}
-          </td>
-
-          <td class="max-w-20rem text-overflow-ellipsis overflow-hidden">
-            {{ team.client }}
-          </td>
-
-          <td class="text-600 max-w-20rem text-overflow-ellipsis overflow-hidden">
-            {{ team.object_contract }}
-          </td>
-
-          <td class="font-medium">
-            {{ team.team_name }}
-          </td>
-
-          <td class="text-center">
-            <span class="bg-blue-100 text-blue-700 border-round px-2 py-1 text-sm font-semibold">
-              {{ team.members_count }}
-            </span>
-          </td>
-
-          <td class="text-center text-600">
-            {{ formatDate(team.created_at) }}
-          </td>
-
-          <td class="text-center">
-            <p-tag
-              [value]="team.state"
-              [severity]="getSeverity(team.state)"
-              [rounded]="true"
-            ></p-tag>
-          </td>
-
-
-          <!-- PROGRESO -->
-          <td>
-            <div class="flex align-items-center gap-2">
-
-              <span class="text-sm w-3rem">
-                {{ team.progress }}
-              </span>
-
-              <div class="flex-1 bg-gray-200 border-round h-1rem overflow-hidden">
-
-                <div
-                  class="h-full border-round"
-                  [class]="getProgressColor(team.progress)"
-                  [style.width.%]="getProgressValue(team.progress)"
-                ></div>
-
-              </div>
-
+          <!-- Contrato & Cliente -->
+          <td class="border-bottom-1 surface-border py-4">
+            <div class="flex flex-column gap-1">
+              <span class="font-bold text-color text-lg">{{ team.contract_number }}</span>
+              <span class="text-sm font-medium text-color-secondary line-height-2 max-w-20rem text-overflow-ellipsis overflow-hidden white-space-nowrap" [pTooltip]="team.client">{{ team.client }}</span>
+              <span class="text-xs text-500 max-w-20rem text-overflow-ellipsis overflow-hidden white-space-nowrap" [pTooltip]="team.object_contract"><i class="ph ph-file-text mr-1"></i>{{ team.object_contract }}</span>
             </div>
           </td>
 
-
-          <td class="text-center font-semibold">
-            {{ team.total_tasks }}
+          <!-- Equipo -->
+          <td class="border-bottom-1 surface-border py-4">
+            <div class="flex flex-column gap-2">
+              <div class="flex align-items-center gap-2">
+                <div class="w-2rem h-2rem border-round-md surface-card shadow-1 border-1 surface-border flex align-items-center justify-content-center text-primary font-bold text-sm">
+                  {{ team.team_name.charAt(0) | uppercase }}
+                </div>
+                <span class="font-bold text-color">{{ team.team_name }}</span>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <span class="text-xs font-bold text-blue-500 surface-card border-1 surface-border shadow-1 border-round-xl px-2 py-1 flex align-items-center gap-1">
+                  <i class="ph-fill ph-users"></i> {{ team.members_count }} miembros
+                </span>
+                <span class="text-xs text-color-secondary flex align-items-center gap-1">
+                  <i class="ph ph-calendar-blank"></i> {{ formatDate(team.created_at) }}
+                </span>
+              </div>
+            </div>
           </td>
 
-
-          <td class="text-center">
-            <span class="bg-red-100 text-red-700 border-round px-2 py-1 text-sm font-bold">
-              {{ team.overdue_tasks }}
-            </span>
+          <!-- Planificación (Tareas y Fechas) -->
+          <td class="border-bottom-1 surface-border py-4 text-center">
+            <div class="flex flex-column align-items-center justify-content-center gap-2">
+              <div class="flex gap-2">
+                <span class="text-xs font-bold text-color-secondary surface-card border-1 surface-border shadow-1 border-round-xl px-2 py-1 flex align-items-center gap-1" pTooltip="Tareas Totales">
+                  <i class="ph-bold ph-list-numbers"></i> {{ team.total_tasks }}
+                </span>
+                <span *ngIf="team.overdue_tasks > 0" class="text-xs font-bold text-red-500 surface-card border-1 surface-border shadow-1 border-round-xl px-2 py-1 flex align-items-center gap-1" pTooltip="Tareas Atrasadas">
+                  <i class="ph-bold ph-warning-circle"></i> {{ team.overdue_tasks }}
+                </span>
+              </div>
+              <span class="text-xs font-bold surface-card border-1 surface-border shadow-1 border-round-xl px-2 py-1 flex align-items-center gap-1" [ngClass]="getDaysRemainingColor(team.days_remaining)">
+                <i class="ph-bold ph-clock"></i> {{ team.days_remaining }} días rest.
+              </span>
+            </div>
           </td>
 
-
-          <td class="text-center">
-            <span [class]="getDaysRemainingColor(team.days_remaining)">
-              {{ team.days_remaining }}
-            </span>
+          <!-- Estado -->
+          <td class="border-bottom-1 surface-border py-4 text-center">
+            <p-tag
+              [value]="team.state | uppercase"
+              [severity]="getSeverity(team.state)"
+              styleClass="border-round-xl px-3 font-bold text-xs shadow-1">
+            </p-tag>
           </td>
 
+          <!-- Progreso -->
+          <td class="border-bottom-1 surface-border py-4 w-12rem">
+            <div class="flex flex-column gap-2">
+              <div class="flex justify-content-between align-items-center">
+                <span class="text-xs font-bold text-color-secondary">Avance</span>
+                <span class="text-sm font-bold text-color">{{ team.progress }}</span>
+              </div>
+              <div class="w-full surface-card border-1 surface-border border-round-xl h-1rem overflow-hidden p-0 m-0 shadow-inset-1 relative">
+                <div
+                  class="h-full border-round-xl absolute left-0 top-0 transition-all transition-duration-500"
+                  [ngClass]="getProgressColor(team.progress)"
+                  [style.width.%]="getProgressValue(team.progress)"
+                ></div>
+              </div>
+            </div>
+          </td>
 
-          <td class="text-center">
-
+          <!-- Acciones -->
+          <td class="border-bottom-1 surface-border py-4 text-center">
             <button
               pButton
               type="button"
-              icon="ph ph-list-checks"
-              class="p-button-rounded p-button-text p-button-sm"
+              icon="ph-bold ph-arrow-square-out"
+              class="p-button-rounded p-button-info p-button-outlined p-button-sm transition-all transition-duration-200 hover:surface-card hover:text-blue-600 shadow-1"
               (click)="navigateToTasks(team)"
+              pTooltip="Ver Detalles de Tareas"
+              tooltipPosition="left"
             ></button>
-
           </td>
 
         </tr>
       </ng-template>
-
 
       <!-- EMPTY -->
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="12">
-
-            <div class="flex flex-column align-items-center justify-content-center p-6 text-400">
-
-              <i class="ph ph-database text-4xl mb-3"></i>
-
-              <p>No hay información disponible</p>
-
+          <td colspan="6" class="text-center p-6">
+            <div class="flex flex-column align-items-center justify-content-center text-color-secondary">
+              <div class="w-5rem h-5rem border-round-circle surface-card shadow-1 border-1 surface-border flex align-items-center justify-content-center mb-3">
+                <i class="ph ph-magnifying-glass text-4xl text-400"></i>
+              </div>
+              <span class="text-xl font-medium text-color">No hay información disponible</span>
+              <p class="mt-2 text-sm max-w-20rem">Intenta ajustar tu búsqueda o asegúrate de que existen contratos asignados al equipo.</p>
             </div>
-
           </td>
         </tr>
       </ng-template>
 
     </p-table>
-
   </div>
 
 </div>
