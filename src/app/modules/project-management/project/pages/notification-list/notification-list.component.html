@@ -1,6 +1,6 @@
 <div class="flex h-full bg-surface-50">
   <!-- Lista de notificaciones -->
-  <div class="w-full md:w-4 bg-white border-right-1 surface-border" [class.hidden]="showDetails && !isMobile"
+  <div class="w-full md:w-4 surface-card border-right-1 surface-border" [class.hidden]="showDetails && !isMobile"
        [class.md:block]="true" [class.w-full]="showDetails && isMobile"
        [class.md:w-4]="true">
 
@@ -30,7 +30,7 @@
            class="relative p-4 cursor-pointer transition-all transition-duration-200 border-bottom-1 surface-border hover:surface-hover"
            [ngClass]="{
              'surface-ground opacity-60': notification.read,
-             'bg-white shadow-1 z-1': !notification.read,
+             'surface-card shadow-1 z-1': !notification.read,
              'bg-primary-50': selectedNotification === notification && !showDetails
            }"
            (click)="openNotification(notification)">
@@ -50,17 +50,17 @@
           <!-- Content -->
           <div class="flex-1 min-w-0">
             <div class="flex align-items-center justify-content-between mb-1 pr-3">
-              <h3 class="text-base m-0 line-height-2 transition-colors transition-duration-200" 
+              <h3 class="text-base m-0 line-height-2 transition-colors transition-duration-200"
                   [ngClass]="notification.read ? 'font-medium text-color-secondary' : 'font-bold text-color'">
                 {{notification?.title || 'Sin título'}}
               </h3>
-              <span class="text-xs flex-shrink-0 transition-colors transition-duration-200" 
+              <span class="text-xs flex-shrink-0 transition-colors transition-duration-200"
                     [ngClass]="notification.read ? 'text-500' : 'text-primary font-medium'">
                 {{getTimeAgo(notification?.createdAt)}}
               </span>
             </div>
 
-            <p class="text-sm m-0 line-height-3 transition-colors transition-duration-200" 
+            <p class="text-sm m-0 line-height-3 transition-colors transition-duration-200"
                [ngClass]="notification.read ? 'text-500' : 'text-color-secondary'">
               {{notification?.message ? (notification.message | slice:0:90) : 'Sin mensaje'}}
               {{notification?.message && notification.message.length > 90 ? '...' : ''}}
@@ -82,7 +82,7 @@
   </div>
 
   <!-- Panel de detalle -->
-  <div class="flex-1 bg-white shadow-2 z-2" [class.hidden]="!showDetails && !isMobile" [class.md:block]="true">
+  <div class="flex-1 surface-card shadow-2 z-2" [class.hidden]="!showDetails && !isMobile" [class.md:block]="true">
 
     <!-- Back button for mobile -->
     <div *ngIf="isMobile" class="flex align-items-center p-3 border-bottom-1 surface-border">
@@ -123,7 +123,7 @@
                 class="p-button-rounded p-button-primary shadow-2 flex-grow-1 font-semibold"
                 (click)="navigateToLink(selectedNotification)"></button>
         <button pButton pRipple type="button" icon="pi pi-times" label="Cerrar detalles"
-                class="p-button-outlined p-button-rounded p-button-secondary flex-grow-1" 
+                class="p-button-outlined p-button-rounded p-button-secondary flex-grow-1"
                 (click)="closeDetails()"></button>
       </div>
     </div>

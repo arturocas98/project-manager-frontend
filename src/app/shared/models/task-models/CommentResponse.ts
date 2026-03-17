@@ -17,8 +17,8 @@ export interface Incidence {
 export interface CommentResponse {
   id: number;
   description: string;
-  created_at:string;
-  updated_at:string;
+  created_at: string;
+  updated_at: string;
   incidence: Incidence;
   createdBy: CreatedBy;
 }

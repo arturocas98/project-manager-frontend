@@ -90,10 +90,10 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
   // Mapeo de prioridades a colores y etiquetas
   readonly priorityMap: Record<string, { label: string; severity: string; icon: string; color: string }> = {
-    low: { label: 'Baja', severity: 'info', icon: 'pi-arrow-down', color: 'text-blue-600' },
-    medium: { label: 'Media', severity: 'warning', icon: 'pi-minus', color: 'text-yellow-600' },
-    high: { label: 'Alta', severity: 'danger', icon: 'pi-arrow-up', color: 'text-orange-600' },
-    critical: { label: 'Crítica', severity: 'danger', icon: 'pi-exclamation-triangle', color: 'text-red-600' },
+    low: { label: 'Baja', severity: 'info', icon: 'ph ph-arrow-down', color: 'text-blue-600' },
+    medium: { label: 'Media', severity: 'warning', icon: 'ph ph-minus', color: 'text-yellow-600' },
+    high: { label: 'Alta', severity: 'danger', icon: 'ph ph-arrow-up', color: 'text-orange-600' },
+    critical: { label: 'Crítica', severity: 'danger', icon: 'ph ph-warning', color: 'text-red-600' },
   };
 
   // Mapeo de estados a colores
@@ -196,7 +196,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       this.commentMenuItems[comment.id] = [
         {
           label: 'Eliminar',
-          icon: 'pi pi-trash',
+          icon: 'ph ph-trash',
           command: () => this.confirmDeleteComment(comment),
         },
       ];
@@ -247,7 +247,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     this.confirmationService.confirm({
       message: `¿Estás seguro de que deseas eliminar este comentario?`,
       header: 'Confirmar eliminación',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'ph ph-warning',
       accept: () => {
         this.deleteComment(comment.id);
       },
@@ -394,8 +394,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
    * Obtiene el icono de la prioridad
    */
   getPriorityIcon(priority: string | null): string {
-    if (!priority) return 'pi-tag';
-    return this.priorityMap[priority.toLowerCase()]?.icon || 'pi-tag';
+    if (!priority) return 'ph ph-tag';
+    return this.priorityMap[priority.toLowerCase()]?.icon || 'ph ph-tag';
   }
 
   /**
