@@ -128,6 +128,40 @@ export class UserEditComponent implements OnInit {
 
   onSubmit() {
     if (this.userForm.invalid || !this.userId) {
+      let firstInvalidControlName = '';
+      for (const controlName in this.userForm.controls) {
+        if (this.userForm.controls[controlName].invalid) {
+          firstInvalidControlName = controlName;
+          break;
+        }
+      }
+
+      const fieldNames: { [key: string]: string } = {
+        name: 'Nombre',
+        email: 'Correo Electrónico',
+        address: 'Dirección',
+        telephone: 'Teléfono',
+      };
+
+      const friendlyName = fieldNames[firstInvalidControlName] || firstInvalidControlName;
+      let errorMessage = `El campo ${friendlyName} es requerido o inválido.`;
+
+      if (firstInvalidControlName === 'email') {
+        const emailControl = this.userForm.get('email');
+        if (emailControl?.hasError('required')) {
+          errorMessage = 'El campo Correo Electrónico es requerido.';
+        } else if (emailControl?.hasError('email')) {
+          errorMessage = 'El formato del Correo Electrónico es inválido.';
+        }
+      }
+
+      this.messageService.add({
+        life: NUMBERS.TEN_THOUSAND,
+        severity: SEVERITY.ERROR,
+        summary: Constants.alert.error,
+        detail: firstInvalidControlName ? errorMessage : 'Por favor, resuelva los errores del formulario.',
+      });
+      this.userForm.markAllAsTouched();
       return;
     }
 
@@ -162,7 +196,15 @@ export class UserEditComponent implements OnInit {
 
     this.userService.updateUser(body, this.userId).subscribe({
       next: () => {
-        this.navigateToUserList();
+        this.messageService.add({
+          life: 3000,
+          severity: SEVERITY.SUCCESS,
+          summary: 'Éxito',
+          detail: 'Proceso completado correctamente.',
+        });
+        setTimeout(() => {
+          this.navigateToUserList();
+        }, 1500);
       },
       error: err => {
         this.messageService.add({

@@ -1,176 +1,79 @@
-<p-card
-  class="project-card group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 surface-card"
-  [style]="{ width: '21rem', height: '23rem', overflow: 'hidden' }">
-
-  <div class="flex h-full">
-    <!-- Header Lateral Izquierdo -->
-    <div class="flex flex-column align-items-center p-3"
-         [ngClass]="getHeaderColorClass(project.id)"
-         style="width: 80px;">
-
-      <!-- Avatar -->
-      <div class="transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 mb-2">
+<div class="surface-card border-round-2xl shadow-1 hover:shadow-4 border-1 surface-border transition-all transition-duration-300 cursor-pointer flex flex-column h-full relative overflow-hidden group w-full" style="min-width: 20rem; max-width: 24rem;" [style.border-top]="'4px solid var(--' + getProjectColor(project.id).name + '-500)'">
+  
+  <!-- Content -->
+  <div class="p-4 flex flex-column flex-1">
+    
+    <!-- Header: Avatar + Title + Status -->
+    <div class="flex align-items-start justify-content-between mb-3 gap-3">
+      <div class="flex align-items-center gap-3 overflow-hidden">
         <p-avatar
-          label="{{ project.project_type?.charAt(0) || '?' }}"
+          [label]="(project.project_type?.charAt(0) || '?') | uppercase"
           shape="circle"
-          [style]="{
-            backgroundColor: 'var(--surface-card)',
-            color: getAvatarTextColor(project.id),
-            fontWeight: 'bold',
-            fontSize: '1.8rem',
-            width: '3.5rem',
-            height: '3.5rem'
-          }"
-          class="shadow-lg">
+          size="xlarge"
+          [styleClass]="'font-bold shadow-1 flex-shrink-0 ' + getProjectColor(project.id).iconBg + ' ' + getProjectColor(project.id).icon">
         </p-avatar>
+        
+        <div class="overflow-hidden">
+          <h3 class="m-0 text-lg font-bold text-color white-space-nowrap overflow-hidden text-overflow-ellipsis transition-colors" [ngClass]="getProjectColor(project.id).hover">
+            {{ project.project_type || 'Proyecto' }}
+          </h3>
+          <span class="text-xs font-semibold text-color-secondary block mt-1">
+            {{ project.ContractNo }}
+          </span>
+        </div>
       </div>
+      
+      <p-tag *ngIf="project.state" [value]="getTranslatedState(project.state.name)" [styleClass]="'text-xs px-2 py-1 border-round-3xl shadow-none white-space-nowrap flex-shrink-0 ' + getProjectColor(project.id).iconBg + ' ' + getProjectColor(project.id).icon"></p-tag>
+    </div>
 
-      <!-- ContractNo -->
-      <span
-        class="flex align-items-center px-2 py-1 rounded-full border-round text-sm font-bold surface-card mb-2"
-        [ngClass]="getBadgeTextColor(project.id)">
-        {{ project.ContractNo }}
-      </span>
+    <!-- Description -->
+    <p class="text-sm text-color-secondary line-height-3 m-0 mb-4" style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.5rem;">
+      {{ project.objectContract || 'Sin descripción disponible.' }}
+    </p>
 
-      <!-- Patrón decorativo -->
-      <div class="absolute inset-0 opacity-10"
-           style="background-image: radial-gradient(circle at 2px 2px, #ffffff 1px, transparent 0);
-                  background-size: 24px 24px;">
+    <!-- Meta Grid -->
+    <div class="flex flex-column gap-2 mb-4 mt-auto">
+      <div class="flex align-items-center gap-2 text-sm overflow-hidden" pTooltip="Cliente" tooltipPosition="top">
+        <i class="ph ph-buildings text-color-secondary text-lg flex-shrink-0"></i>
+        <span class="text-color font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ project.client || 'Sin cliente' }}</span>
+      </div>
+      <div class="flex align-items-center gap-2 text-sm overflow-hidden" *ngIf="project.administrator" pTooltip="Administrador" tooltipPosition="top">
+        <i class="ph ph-user-circle text-color-secondary text-lg flex-shrink-0"></i>
+        <span class="text-color white-space-nowrap overflow-hidden text-overflow-ellipsis"><span class="text-color-secondary">Admin:</span> {{ project.administrator.name }}</span>
+      </div>
+      <div class="flex align-items-center gap-2 text-sm overflow-hidden" *ngIf="project.last_phase" pTooltip="Fase actual" tooltipPosition="top">
+        <i class="ph ph-flag text-color-secondary text-lg flex-shrink-0"></i>
+        <span class="text-color white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ project.last_phase }}</span>
       </div>
     </div>
 
-    <!-- Contenido Derecho -->
-    <div class="flex flex-column flex-1 p-3" style="width: calc(100% - 80px);">
-
-      <!-- Título -->
-      <div class="mb-2">
-        <h4 class="text-lg font-bold text-color mb-1 line-clamp-1 transition-colors"
-            [ngClass]="getHoverTextColor(project.id)">
-          {{ project.project_type }}
-        </h4>
-
-        <p class="description text-sm text-color-secondary line-clamp-2 leading-relaxed">
-          {{ project.objectContract || 'Sin descripción' }}
-        </p>
+    <!-- ProgressBar -->
+    <div class="mt-auto">
+      <div class="flex justify-content-between align-items-center mb-2">
+        <span class="text-xs font-medium text-color-secondary">Progreso</span>
+        <span class="text-xs font-bold" [ngClass]="getProjectColor(project.id).text">{{ calculateProgress(project) }}%</span>
       </div>
-
-      <!-- Información -->
-      <div class="flex-1 space-y-2">
-
-        <!-- Administrador -->
-        <div *ngIf="project.administrator"
-             class="flex items-center gap-2 text-sm text-color">
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center flex-shrink-0"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-user-circle text-xl"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-          <span class="truncate">
-            Admin: <span class="font-semibold">{{ project.administrator.name }}</span>
-          </span>
-        </div>
-
-        <!-- Cliente -->
-        <div class="flex items-center gap-2 text-sm text-color">
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-buildings text-xl"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-          <span class="truncate">{{ project.client }}</span>
-        </div>
-
-        <!-- Empresa contratada -->
-        <div class="flex items-center gap-2 text-sm text-color">
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-briefcase text-xl"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-          <span class="truncate">{{ project.contracted_company }}</span>
-        </div>
-
-        <!-- Fase -->
-        <div class="flex items-center gap-2 text-sm text-color">
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-flag text-xl"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-          <span class="truncate">{{ project.last_phase }}</span>
-        </div>
-
-        <!-- Rol del usuario -->
-        <div *ngIf="project.user_role"
-             class="flex items-center gap-2 text-sm text-color">
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-tag text-xl"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-          <span class="font-medium truncate">{{ project.user_role.type }}</span>
-        </div>
-
-        <!-- Estado -->
-        <div *ngIf="project.state"
-             class="flex items-center gap-2 text-sm text-color">
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-check-circle text-xl"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-          <span class="font-medium">{{ project.state.name }}</span>
-        </div>
-
-        <!-- Stats -->
-        <div class="mt-3">
-          <div class="flex items-center justify-content-between text-sm mb-2">
-            <span class="text-color-secondary font-medium">Proyecto ID:</span>
-            <span class="font-bold text-sm"
-                  [ngClass]="getNumberColor(project.id)">
-              #{{ project.id }}
-            </span>
-          </div>
-
-          <div class="w-full surface-border border-round h-1 mt-2 surface-ground">
-            <div class="h-1 border-round"
-                 [ngClass]="getProgressBarColor(project.id)"
-                 style="width: 75%">
-            </div>
-          </div>
-
+      <div class="w-full surface-200 border-round-3xl h-1 overflow-hidden" style="height: 6px;">
+        <div class="h-full border-round-3xl transition-all transition-duration-500"
+             [ngClass]="getProjectColor(project.id).header"
+             [style.width]="calculateProgress(project) + '%'">
         </div>
       </div>
+    </div>
 
-      <!-- Footer -->
-      <div class="footer pt-2 border-top-1 surface-border surface-section flex align-items-center justify-content-between">
+  </div>
 
-        <div class="flex align-items-center gap-2">
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-users-three text-sm"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-        </div>
-
-        <div class="flex align-items-center gap-3">
-
-          <div *ngIf="project.start_date"
-               class="text-sm text-color-secondary">
-            {{ project.start_date | date:'dd/MM/yyyy' }}
-          </div>
-
-          <div class="w-1.2rem h-1.2rem border-round-3xl flex align-items-center justify-content-center"
-               [ngClass]="getIconBgColor(project.id)">
-            <i class="ph ph-arrow-right text-sm"
-               [ngClass]="getIconColor(project.id)"></i>
-          </div>
-
-        </div>
-
-      </div>
-
+  <!-- Footer -->
+  <div class="px-4 py-3 border-top-1 surface-border surface-50 flex align-items-center justify-content-between">
+    <div class="flex align-items-center gap-2 text-xs text-color-secondary font-medium">
+      <i class="ph ph-users text-lg"></i>
+      <span>{{ project.stats?.members_count || 0 }} miembros</span>
+    </div>
+    
+    <div class="flex align-items-center gap-2 text-xs font-medium" [ngClass]="getProjectColor(project.id).text" pTooltip="Fecha de inicio" tooltipPosition="top">
+      <i class="ph ph-calendar-blank text-lg"></i>
+      <span>{{ (project.start_date | date:'dd/MM/yyyy') || 'Sin fecha' }}</span>
     </div>
   </div>
 
-</p-card>
+</div>

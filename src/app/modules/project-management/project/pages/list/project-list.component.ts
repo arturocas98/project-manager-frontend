@@ -16,6 +16,7 @@ import { ApiListResponse } from '../../../../../shared/models/api-response.model
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {AuthService} from "../../../../../core/service/auth.service";
 import {Profile} from "../../../../../shared/models/auth";
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-project-list',
@@ -34,11 +35,14 @@ import {Profile} from "../../../../../shared/models/auth";
     ProgressSpinnerModule,
     RouterLink,
     RouterLinkActive,
+    FormsModule
   ],
   standalone: true,
 })
 export class ProjectListComponent implements OnInit {
   projects: Project[] = [];
+  filteredProjects: Project[] = [];
+  searchQuery: string = '';
   loading: boolean = false;
   isAdmin: boolean = false;
   profile?: Profile;
@@ -55,7 +59,19 @@ export class ProjectListComponent implements OnInit {
   }
 
   goToProject(id: number) {
-    this.router.navigate(['/project-management/projects/kanban', id]);
+    this.projectService.getMyRole(id).subscribe({
+      next: (res) => {
+        if (res && res.role_type) {
+          localStorage.setItem('role_type', res.role_type);
+        }
+        this.router.navigate(['/project-management/projects/kanban', id]);
+      },
+      error: (err) => {
+        console.error('Error al obtener el rol del proyecto:', err);
+        // Navega de todas formas por si falla la llamada
+        this.router.navigate(['/project-management/projects/kanban', id]);
+      }
+    });
   }
 
   ngOnInit() {
@@ -68,6 +84,7 @@ export class ProjectListComponent implements OnInit {
     this.projectService.getAll().subscribe({
       next: (projects: Project[]) => {
         this.projects = projects;
+        this.filteredProjects = [...this.projects];
 
         console.log('Proyectos cargados:', this.projects);
         console.log('Total de proyectos:', this.projects.length);
@@ -79,5 +96,21 @@ export class ProjectListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  filterProjects() {
+    if (!this.searchQuery) {
+      this.filteredProjects = [...this.projects];
+    } else {
+      const query = this.searchQuery.toLowerCase().trim();
+      this.filteredProjects = this.projects.filter(p => 
+        p.objectContract?.toLowerCase().includes(query) ||
+        p.ContractNo?.toLowerCase().includes(query) ||
+        p.client?.toLowerCase().includes(query) ||
+        p.administrator?.name?.toLowerCase().includes(query) ||
+        p.state?.name?.toLowerCase().includes(query) ||
+        p.project_type?.toLowerCase().includes(query)
+      );
+    }
   }
 }

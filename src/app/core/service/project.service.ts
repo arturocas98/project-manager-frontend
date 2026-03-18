@@ -130,6 +130,10 @@ export class ProjectService {
     return this.apiService.get<ProjectResponse>(`projects/${projectId}`);
   }
 
+  getMyRole(projectId: number): Observable<{ role_type: string }> {
+    return this.apiService.get<{ role_type: string }>(`projects/${projectId}/my-role`);
+  }
+
   getOneTask(projectId: number, taskId:number): Observable<IncidenceDetail> {
     return this.apiService.get<IncidenceDetail>(`projects/${projectId}/incidences/${taskId}`);
   }

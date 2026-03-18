@@ -25,7 +25,7 @@ export class UserService {
   private globalFilter: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private page: BehaviorSubject<number> = new BehaviorSubject<number>(1);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   setGlobalFilter(filter: string) {
     this.globalFilter.next(filter);
@@ -48,7 +48,6 @@ export class UserService {
   }
 
   updateUser(user: User, userId: number): Observable<boolean> {
-    console.log(user);
     return this.http.put<boolean>(`${environment.apiUrl}/auth/users/${userId}`, user);
   }
 

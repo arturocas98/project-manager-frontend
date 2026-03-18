@@ -26,15 +26,14 @@ export class AppMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('es admin:', this.profile?.role.toString());
-
+    console.log('es admin:', this.profile?.role);
     this.loadMenu();
   }
 
   loadMenu(): void {
     this.menuService.getMenus().subscribe(menu => {
       let myMenu = menu.data[0];
-      if (this.profile?.role.includes('Admin')) {
+      if (this.profile?.role === 'Admin') {
         myMenu = menu.data.find(({ id }: any) => id === 1);
       }
       this.model = [

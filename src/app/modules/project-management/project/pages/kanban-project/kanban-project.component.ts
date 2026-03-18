@@ -12,7 +12,7 @@ import { RippleModule } from 'primeng/ripple';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 import { AvatarModule } from 'primeng/avatar';
-import { DatePipe, NgForOf, NgIf, NgStyle, SlicePipe } from '@angular/common';
+import { DatePipe, NgForOf, NgIf, NgStyle, SlicePipe, TitleCasePipe } from '@angular/common';
 import { Menu, MenuModule } from 'primeng/menu';
 import { TagModule } from 'primeng/tag';
 import { DragDropModule } from 'primeng/dragdrop';
@@ -70,6 +70,7 @@ interface TypeOption {
     CdkDragPreview,
     CdkDragPlaceholder,
     NgStyle,
+    TitleCasePipe,
   ],
   templateUrl: './kanban-project.component.html',
 })
@@ -94,39 +95,39 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
 
   // Opciones para filtros
   priorityOptions: PriorityOption[] = [
-    { label: 'Critical', value: 'critical', icon: 'pi pi-exclamation-triangle' },
-    { label: 'High', value: 'high', icon: 'pi pi-arrow-up' },
-    { label: 'Medium', value: 'medium', icon: 'pi pi-minus' },
-    { label: 'Low', value: 'low', icon: 'pi pi-arrow-down' },
+    { label: 'Critical', value: 'critical', icon: 'ph ph-warning-octagon' },
+    { label: 'High', value: 'high', icon: 'ph ph-arrow-up-right' },
+    { label: 'Medium', value: 'medium', icon: 'ph ph-minus' },
+    { label: 'Low', value: 'low', icon: 'ph ph-arrow-down-right' },
   ];
 
   typeOptions: TypeOption[] = [
-    { label: 'Task', value: 'task', icon: 'pi pi-check-square' },
-    { label: 'Bug', value: 'bug', icon: 'pi pi-exclamation-triangle' },
-    { label: 'Subtask', value: 'subtask', icon: 'pi pi-sitemap' },
-    { label: 'History', value: 'history_user', icon: 'pi pi-history' },
+    { label: 'Tarea', value: 'task', icon: 'ph ph-check-square' },
+    { label: 'Bug', value: 'bug', icon: 'ph ph-bug' },
+    { label: 'Subtarea', value: 'subtask', icon: 'ph ph-tree-structure' },
+    { label: 'Historia de Usuario', value: 'history_user', icon: 'ph ph-clock-counter-clockwise' },
   ];
 
   // Menú de ordenamiento
   sortMenuItems: MenuItem[] = [
     {
       label: 'Más recientes',
-      icon: 'pi pi-sort-amount-down',
+      icon: 'ph ph-sort-descending',
       command: () => this.sortByDate('desc'),
     },
     {
       label: 'Más antiguos',
-      icon: 'pi pi-sort-amount-up-alt',
+      icon: 'ph ph-sort-ascending',
       command: () => this.sortByDate('asc'),
     },
     {
       label: 'Por prioridad',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'ph ph-warning',
       command: () => this.sortByPriority(),
     },
     {
       label: 'Por tipo',
-      icon: 'pi pi-tag',
+      icon: 'ph ph-tag',
       command: () => this.sortByType(),
     },
   ];
@@ -136,7 +137,7 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     private router: Router,
     private kanbanService: KanbanService,
     private messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
@@ -463,23 +464,30 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
   getTypeIcon(type: string): string {
     switch (type?.toLowerCase()) {
       case 'bug':
-        return 'pi pi-bug';
+        return 'ph ph-bug text-red-500';
       case 'task':
-        return 'pi pi-check-square';
+        return 'ph ph-check-square text-blue-500';
       case 'subtask':
-        return 'pi pi-sitemap';
+        return 'ph ph-tree-structure text-yellow-600';
       case 'history_user':
-        return 'pi pi-history';
+        return 'ph ph-clock-counter-clockwise text-purple-500';
       default:
-        return 'pi pi-tag';
+        return 'ph ph-tag text-color-secondary';
     }
   }
 
   /**
-   * Obtiene el nombre del tipo de tarea como string
+   * Traduce el tipo de tarea a español
    */
-  getTaskType(task: KanbanTask): string {
-    return task.type?.type || 'task';
+  getTaskTypeDisplay(type: string | undefined): string {
+    if (!type) return 'Tarea';
+    const typeMap: Record<string, string> = {
+      task: 'Tarea',
+      bug: 'Bug',
+      subtask: 'Subtarea',
+      history_user: 'Historia de Usuario',
+    };
+    return typeMap[type.toLowerCase()] || type;
   }
 
   /**

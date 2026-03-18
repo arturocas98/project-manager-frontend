@@ -1,11 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {MenubarModule} from "primeng/menubar";
-import {BadgeModule} from "primeng/badge";
-import {CardModule} from "primeng/card";
-import {MenuModule} from "primeng/menu";
-import {ButtonModule} from "primeng/button";
+import { Component, OnInit } from '@angular/core';
+import { MenubarModule } from "primeng/menubar";
+import { BadgeModule } from "primeng/badge";
+import { CardModule } from "primeng/card";
+import { MenuModule } from "primeng/menu";
+import { ButtonModule } from "primeng/button";
 import { MenuItem } from 'primeng/api';
-import {ActivatedRoute, Router} from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
 @Component({
   selector: 'app-view-project',
@@ -22,72 +22,65 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class ViewProjectComponent implements OnInit {
   projectId!: number;
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
     // Ahora el ID está en la ruta actual, no en el padre
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
+    this.updateMenuItems();
 
     // O usando observable por si cambia
     this.route.paramMap.subscribe(params => {
       this.projectId = Number(params.get('id'));
+      this.updateMenuItems();
     });
   }
 
-  menuItems: MenuItem[] = [
-    {
-      label: 'Resumen',
-      icon: 'pi pi-star',
-      command: () => this.router.navigate([
-        '/project-management/projects/kanban',
-        this.projectId,
-        'project-summary'
-      ])
-    },
-    /*
-    {
-      label: 'Schedule',
-      icon: 'pi pi-calendar',
-      command: () => this.router.navigate([
-        '/project-management/projects/kanban',
-        this.projectId,project-listkanban
-        'project-timeline'
-      ])
-    },
-    */
-    {
-      label: 'lista kanban',
-      icon: 'pi pi-list',
-      command: () => this.router.navigate([
-        '/project-management/projects/kanban',
-        this.projectId,
-        'project-listkanban'
-      ])
-    },
-    /*
-    {
-      label: 'Reports',
-      icon: 'pi pi-chart-bar',
-      command: () => this.router.navigate(['reports'])
-    },
-    */
-    {
-      label: 'Kanban',
-      icon: 'pi pi-th-large',
-      command: () => this.router.navigate([
-        '/project-management/projects/kanban',
-        this.projectId,
-        'project-kanban'
-      ])
-    },
-    {
-      label: 'Configuracion',
-      icon: 'pi pi-cog',
-      command: () => this.router.navigate([
-        '/project-management/projects/kanban',
-        this.projectId,
-        'project-settings'
-      ])
+  menuItems: MenuItem[] = [];
+
+  updateMenuItems() {
+    const roleType = localStorage.getItem('role_type');
+
+    this.menuItems = [
+      {
+        label: 'Resumen',
+        icon: 'ph ph-chart-bar',
+        command: () => this.router.navigate([
+          '/project-management/projects/kanban',
+          this.projectId,
+          'project-summary'
+        ])
+      },
+      {
+        label: 'Lista Kanban',
+        icon: 'ph ph-list-dashes',
+        command: () => this.router.navigate([
+          '/project-management/projects/kanban',
+          this.projectId,
+          'project-listkanban'
+        ])
+      },
+      {
+        label: 'Tablero Kanban',
+        icon: 'ph ph-kanban',
+        command: () => this.router.navigate([
+          '/project-management/projects/kanban',
+          this.projectId,
+          'project-kanban'
+        ])
+      }
+    ];
+
+    if (roleType === 'administrator') {
+      this.menuItems.push({
+        label: 'Configuración',
+        icon: 'ph ph-gear',
+        command: () => this.router.navigate([
+          '/project-management/projects/kanban',
+          this.projectId,
+          'project-settings'
+        ])
+      });
     }
-  ];
+  }
 }

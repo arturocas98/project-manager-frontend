@@ -1,12 +1,7 @@
 <div class="card">
   <div class="flex justify-start align-items-start mb-4">
-    <button
-      pButton
-      class="p-button-outlined w-full sm:w-auto flex-order-0 p-button-primary mr-4"
-      icon="pi pi-arrow-left"
-      label="{{ 'general.back' | translate }}"
-      (click)="navigateToUserList()"
-    ></button>
+    <button pButton class="p-button-outlined w-full sm:w-auto flex-order-0 p-button-primary mr-4"
+      icon="pi pi-arrow-left" label="{{ 'general.back' | translate }}" (click)="navigateToUserList()"></button>
     <span class="text-900 text-xl font-bold block">{{ 'user.edit' | translate }}</span>
   </div>
   <div class="grid">
@@ -31,24 +26,15 @@
           <div class="field mb-4 col-6">
             <label for="password_confirmation" class="font-medium text-900">{{
               'user.passwordConfirmation' | translate
-            }}</label>
-            <p-password
-              formControlName="password_confirmation"
-              id="password_confirmation"
-              [toggleMask]="true"
-            ></p-password>
+              }}</label>
+            <p-password formControlName="password_confirmation" id="password_confirmation"
+              [toggleMask]="true"></p-password>
           </div>
           <div class="field mb-4 col-6">
             <label for="status" class="font-medium text-900">{{ 'user.statusLabel' | translate }}</label>
-            <p-toggleButton
-              formControlName="status"
-              id="status"
-              [onLabel]="'user.status.active' | translate"
-              [offLabel]="'user.status.inactive' | translate"
-              [onIcon]="'pi pi-lock-open'"
-              [offIcon]="'pi pi-lock'"
-              class="w-[10em] block"
-            ></p-toggleButton>
+            <p-toggleButton formControlName="status" id="status" [onLabel]="'user.status.active' | translate"
+              [offLabel]="'user.status.inactive' | translate" [onIcon]="'pi pi-lock-open'" [offIcon]="'pi pi-lock'"
+              class="w-[10em] block"></p-toggleButton>
           </div>
           <div class="field mb-4 col-6">
             <label for="role" class="font-medium text-900">{{ 'general.expiredAt' | translate }}</label>
@@ -56,15 +42,8 @@
           </div>
           <div class="field mb-4 col-6">
             <label for="role" class="font-medium text-900">{{ 'user.role' | translate }}</label>
-            <p-multiSelect
-              (onChange)="changeRol()"
-              dataKey="id"
-              [options]="roles"
-              optionLabel="name"
-              id="role"
-              formControlName="rols"
-              [placeholder]="'role.rolePlaceholder' | translate"
-            >
+            <p-multiSelect (onChange)="changeRol()" dataKey="id" [options]="roles" optionLabel="name" id="role"
+              formControlName="rols" [placeholder]="'role.rolePlaceholder' | translate">
             </p-multiSelect>
           </div>
 
@@ -79,14 +58,8 @@
 
           <div class="field mb-4 col-6">
             <label for="modality" class="font-medium text-900">{{ 'user.modality' | translate }}</label>
-            <p-dropdown
-              [options]="modalities"
-              optionLabel="name"
-              optionValue="id"
-              id="modality"
-              formControlName="modality_id"
-              [placeholder]="'modality.rolePlaceholder' | translate"
-            >
+            <p-dropdown [options]="modalities" optionLabel="name" optionValue="id" id="modality"
+              formControlName="modality_id" [placeholder]="'modality.rolePlaceholder' | translate">
             </p-dropdown>
           </div>
 

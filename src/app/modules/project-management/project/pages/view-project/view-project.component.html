@@ -1,9 +1,12 @@
-<!-- Menú estilo Jira -->
-<p-menubar [model]="menuItems"
-           class="surface-card border-none border-bottom-1 surface-border   ">
-</p-menubar>
+<!-- Menú del Proyecto -->
+<div class="sticky top-0 z-5 shadow-1 w-full">
+  <p-menubar 
+    [model]="menuItems" 
+    styleClass="surface-card border-none border-bottom-1 surface-border px-3 md:px-5 py-3">
+  </p-menubar>
+</div>
 
 <!-- Contenido dinámico -->
-<div class="border-round border-1 surface-border">
+<div class="w-full animation-duration-300 fadein">
   <router-outlet></router-outlet>
 </div>

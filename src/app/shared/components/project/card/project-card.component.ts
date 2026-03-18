@@ -2,13 +2,14 @@ import { Component, Input } from "@angular/core";
 import { Project } from "src/app/shared/models/project";
 import { AvatarModule } from "primeng/avatar";
 import { CardModule } from "primeng/card";
-import {CommonModule, DatePipe} from "@angular/common";
-
+import { CommonModule, DatePipe } from "@angular/common";
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: "app-project-card",
   standalone: true,
-  imports: [CardModule, AvatarModule, DatePipe, CommonModule],
+  imports: [CardModule, AvatarModule, DatePipe, CommonModule, TagModule, TooltipModule],
   templateUrl: "./project-card.component.html",
   styleUrls: ["./project-card.component.scss"],
 })
@@ -157,5 +158,16 @@ export class ProjectCardComponent {
     }
 
     return project.duration_days ? 50 : 0;
+  }
+
+  getTranslatedState(state: string | undefined): string {
+    if (!state) return 'Desconocido';
+    const stateMap: Record<string, string> = {
+      open: 'Abierto',
+      process: 'En Proceso',
+      finish: 'Finalizado',
+      suspended: 'Suspendido'
+    };
+    return stateMap[state.toLowerCase()] || state;
   }
 }

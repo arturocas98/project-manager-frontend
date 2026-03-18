@@ -27,7 +27,7 @@ export class ApiService {
     private http: HttpClient,
     private headersService: HttpHeadersService,
     private errorService: ErrorService
-  ) {}
+  ) { }
 
   /**
    * Construye la URL base

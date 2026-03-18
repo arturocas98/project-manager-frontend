@@ -106,10 +106,10 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
   ];
 
   typeOptions: TypeOption[] = [
-    { label: 'Task', value: 'task', icon: 'pi pi-check-square' },
+    { label: 'Tarea', value: 'task', icon: 'pi pi-check-square' },
     { label: 'Bug', value: 'bug', icon: 'pi pi-exclamation-triangle' },
-    { label: 'Subtask', value: 'subtask', icon: 'pi pi-sitemap' },
-    { label: 'History', value: 'history_user', icon: 'pi pi-history' }
+    { label: 'Subtarea', value: 'subtask', icon: 'pi pi-sitemap' },
+    { label: 'Historia de Usuario', value: 'history_user', icon: 'pi pi-history' }
   ];
 
   // Opciones para dropdowns de la tabla
@@ -482,6 +482,20 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Traduce el tipo de tarea a español
+   */
+  getTaskTypeDisplay(type: string | undefined): string {
+    if (!type) return 'Tarea';
+    const typeMap: Record<string, string> = {
+      task: 'Tarea',
+      bug: 'Bug',
+      subtask: 'Subtarea',
+      history_user: 'Historia de Usuario',
+    };
+    return typeMap[type.toLowerCase()] || type;
+  }
+
+  /**
    * Obtiene el icono del tipo de tarea
    */
   getTypeIcon(type: string): string {
@@ -603,6 +617,83 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
     const today = new Date();
     const due = new Date(dueDate);
     return due < today;
+  }
+
+  /**
+   * Determina el color de texto óptimo (blanco o gris oscuro) basado en el brillo del fondo
+   */
+  getTextColorForBackground(hexColor: string | undefined): string {
+    if (!hexColor) return '#ffffff';
+    
+    const hex = hexColor.replace('#', '');
+    if (hex.length !== 6 && hex.length !== 3) return '#ffffff';
+    
+    let r, g, b;
+    if (hex.length === 3) {
+      r = parseInt(hex[0] + hex[0], 16);
+      g = parseInt(hex[1] + hex[1], 16);
+      b = parseInt(hex[2] + hex[2], 16);
+    } else {
+      r = parseInt(hex.substring(0, 2), 16);
+      g = parseInt(hex.substring(2, 4), 16);
+      b = parseInt(hex.substring(4, 6), 16);
+    }
+    
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#1f2937' : '#ffffff';
+  }
+
+  /**
+   * Obtiene los estilos consolidados (fondo, texto dinámico y borde) del tag de un estado
+   */
+  getStateTagStyle(stateName: string | undefined, defaultColorHex: string | undefined): Record<string, string> {
+    const stateColors: Record<string, string> = {
+      'asignado': 'D6E4F0',
+      'ejecutando': 'D9E2F3',
+      'suspendido': 'FFF2CC',
+      'terminada': 'C6EFCE',
+      'terminada (fuera de plazo)': 'F2DCDB',
+      'en revisión': 'FFF9C4',
+      'finalizada': 'DAEEF3'
+    };
+
+    const finalHex = (stateName && stateColors[stateName.toLowerCase()]) 
+      ? stateColors[stateName.toLowerCase()] 
+      : (defaultColorHex || 'ffffff');
+
+    const textColor = this.getTextColorForBackground(finalHex);
+    const borderColor = textColor === '#1f2937' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)';
+
+    return {
+      'background-color': '#' + finalHex,
+      'color': textColor,
+      'border': '1px solid ' + borderColor
+    };
+  }
+
+  /**
+   * Obtiene los estilos consolidados de la celda de prioridad, simulando una interfaz Excel
+   */
+  getPriorityTagStyle(priority: string | undefined): Record<string, string> {
+    const priorityColors: Record<string, string> = {
+      'critical': 'FFCDD2',
+      'high': 'FFE0B2',
+      'medium': 'FFF59D',
+      'low': 'C8E6C9'
+    };
+    
+    const finalHex = (priority && priorityColors[priority.toLowerCase()]) 
+      ? priorityColors[priority.toLowerCase()] 
+      : 'ffffff';
+
+    const textColor = this.getTextColorForBackground(finalHex);
+    const borderColor = textColor === '#1f2937' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)';
+
+    return {
+      'background-color': '#' + finalHex,
+      'color': textColor,
+      'border': '1px solid ' + borderColor
+    };
   }
 
   /**

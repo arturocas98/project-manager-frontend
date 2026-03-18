@@ -18,22 +18,28 @@
       <h3 class="text-2xl font-bold text-color mb-2">Error al cargar</h3>
       <p class="text-color-secondary mb-4 text-lg">{{ error }}</p>
       <div class="flex gap-3 justify-content-center">
-        <button pButton label="Reintentar" icon="ph ph-arrows-clockwise" class="p-button-primary border-round-lg" (click)="loadTaskDetails()"></button>
-        <button pButton label="Volver al Kanban" icon="ph ph-arrow-left" class="p-button-outlined border-round-lg" (click)="goBack()"></button>
+        <button pButton label="Reintentar" icon="ph ph-arrows-clockwise" class="p-button-primary border-round-lg"
+          (click)="loadTaskDetails()"></button>
+        <button pButton label="Volver al Kanban" icon="ph ph-arrow-left" class="p-button-outlined border-round-lg"
+          (click)="goBack()"></button>
       </div>
     </div>
   </div>
 
   <ng-container *ngIf="task && !loading">
     <!-- Header -->
-    <div class="flex flex-wrap align-items-center justify-content-between gap-3 mb-5 surface-card p-4 border-round-xl shadow-1">
+    <div
+      class="flex flex-wrap align-items-center justify-content-between gap-3 mb-5 surface-card p-4 border-round-xl shadow-1">
       <div class="flex align-items-center gap-4">
-        <button pButton icon="ph ph-arrow-left" class="p-button-rounded p-button-text p-button-lg text-color-secondary hover:surface-hover" (click)="goBack()" pTooltip="Volver al Kanban" tooltipPosition="right"></button>
+        <button pButton icon="ph ph-arrow-left"
+          class="p-button-rounded p-button-text p-button-lg text-color-secondary hover:surface-hover" (click)="goBack()"
+          pTooltip="Volver al Kanban" tooltipPosition="right"></button>
         <div>
           <div class="flex align-items-center gap-2 text-sm text-color-secondary mb-1">
             <i class="ph ph-tree-structure text-primary"></i>
             <span *ngFor="let ancestor of taskAncestors; let last = last" class="flex align-items-center gap-1">
-              <span class="cursor-pointer hover:text-primary transition-colors font-medium" (click)="navigateToTask(ancestor.id)">
+              <span class="cursor-pointer hover:text-primary transition-colors font-medium"
+                (click)="navigateToTask(ancestor.id)">
                 {{ ancestor.title | truncate:30 }}
               </span>
               <i class="ph ph-caret-right text-xs" *ngIf="!last"></i>
@@ -46,8 +52,11 @@
         </div>
       </div>
       <div class="flex align-items-center gap-3">
-        <p-tag [value]="task.state?.state || 'N/A'" [severity]="getStateSeverity(task.state?.state)" styleClass="font-bold text-sm px-3 py-2 border-round-lg"></p-tag>
-        <button pButton label="Editar Tarea" icon="ph ph-pencil-simple" class="p-button-primary border-round-lg shadow-1" (click)="editTask(task?.id)" [disabled]="!task || loading"></button>
+        <p-tag [value]="task.state?.state || 'N/A'" [severity]="getStateSeverity(task.state?.state)"
+          styleClass="font-bold text-sm px-3 py-2 border-round-lg"></p-tag>
+        <button pButton label="Editar Tarea" icon="ph ph-pencil-simple"
+          class="p-button-primary border-round-lg shadow-1" (click)="editTask(task?.id)"
+          [disabled]="!task || loading"></button>
       </div>
     </div>
 
@@ -59,18 +68,19 @@
         <!-- Tarea Info Card -->
         <div class="surface-card p-5 border-round-xl shadow-1 border-top-3 border-primary">
           <div class="flex justify-content-between align-items-start mb-4">
-            <h2 class="text-xl font-bold bg-indigo-50 text-indigo-700 px-3 py-2 border-round-lg m-0 flex align-items-center gap-2">
+            <h2
+              class="text-xl font-bold bg-indigo-50 text-indigo-700 px-3 py-2 border-round-lg m-0 flex align-items-center gap-2">
               <i class="ph ph-folder-open"></i> {{ task.category?.name || 'General' }}
             </h2>
           </div>
 
           <div class="surface-ground p-4 border-round-xl">
-             <h3 class="text-xs font-bold text-color-secondary text-uppercase mb-3 flex align-items-center gap-2">
-               <i class="ph ph-text-align-left text-lg"></i> Descripción de la Tarea
-             </h3>
-             <p class="text-color line-height-3 white-space-pre-wrap m-0 font-medium text-lg">
-               {{ task.description || 'Sin descripción provista.' }}
-             </p>
+            <h3 class="text-xs font-bold text-color-secondary text-uppercase mb-3 flex align-items-center gap-2">
+              <i class="ph ph-text-align-left text-lg"></i> Descripción de la Tarea
+            </h3>
+            <p class="text-color line-height-3 white-space-pre-wrap m-0 font-medium text-lg">
+              {{ task.description || 'Sin descripción provista.' }}
+            </p>
           </div>
         </div>
 
@@ -82,50 +92,65 @@
                 <i class="ph ph-tree-structure text-primary text-2xl"></i>
               </div>
               Subtareas
-              <span class="bg-primary-50 text-primary-700 font-bold px-2 py-1 border-round-md text-sm">{{ getTotalChildrenCount(task) }}</span>
+              <span class="bg-primary-50 text-primary-700 font-bold px-2 py-1 border-round-md text-sm">{{
+                getTotalChildrenCount(task) }}</span>
             </h3>
-            <button pButton label="Nueva Subtarea" icon="ph ph-plus" class="p-button-outlined p-button-primary border-round-lg" (click)="createTask(1)"></button>
+            <button pButton label="Nueva Subtarea" icon="ph ph-plus"
+              class="p-button-outlined p-button-primary border-round-lg" (click)="createTask(1)"></button>
           </div>
 
           <div *ngIf="task.children && task.children.length > 0" class="border-round-xl">
-            <p-tree [value]="treeData" [loading]="loading" class="w-full bg-transparent border-none p-0" styleClass="border-none w-full p-0">
+            <p-tree [value]="treeData" [loading]="loading" class="w-full bg-transparent border-none p-0"
+              styleClass="border-none w-full p-0">
               <ng-template let-node pTemplate="default">
-                <div class="flex flex-column md:flex-row md:align-items-center justify-content-between w-full p-4 surface-ground border-round-xl mb-3 hover:shadow-2 transition-all cursor-pointer border-1 surface-border hover:border-primary" (click)="navigateToTask(node.data.id)">
+                <div
+                  class="flex flex-column md:flex-row md:align-items-center justify-content-between w-full p-4 surface-ground border-round-xl mb-3 hover:shadow-2 transition-all cursor-pointer border-1 surface-border hover:border-primary"
+                  (click)="navigateToTask(node.data.id)">
 
                   <div class="flex align-items-center gap-4 mb-3 md:mb-0">
-                    <div class="w-3rem h-3rem flex align-items-center justify-content-center border-circle surface-card shadow-1">
-                      <i class="ph text-xl text-primary" [ngClass]="node.children?.length ? 'ph-folder-open text-indigo-500' : 'ph-file-text text-blue-500'"></i>
+                    <div
+                      class="w-3rem h-3rem flex align-items-center justify-content-center border-circle surface-card shadow-1">
+                      <i class="ph text-xl text-primary"
+                        [ngClass]="node.children?.length ? 'ph-folder-open text-indigo-500' : 'ph-file-text text-blue-500'"></i>
                     </div>
                     <div class="flex flex-column">
                       <span class="font-bold text-color text-lg mb-1">{{ node.label }}</span>
                       <div class="flex align-items-center gap-2">
-                        <span class="text-xs surface-card text-color-secondary font-bold px-2 py-1 border-round-md shadow-1">
+                        <span
+                          class="text-xs surface-card text-color-secondary font-bold px-2 py-1 border-round-md shadow-1">
                           {{ node.data.type?.type || 'Sin tipo' }}
                         </span>
-                        <p-tag [value]="node.data.state?.state" [severity]="getStateSeverity(node.data.state?.state)" styleClass="text-xs font-bold px-2"></p-tag>
+                        <p-tag [value]="node.data.state?.state" [severity]="getStateSeverity(node.data.state?.state)"
+                          styleClass="text-xs font-bold px-2"></p-tag>
                       </div>
                     </div>
                   </div>
 
                   <div class="flex align-items-center gap-4 flex-wrap">
-                    <span class="flex align-items-center gap-1 text-sm font-bold surface-card px-2 py-1 border-round-md shadow-1" [ngClass]="getPriorityColor(node.data.priority)">
+                    <span
+                      class="flex align-items-center gap-1 text-sm font-bold surface-card px-2 py-1 border-round-md shadow-1"
+                      [ngClass]="getPriorityColor(node.data.priority)">
                       <i [class]="getPriorityIcon(node.data.priority)"></i>
                       {{ getPriorityInfo(node.data.priority).label }}
                     </span>
 
-                    <div class="flex align-items-center gap-2 text-sm text-color-secondary surface-card px-3 py-2 border-round-md shadow-1 font-medium">
+                    <div
+                      class="flex align-items-center gap-2 text-sm text-color-secondary surface-card px-3 py-2 border-round-md shadow-1 font-medium">
                       <i class="ph ph-calendar-blank"></i>
                       <span>{{ getDisplayDate(node.data) | date:'dd/MM/yyyy' }}</span>
                     </div>
 
-                    <p-avatar *ngIf="node.data.assigned_to" [label]="getUserInitials(node.data.assigned_to.name)" shape="circle" pTooltip="{{node.data.assigned_to.name}}" [style]="{'background': '#6366f1', 'color': '#fff', 'font-size': '0.9rem', 'font-weight': 'bold', 'width':'36px','height':'36px'}"></p-avatar>
+                    <p-avatar *ngIf="node.data.assigned_to" [label]="getUserInitials(node.data.assigned_to.name)"
+                      shape="circle" pTooltip="{{node.data.assigned_to.name}}"
+                      [style]="{'background': '#6366f1', 'color': '#fff', 'font-size': '0.9rem', 'font-weight': 'bold', 'width':'36px','height':'36px'}"></p-avatar>
                   </div>
                 </div>
               </ng-template>
             </p-tree>
           </div>
 
-          <div *ngIf="!task.children || task.children.length === 0" class="flex flex-column align-items-center py-6 surface-ground border-round-xl border-dashed border-2 surface-border">
+          <div *ngIf="!task.children || task.children.length === 0"
+            class="flex flex-column align-items-center py-6 surface-ground border-round-xl border-dashed border-2 surface-border">
             <i class="ph ph-tree-structure text-5xl text-400 mb-3"></i>
             <h4 class="text-xl font-bold text-color mb-2">No hay subtareas</h4>
             <p class="text-color-secondary mb-0 text-lg">Esta tarea principal no contiene elementos secundarios.</p>
@@ -141,16 +166,23 @@
               </div>
               <h3 class="text-xl font-bold text-color m-0">Conversación y Anotaciones</h3>
             </div>
-            <span class="bg-blue-100 text-blue-700 font-bold px-3 py-2 border-round-lg text-sm">{{ comments.length }} comentarios</span>
+            <span class="bg-blue-100 text-blue-700 font-bold px-3 py-2 border-round-lg text-sm">{{ comments.length }}
+              comentarios</span>
           </div>
 
           <!-- Caja de nuevo comentario -->
           <div class="flex gap-4 mb-6 p-4 surface-ground border-round-xl border-1 surface-border">
-            <p-avatar [label]="getUserInitials('Usuario')" size="large" shape="circle" [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'font-weight': 'bold'}"></p-avatar>
+            <p-avatar [label]="getUserInitials('Usuario')" size="large" shape="circle"
+              [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'font-weight': 'bold'}"></p-avatar>
             <div class="flex-1">
-              <textarea pInputTextarea [(ngModel)]="newComment" placeholder="Escribe una actualización, nota o comentario importante..." rows="3" class="w-full p-4 border-round-xl surface-white border-1 surface-border hover:border-primary focus:border-primary transition-colors text-lg" [disabled]="submittingComment"></textarea>
+              <textarea pInputTextarea [(ngModel)]="newComment"
+                placeholder="Escribe una actualización, nota o comentario importante..." rows="3"
+                class="w-full p-4 border-round-xl surface-white border-1 surface-border hover:border-primary focus:border-primary transition-colors text-lg"
+                [disabled]="submittingComment"></textarea>
               <div class="flex justify-content-end mt-3">
-                <button pButton label="Publicar Nota" icon="ph ph-paper-plane-right" [disabled]="!newComment.trim() || submittingComment" [loading]="submittingComment" (click)="submitComment()" class="p-button-primary border-round-lg px-5 font-bold shadow-1"></button>
+                <button pButton label="Publicar Nota" icon="ph ph-paper-plane-right"
+                  [disabled]="!newComment.trim() || submittingComment" [loading]="submittingComment"
+                  (click)="submitComment()" class="p-button-primary border-round-lg px-5 font-bold shadow-1"></button>
               </div>
             </div>
           </div>
@@ -168,32 +200,43 @@
           </div>
 
           <div *ngIf="!loadingComments && comments.length > 0" class="flex flex-column gap-4">
-            <div *ngFor="let comment of comments" class="flex gap-4 p-4 surface-ground border-1 surface-border border-round-xl hover:shadow-1 transition-shadow relative">
+            <div *ngFor="let comment of comments"
+              class="flex gap-4 p-4 surface-ground border-1 surface-border border-round-xl hover:shadow-1 transition-shadow relative">
 
-              <p-avatar [label]="getUserInitials(comment.createdBy?.name || 'Usuario')" size="large" shape="circle" [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'font-weight': 'bold'}" class="flex-shrink-0 mt-1"></p-avatar>
+              <p-avatar [label]="getUserInitials(comment.createdBy?.name || 'Usuario')" size="large" shape="circle"
+                [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'font-weight': 'bold'}"
+                class="flex-shrink-0 mt-1"></p-avatar>
 
               <div class="flex-1">
                 <div class="flex align-items-center justify-content-between mb-3">
                   <div class="flex align-items-center gap-3">
                     <span class="font-bold text-color text-lg">{{ comment.createdBy?.name || 'Usuario' }}</span>
-                    <span *ngIf="comment.createdBy?.user_role?.type" class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 border-round font-bold">
+                    <span *ngIf="comment.createdBy?.user_role?.type"
+                      class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 border-round font-bold">
                       {{ getRoleNameInSpanish(comment.createdBy?.user_role?.type) }}
                     </span>
-                    <span class="text-sm font-medium text-color-secondary flex align-items-center gap-1 surface-card px-2 py-1 border-round shadow-1">
-                      <i class="ph ph-clock"></i> {{ comment.created_at ? (comment.created_at | date:'dd/MM/yyyy HH:mm') : '' }}
+                    <span
+                      class="text-sm font-medium text-color-secondary flex align-items-center gap-1 surface-card px-2 py-1 border-round shadow-1">
+                      <i class="ph ph-clock"></i> {{ comment.created_at ? (comment.created_at | date:'dd/MM/yyyy HH:mm')
+                      : '' }}
                     </span>
                   </div>
 
-                  <button pButton icon="ph ph-dots-three-outline-vertical" class="p-button-rounded p-button-text p-button-sm text-color-secondary hover:surface-card" (click)="menu.toggle($event)"></button>
+                  <button pButton icon="ph ph-dots-three-outline-vertical"
+                    class="p-button-rounded p-button-text p-button-sm text-color-secondary hover:surface-card"
+                    (click)="menu.toggle($event)"></button>
                   <p-menu #menu [model]="commentMenuItems[comment.id]" [popup]="true" appendTo="body"></p-menu>
                 </div>
 
-                <div class="text-color line-height-3 text-lg white-space-pre-wrap surface-card p-4 border-round-xl shadow-1">
+                <div
+                  class="text-color line-height-3 text-lg white-space-pre-wrap surface-card p-4 border-round-xl shadow-1">
                   {{ comment.description }}
                 </div>
 
                 <div *ngIf="comment.incidence" class="mt-3 flex align-items-center">
-                  <div class="flex align-items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-700 font-bold border-round-lg cursor-pointer hover:bg-indigo-100 transition-colors" (click)="navigateToTask(comment.incidence.id)">
+                  <div
+                    class="flex align-items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-700 font-bold border-round-lg cursor-pointer hover:bg-indigo-100 transition-colors"
+                    (click)="navigateToTask(comment.incidence.id)">
                     <i class="ph ph-tag"></i>
                     <span>Específico a: {{ comment.incidence.name }}</span>
                   </div>
@@ -223,22 +266,28 @@
               </span>
             </div>
 
-            <div class="flex justify-content-between align-items-center surface-ground p-3 border-round-lg" [ngClass]="{'border-red-500 border-1': isOverdue(task.due_date)}">
-               <span class="text-color-secondary text-sm font-bold">Vencimiento</span>
-               <div class="flex align-items-center gap-2">
-                  <span class="font-bold text-color flex align-items-center gap-2" [ngClass]="{'text-red-500': isOverdue(task.due_date)}">
-                    <i class="ph-fill ph-circle text-xs" [ngClass]="isOverdue(task.due_date) ? 'text-red-500' : 'text-primary'"></i>
-                    {{ task.due_date ? (task.due_date | date:'mediumDate') : 'No definida' }}
-                  </span>
-                  <p-tag *ngIf="isOverdue(task.due_date)" value="Vencida" severity="danger" styleClass="font-bold"></p-tag>
-               </div>
+            <div class="flex justify-content-between align-items-center surface-ground p-3 border-round-lg"
+              [ngClass]="{'border-red-500 border-1': isOverdue(task.due_date)}">
+              <span class="text-color-secondary text-sm font-bold">Vencimiento</span>
+              <div class="flex align-items-center gap-2">
+                <span class="font-bold text-color flex align-items-center gap-2"
+                  [ngClass]="{'text-red-500': isOverdue(task.due_date)}">
+                  <i class="ph-fill ph-circle text-xs"
+                    [ngClass]="isOverdue(task.due_date) ? 'text-red-500' : 'text-primary'"></i>
+                  {{ task.due_date ? (task.due_date | date:'mediumDate') : 'No definida' }}
+                </span>
+                <p-tag *ngIf="isOverdue(task.due_date)" value="Vencida" severity="danger"
+                  styleClass="font-bold"></p-tag>
+              </div>
             </div>
           </div>
 
           <p-divider styleClass="my-4"></p-divider>
           <div class="flex justify-content-between text-xs text-color-secondary font-medium">
-            <span class="flex align-items-center gap-1"><i class="ph ph-calendar-plus"></i> Creado: {{ task.created_at | date:'dd/MM/yyyy' }}</span>
-            <span class="flex align-items-center gap-1"><i class="ph ph-arrows-clockwise"></i> Actualizado: {{ task.updated_at | date:'dd/MM/yyyy' }}</span>
+            <span class="flex align-items-center gap-1"><i class="ph ph-calendar-plus"></i> Creado: {{ task.created_at |
+              date:'dd/MM/yyyy' }}</span>
+            <span class="flex align-items-center gap-1"><i class="ph ph-arrows-clockwise"></i> Actualizado: {{
+              task.updated_at | date:'dd/MM/yyyy' }}</span>
           </div>
         </div>
 
@@ -250,15 +299,18 @@
           <div class="flex flex-column gap-3">
             <div class="flex align-items-center justify-content-between py-2 border-bottom-1 surface-border">
               <span class="text-color-secondary text-sm font-medium">Proyecto ID</span>
-              <span class="font-bold text-white bg-indigo-500 px-3 py-1 border-round-md shadow-1">#{{ task.project_id }}</span>
+              <span class="font-bold text-white bg-indigo-500 px-3 py-1 border-round-md shadow-1">#{{ task.project_id
+                }}</span>
             </div>
             <div class="flex align-items-center justify-content-between py-2 border-bottom-1 surface-border">
               <span class="text-color-secondary text-sm font-medium">Tipo de Tarea</span>
-              <span class="font-bold text-color bg-surface-100 px-3 py-1 border-round-md">{{ task.type?.type || 'No definido' }}</span>
+              <span class="font-bold text-color bg-surface-100 px-3 py-1 border-round-md">{{ task.type?.type || 'No
+                definido' }}</span>
             </div>
             <div class="flex align-items-center justify-content-between py-2">
               <span class="text-color-secondary text-sm font-medium">Prioridad</span>
-              <p-tag [value]="getPriorityInfo(task.priority).label" [severity]="getPriorityInfo(task.priority).severity" styleClass="font-bold px-3 py-1"></p-tag>
+              <p-tag [value]="getPriorityInfo(task.priority).label" [severity]="getPriorityInfo(task.priority).severity"
+                styleClass="font-bold px-3 py-1"></p-tag>
             </div>
           </div>
         </div>
@@ -266,25 +318,29 @@
         <!-- Assigned To -->
         <div class="surface-card p-5 border-round-xl shadow-1">
           <h3 class="text-xs font-bold text-color-secondary text-uppercase mb-4 flex align-items-center gap-2">
-             <i class="ph ph-users text-lg"></i> Involucrados
+            <i class="ph ph-users text-lg"></i> Involucrados
           </h3>
 
           <div class="mb-4">
             <span class="text-sm text-color-secondary block mb-2 font-medium">Asignado a</span>
-            <div *ngIf="task.assigned_to" class="flex align-items-center gap-3 surface-ground p-3 border-round-xl border-1 surface-border hover:shadow-1 transition-shadow">
-              <p-avatar [label]="getUserInitials(task.assigned_to.name)" size="xlarge" shape="circle" [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'font-weight':'bold'}"></p-avatar>
+            <div *ngIf="task.assigned_to"
+              class="flex align-items-center gap-3 surface-ground p-3 border-round-xl border-1 surface-border hover:shadow-1 transition-shadow">
+              <p-avatar [label]="getUserInitials(task.assigned_to.name)" size="xlarge" shape="circle"
+                [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'font-weight':'bold'}"></p-avatar>
               <div class="flex flex-column">
                 <span class="font-bold text-color text-lg">{{ task.assigned_to.name }}</span>
                 <span class="text-sm text-color-secondary flex align-items-center gap-1 mb-2">
                   <i class="ph ph-envelope-simple"></i> {{ task.assigned_to.email }}
                 </span>
-                <span *ngIf="task.assigned_to?.role_name" class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 border-round w-max font-bold">
+                <span *ngIf="task.assigned_to?.role_name"
+                  class="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 border-round w-max font-bold">
                   {{ getRoleNameInSpanish(task.assigned_to.role_name) }}
                 </span>
               </div>
             </div>
 
-            <div *ngIf="!task.assigned_to" class="flex flex-column align-items-center justify-content-center p-4 surface-ground border-round-xl border-dashed border-2 surface-border">
+            <div *ngIf="!task.assigned_to"
+              class="flex flex-column align-items-center justify-content-center p-4 surface-ground border-round-xl border-dashed border-2 surface-border">
               <i class="ph ph-user-minus text-3xl text-400 mb-2"></i>
               <span class="text-color-secondary font-bold">Sin asignar</span>
             </div>
@@ -295,25 +351,30 @@
           <div class="mt-4">
             <span class="text-sm text-color-secondary block mb-2 font-medium">Creado por</span>
             <div *ngIf="task.created_by" class="flex align-items-center gap-3">
-              <p-avatar [label]="getUserInitials(task.created_by.name)" size="large" shape="circle" [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'font-weight':'bold'}"></p-avatar>
+              <p-avatar [label]="getUserInitials(task.created_by.name)" size="large" shape="circle"
+                [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'font-weight':'bold'}"></p-avatar>
               <div class="flex flex-column">
-                 <span class="font-bold text-color">{{ task.created_by.name }}</span>
-                 <span class="text-sm text-color-secondary">{{ task.created_by.email }}</span>
+                <span class="font-bold text-color">{{ task.created_by.name }}</span>
+                <span class="text-sm text-color-secondary">{{ task.created_by.email }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Parent Task -->
-        <div *ngIf="task.parent" class="surface-cardping google.com p-5 border-round-xl shadow-1 cursor-pointer hover:bg-indigo-100 transition-colors border-1 border-indigo-100 hover:border-indigo-200" (click)="navigateToTask(task.parent!.id)">
+        <div *ngIf="task.parent"
+          class="surface-cardping google.com p-5 border-round-xl shadow-1 cursor-pointer transition-colors border-1 border-indigo-100 hover:border-indigo-200"
+          (click)="navigateToTask(task.parent!.id)">
           <h3 class="text-xs font-bold text-indigo-700 text-uppercase mb-3 flex align-items-center gap-2">
-             <i class="ph ph-arrow-u-up-left text-lg"></i> Tarea Origen (Padre)
+            <i class="ph ph-arrow-u-up-left text-lg"></i> Tarea Origen (Padre)
           </h3>
           <div class="flex align-items-center justify-content-between">
-             <span class="font-bold text-color surface-card px-4 py-3 border-round-xl shadow-1 w-full flex justify-content-between align-items-center text-lg">
-               <span class="text-overflow-ellipsis white-space-nowrap overflow-hidden pr-2">{{ task.parent.title }}</span>
-               <i class="ph ph-caret-right text-indigo-500 font-bold"></i>
-             </span>
+            <span
+              class="font-bold text-color surface-card px-4 py-3 border-round-xl shadow-1 w-full flex justify-content-between align-items-center text-lg">
+              <span class="text-overflow-ellipsis white-space-nowrap overflow-hidden pr-2">{{ task.parent.title
+                }}</span>
+              <i class="ph ph-caret-right text-indigo-500 font-bold"></i>
+            </span>
           </div>
         </div>
 

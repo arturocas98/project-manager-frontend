@@ -1,28 +1,28 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {ButtonModule} from "primeng/button";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
-import {ToastModule} from "primeng/toast";
-import {InputTextareaModule} from "primeng/inputtextarea";
-import {DatePipe, NgClass, NgForOf, NgIf} from "@angular/common";
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {ActivatedRoute, Router} from "@angular/router";
-import {ProjectService} from "../../../../../core/service/project.service";
-import {ConfirmationService, MessageService} from "primeng/api";
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ButtonModule } from "primeng/button";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { ToastModule } from "primeng/toast";
+import { InputTextareaModule } from "primeng/inputtextarea";
+import { DatePipe, NgClass, NgForOf, NgIf } from "@angular/common";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { ActivatedRoute, Router } from "@angular/router";
+import { ProjectService } from "../../../../../core/service/project.service";
+import { ConfirmationService, MessageService } from "primeng/api";
 import {
   ProjectMemberRequest,
   ProjectMemberUpdateRequest,
   UpdateProjectRequest
 } from "../../../../../shared/models/projects-models/project-request";
-import {InputTextModule} from "primeng/inputtext";
-import {DropdownModule} from "primeng/dropdown";
-import {DialogModule} from "primeng/dialog";
-import {HttpClient} from "@angular/common/http";
-import {unassignedUsersData} from "../../../../../shared/models/auth";
-import {ProjectMember} from "../../../../../shared/models/kanban.models";
-import {KanbanService} from "../../../../../core/service/kanban-service";
-import {TooltipModule} from "primeng/tooltip";
-import {Option} from "../../../../../shared/models/general";
-import {TranslateModule} from "@ngx-translate/core";
+import { InputTextModule } from "primeng/inputtext";
+import { DropdownModule } from "primeng/dropdown";
+import { DialogModule } from "primeng/dialog";
+import { HttpClient } from "@angular/common/http";
+import { unassignedUsersData } from "../../../../../shared/models/auth";
+import { ProjectMember } from "../../../../../shared/models/kanban.models";
+import { KanbanService } from "../../../../../core/service/kanban-service";
+import { TooltipModule } from "primeng/tooltip";
+import { Option } from "../../../../../shared/models/general";
+import { TranslateModule } from "@ngx-translate/core";
 
 @Component({
   selector: 'app-project-settings',
@@ -94,7 +94,7 @@ export class ProjectSettingsComponent implements OnInit {
   roleOptions = [
     { label: 'Lider', value: 'LDR' },
     { label: 'Desarrollador', value: 'DEV' },
-      { label: 'Tester', value: 'TST' },
+    { label: 'Tester', value: 'TST' },
     { label: 'Documentador', value: 'DOC' }
   ];
 
@@ -163,7 +163,7 @@ export class ProjectSettingsComponent implements OnInit {
     this.projectService.getProject(this.projectId).subscribe({
       next: (project) => {
         console.log(project);
-          this.projectForm.patchValue({
+        this.projectForm.patchValue({
           ContractNo: project.ContractNo ?? '',
           client: project.client ?? '',
           project_type: project.project_type ?? '',
