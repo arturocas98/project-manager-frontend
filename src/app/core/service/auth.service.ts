@@ -1,7 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import {BehaviorSubject, map, Observable, tap} from 'rxjs';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Constants, LOCAL_STORAGE_KEYS, ROLE } from 'src/app/shared/constants/constants';
 import { User } from 'src/app/shared/models/user';
@@ -14,7 +14,7 @@ import {
   TeamMemberRequest,
   UpdateTeamRequest
 } from "../../shared/models/team-models/team-request.model";
-import {Team, TeamManagement} from "../../shared/models/team-models/team.model";
+import { Team, TeamManagement } from "../../shared/models/team-models/team.model";
 
 export interface LoginData {
   email: string;
@@ -180,8 +180,8 @@ export class AuthService {
     return this.apiService.post<Team>(`${environment.apiUrl}/auth/team/${teamId}/members`, data);
   }
 
-  removeTeamMember(teamId: number, data: TeamMemberRequest): Observable<Team> {
-    return this.apiService.delete<Team>(`${environment.apiUrl}/auth/team/${teamId}/members`, data);
+  removeTeamMember(teamId: number, userId: number): Observable<Team> {
+    return this.apiService.delete<Team>(`${environment.apiUrl}/auth/team/${teamId}/members/${userId}`);
   }
 
   removeTeamMemberByQuery(teamId: number, userId: number): Observable<Team> {

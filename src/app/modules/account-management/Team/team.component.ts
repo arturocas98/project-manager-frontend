@@ -20,12 +20,12 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import {AuthService} from "../../../core/service/auth.service";
-import {Team} from "../../../shared/models/team-models/team.model";
-import {Profile} from "../../../shared/models/auth";
-import {CreateTeamRequest, TeamFilters} from "../../../shared/models/team-models/team-request.model";
-import {TooltipModule} from "primeng/tooltip";
-import {TeamManagementComponent} from "../team-management/team-management.component";
+import { AuthService } from "../../../core/service/auth.service";
+import { Team } from "../../../shared/models/team-models/team.model";
+import { Profile } from "../../../shared/models/auth";
+import { CreateTeamRequest, TeamFilters } from "../../../shared/models/team-models/team-request.model";
+import { TooltipModule } from "primeng/tooltip";
+import { TeamManagementComponent } from "../team-management/team-management.component";
 
 interface PageEvent {
   first: number;
@@ -76,6 +76,7 @@ export class TeamComponent implements OnInit {
   memberDialogVisible = false;
   detailsDialogVisible = false;
   editingTeam = false;
+  addingMemberId: number | null = null;
 
   // Formularios
   teamFormData: CreateTeamRequest = {
@@ -127,7 +128,7 @@ export class TeamComponent implements OnInit {
     private authService: AuthService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadTeams();
@@ -166,7 +167,7 @@ export class TeamComponent implements OnInit {
   }
 
   getTagSeverity(type: string): string {
-    switch(type) {
+    switch (type) {
       case 'premium': return 'warning';
       case 'enterprise': return 'success';
       default: return 'info';
@@ -174,7 +175,7 @@ export class TeamComponent implements OnInit {
   }
 
   getRoleSeverity(role: string): string {
-    switch(role) {
+    switch (role) {
       case 'admin': return 'danger';
       case 'editor': return 'warning';
       default: return 'info';
@@ -297,27 +298,36 @@ export class TeamComponent implements OnInit {
   addMemberToTeam(userId: number) {
     if (!this.selectedTeam) return;
 
+    this.addingMemberId = userId;
     this.authService.addTeamMember(this.selectedTeam.id, { user_id: userId }).subscribe({
       next: (updatedTeam) => {
+        this.addingMemberId = null;
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
           detail: 'Miembro agregado correctamente'
         });
 
-        // Actualizar el equipo en la lista
-        const index = this.teams.findIndex(t => t.id === updatedTeam.id);
-        if (index !== -1) {
-          this.teams[index] = updatedTeam;
+        // Actualizar vista local (por si el backend no trae la relación 'members')
+        if (updatedTeam.members) {
+          this.selectedTeam = updatedTeam;
+        } else if (this.selectedTeam) {
+          if (!this.selectedTeam.members) this.selectedTeam.members = [];
+          const newMember = this.profiles.find(p => p.id === userId);
+          if (newMember && !this.selectedTeam.members.some(m => m.id === userId)) {
+            // Creamos nueva referencia para forzar detección de cambios visuales
+            this.selectedTeam.members = [...this.selectedTeam.members, newMember as any];
+          }
         }
 
-        // Actualizar selectedTeam
-        this.selectedTeam = updatedTeam;
-
+        // Refrescar tabla principal en background
+        this.loadTeams();
+        
         // Actualizar lista filtrada
         this.filterProfiles();
       },
       error: (error) => {
+        this.addingMemberId = null;
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -340,8 +350,9 @@ export class TeamComponent implements OnInit {
 
   removeMember(userId: number) {
     if (!this.selectedTeam) return;
+    console.log(userId);
 
-    this.authService.removeTeamMember(this.selectedTeam.id, { user_id: userId }).subscribe({
+    this.authService.removeTeamMember(this.selectedTeam.id, userId).subscribe({
       next: (updatedTeam) => {
         this.messageService.add({
           severity: 'success',
@@ -349,14 +360,16 @@ export class TeamComponent implements OnInit {
           detail: 'Miembro eliminado correctamente'
         });
 
-        // Actualizar el equipo en la lista
-        const index = this.teams.findIndex(t => t.id === updatedTeam.id);
-        if (index !== -1) {
-          this.teams[index] = updatedTeam;
+        // Actualizar vista local (por si el backend no trae la relación 'members')
+        if (updatedTeam.members) {
+          this.selectedTeam = updatedTeam;
+        } else if (this.selectedTeam && this.selectedTeam.members) {
+          // Eliminamos localmente
+          this.selectedTeam.members = this.selectedTeam.members.filter(m => m.id !== userId);
         }
 
-        // Actualizar selectedTeam
-        this.selectedTeam = updatedTeam;
+        // Refrescar tabla principal en background
+        this.loadTeams();
       },
       error: (error) => {
         this.messageService.add({

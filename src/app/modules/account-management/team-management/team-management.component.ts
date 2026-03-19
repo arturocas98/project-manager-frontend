@@ -1,18 +1,19 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ButtonModule} from "primeng/button";
-import {TooltipModule} from "primeng/tooltip";
-import {TagModule} from "primeng/tag";
-import {TableModule} from "primeng/table";
-import {InputTextModule} from "primeng/inputtext";
-import {TeamManagement} from "../../../shared/models/team-models/team.model";
-import {AuthService} from "../../../core/service/auth.service";
-import {NgClass, UpperCasePipe} from "@angular/common";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ButtonModule } from "primeng/button";
+import { TooltipModule } from "primeng/tooltip";
+import { TagModule } from "primeng/tag";
+import { TableModule } from "primeng/table";
+import { InputTextModule } from "primeng/inputtext";
+import { TeamManagement } from "../../../shared/models/team-models/team.model";
+import { AuthService } from "../../../core/service/auth.service";
+import { CommonModule, NgClass, UpperCasePipe } from "@angular/common";
 
 @Component({
   selector: 'app-team-management',
   standalone: true,
   imports: [
     ButtonModule,
+    CommonModule,
     TooltipModule,
     TagModule,
     TableModule,
@@ -22,7 +23,7 @@ import {NgClass, UpperCasePipe} from "@angular/common";
   ],
   templateUrl: './team-management.component.html',
 })
-export class TeamManagementComponent implements OnInit, OnDestroy{
+export class TeamManagementComponent implements OnInit, OnDestroy {
   teamData: TeamManagement[] = [];
   loading: boolean = true;
   searchValue: string = '';
@@ -43,7 +44,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy{
     contractsUnder30Days: '0%'
   };
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
     this.loadTeamManagement();

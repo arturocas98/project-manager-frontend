@@ -241,32 +241,6 @@
             autofocus />
         </span>
       </div>
-
-      <div class="field mb-2">
-        <label for="type" class="font-bold text-color-secondary block mb-2 text-sm">Tipo <span class="text-pink-500">*</span></label>
-        <p-dropdown
-          id="type"
-          [options]="typeOptions"
-          [(ngModel)]="teamFormData.type"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Selecciona un tipo"
-          [showClear]="false"
-          appendTo="body"
-          styleClass="w-full border-round-lg">
-          <ng-template let-option pTemplate="item">
-            <div class="flex align-items-center gap-2">
-              <i class="ph ph-circle-fill text-xs"
-                [ngClass]="{'text-blue-500': option.value === 'default', 'text-yellow-500': option.value === 'premium', 'text-green-500': option.value === 'enterprise'}">
-              </i>
-              {{option.label}}
-            </div>
-          </ng-template>
-        </p-dropdown>
-        <small *ngIf="!teamFormData.type" class="p-error block mt-2 flex align-items-center gap-1">
-          <i class="ph-bold ph-info"></i> El tipo es obligatorio
-        </small>
-      </div>
     </div>
 
     <ng-template pTemplate="footer">
@@ -356,7 +330,8 @@
           icon="ph-bold ph-plus"
           class="p-button-rounded p-button-success shadow-2"
           (click)="addMemberToTeam(profile.id); $event.stopPropagation()"
-          [disabled]="isUserInTeam(profile.id)"
+          [loading]="addingMemberId === profile.id"
+          [disabled]="isUserInTeam(profile.id) || addingMemberId === profile.id"
           [pTooltip]="isUserInTeam(profile.id) ? 'Ya es miembro' : 'Agregar al equipo'"
           type="button">
         </button>
