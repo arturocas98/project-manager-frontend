@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
+import { RoleGuard } from 'src/app/shared/guards/role.guard';
 
 const routes: Routes = [
   {
@@ -77,7 +78,8 @@ const routes: Routes = [
       },
       {
         path: "create-task/:stateId",
-        data: { breadcrumb: "create" },
+        canActivate: [RoleGuard],
+        data: { breadcrumb: "create", roles: ['administrator', 'leader'] },
         loadComponent: () =>
           import("../task/pages/create/task-create.component").then(
             (m) => m.TaskCreateComponent,
@@ -85,7 +87,8 @@ const routes: Routes = [
       },
       {
         path: "task-update/:IncidenceId",
-        data: { breadcrumb: "update" },
+        canActivate: [RoleGuard],
+        data: { breadcrumb: "update", roles: ['administrator', 'leader'] },
         loadComponent: () =>
           import("../task/pages/task-update/task-update.component").then(
             (m) => m.TaskUpdateComponent,

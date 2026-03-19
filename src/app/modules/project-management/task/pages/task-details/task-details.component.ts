@@ -15,6 +15,7 @@ import { ProjectService } from "../../../../../core/service/project.service";
 import {
   IncidenceDetail,
   IncidenceDetailChild,
+  TaskUpdateModelRequest
 } from "../../../../../shared/models/task-models/task-create-model";
 import { TreeModule } from "primeng/tree";
 import { TruncatePipe } from "../../../../../shared/Pipes/TruncatePipe";
@@ -24,6 +25,7 @@ import { InputTextareaModule } from "primeng/inputtextarea";
 import { FormsModule } from "@angular/forms";
 import { ScrollPanelModule } from "primeng/scrollpanel";
 import { MenuModule } from "primeng/menu";
+import { DialogModule } from "primeng/dialog";
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
 
@@ -49,6 +51,7 @@ registerLocaleData(localeEs);
     FormsModule,
     ScrollPanelModule,
     MenuModule,
+    DialogModule,
   ],
   templateUrl: './task-details.component.html',
   providers: [MessageService, { provide: LOCALE_ID, useValue: 'es' }],
@@ -80,11 +83,23 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   submittingComment: boolean = false;
   commentMenuItems: { [key: number]: MenuItem[] } = {};
 
+  roleType: string | null = null;
+  canManageTasks: boolean = false;
+
   // Para el árbol de PrimeNG
   treeData: TreeNode[] = [];
 
   // Para el breadcrumb de ancestros
   taskAncestors: { id: number; title: string }[] = [];
+
+  // Lógica de transición de estados
+  updatingState: boolean = false;
+  showStateCommentDialogVisible: boolean = false;
+  stateCommentDialogHeader: string = '';
+  stateCommentDialogDescription: string = '';
+  stateComment: string = '';
+  stateCommentRequired: boolean = false;
+  pendingStateId: number | null = null;
 
   private subscriptions: Subscription[] = [];
 
@@ -115,6 +130,10 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
+    const roleTypeStr = localStorage.getItem('role_type');
+    this.roleType = roleTypeStr ? roleTypeStr.toLowerCase() : null;
+    this.canManageTasks = this.roleType === 'administrator' || this.roleType === 'leader';
+
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
 
     const taskSub = this.route.paramMap.subscribe(params => {
@@ -442,5 +461,98 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     const dueDate = new Date(date);
     const today = new Date();
     return dueDate < today;
+  }
+
+  // --- LOGICA DE FLUJO DE TRABAJO DE ESTADOS ---
+
+  showStateCommentDialog(header: string, desc: string, targetStateId: number, required: boolean) {
+    this.stateCommentDialogHeader = header;
+    this.stateCommentDialogDescription = desc;
+    this.pendingStateId = targetStateId;
+    this.stateCommentRequired = required;
+    this.stateComment = '';
+    this.showStateCommentDialogVisible = true;
+  }
+
+  confirmStateWithComment() {
+    if (this.stateCommentRequired && !this.stateComment.trim()) {
+       this.showError('Error', 'El comentario es obligatorio para esta acción.');
+       return;
+    }
+    this.showStateCommentDialogVisible = false;
+    if (this.pendingStateId) {
+      this.updateTaskState(this.pendingStateId, this.stateComment);
+    }
+  }
+
+  confirmSuspendTask() {
+    this.confirmationService.confirm({
+      message: '¿Está seguro de que desea suspender esta tarea? La tarea quedará inactiva temporalmente.',
+      header: 'Confirmar Suspensión',
+      icon: 'ph ph-warning-circle text-orange-500 text-3xl',
+      acceptLabel: 'Sí, suspender',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-warning',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.updateTaskState(3); // Estado de suspension
+      }
+    });
+  }
+
+  updateTaskState(newStateId: number, comment?: string) {
+    if (!this.task || !this.projectId || !this.taskId) return;
+    
+    this.updatingState = true;
+    
+    // Mapeo inverso de id de prioridad
+    const priorityMap: Record<string, number> = {
+      'low': 1, 'medium': 2, 'high': 3, 'critical': 4
+    };
+    const priorityId = this.task.priority ? priorityMap[this.task.priority.toLowerCase()] : 2;
+
+    const updateData: TaskUpdateModelRequest = {
+      title: this.task.title,
+      description: this.task.description,
+      incidence_priority_id: priorityId,
+      incidence_type_id: this.task.type?.id || null,
+      incidence_category_id: this.task.category?.id || null,
+      incidence_state_id: newStateId,
+      assigned_user_id: this.task.assigned_to?.id || null,
+      parent_incidence_id: this.task.parent?.id || null,
+      start_date: this.task.start_date,
+      due_date: this.task.due_date
+    };
+
+    const updateSub = this.projectService.UpdateTask(updateData, this.projectId, this.taskId).subscribe({
+      next: (response) => {
+        if (comment && comment.trim() !== '') {
+          this.projectService.createComment(this.projectId, this.taskId, comment).subscribe({
+             next: () => {
+                this.finishStateUpdate();
+             },
+             error: () => {
+                this.showError('Advertencia', 'El estado fue actualizado, pero no se pudo enviar el comentario');
+                this.finishStateUpdate();
+             }
+          });
+        } else {
+          this.finishStateUpdate();
+        }
+      },
+      error: (error) => {
+        this.updatingState = false;
+        console.error('Error updating task state:', error);
+        this.showError('Error', 'No se pudo actualizar el estado de la tarea');
+      }
+    });
+
+    this.subscriptions.push(updateSub);
+  }
+
+  private finishStateUpdate() {
+    this.updatingState = false;
+    this.showSuccess('Estado actualizado', 'El estado de la tarea se actualizó correctamente');
+    this.loadTaskDetails(); // Refrescar los datos para ver el nuevo estado/comentario
   }
 }

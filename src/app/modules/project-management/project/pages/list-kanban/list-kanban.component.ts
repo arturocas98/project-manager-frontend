@@ -145,6 +145,9 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
     }
   ];
 
+  roleType: string | null = null;
+  canManageTasks: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -153,6 +156,10 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    const roleTypeStr = localStorage.getItem('role_type');
+    this.roleType = roleTypeStr ? roleTypeStr.toLowerCase() : null;
+    this.canManageTasks = this.roleType === 'administrator' || this.roleType === 'leader';
+
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
 
     if (!this.projectId) {

@@ -51,11 +51,36 @@
           </h1>
         </div>
       </div>
-      <div class="flex align-items-center gap-3">
+      <div class="flex align-items-center gap-2 flex-wrap">
         <p-tag [value]="task.state?.state || 'N/A'" [severity]="getStateSeverity(task.state?.state)"
           styleClass="font-bold text-sm px-3 py-2 border-round-lg"></p-tag>
-        <button pButton label="Editar Tarea" icon="ph ph-pencil-simple"
-          class="p-button-primary border-round-lg shadow-1" (click)="editTask(task?.id)"
+
+        <!-- Acciones Developer -->
+        <ng-container *ngIf="roleType === 'developer'">
+          <button *ngIf="task.state?.state?.toLowerCase() === 'asignado'" pButton label="Ejecutar" icon="ph ph-play" class="p-button-success border-round-lg shadow-1 h-3rem" (click)="updateTaskState(2)" [loading]="updatingState"></button>
+          <button *ngIf="task.state?.state?.toLowerCase() === 'ejecutando'" pButton label="Terminar" icon="ph ph-check" class="p-button-success border-round-lg shadow-1 h-3rem" (click)="showStateCommentDialog('Terminar Tarea', 'Opcional: Añade un comentario sobre la finalización', 4, false)" [loading]="updatingState"></button>
+        </ng-container>
+
+        <!-- Acciones Tester -->
+        <ng-container *ngIf="roleType === 'tester'">
+          <ng-container *ngIf="task.state?.state?.toLowerCase() === 'terminado' || task.state?.state?.toLowerCase() === 'terminada'">
+            <button pButton label="Devolver" icon="ph ph-arrow-u-down-left" class="p-button-danger border-round-lg shadow-1 h-3rem" (click)="showStateCommentDialog('Devolver Tarea', 'Obligatorio: Añade un comentario explicando la devolución', 2, true)" [loading]="updatingState"></button>
+            <button pButton label="Revisar" icon="ph ph-magnifying-glass" class="p-button-warning border-round-lg shadow-1 h-3rem" (click)="updateTaskState(6)" [loading]="updatingState"></button>
+          </ng-container>
+          <ng-container *ngIf="task.state?.state?.toLowerCase() === 'en revisión' || task.state?.state?.toLowerCase() === 'en revision'">
+            <button pButton label="Devolver" icon="ph ph-arrow-u-down-left" class="p-button-danger border-round-lg shadow-1 h-3rem" (click)="showStateCommentDialog('Devolver Tarea', 'Obligatorio: Añade un comentario explicando la devolución', 2, true)" [loading]="updatingState"></button>
+            <button pButton label="Finalizar" icon="ph ph-check-circle" class="p-button-success border-round-lg shadow-1 h-3rem" (click)="updateTaskState(7)" [loading]="updatingState"></button>
+          </ng-container>
+        </ng-container>
+
+        <!-- Acciones Administrator/Leader -->
+        <ng-container *ngIf="roleType === 'administrator' || roleType === 'leader'">
+          <button *ngIf="task.state?.state?.toLowerCase() === 'suspendido'" pButton label="Ejecutar" icon="ph ph-play" class="p-button-success border-round-lg shadow-1 h-3rem" (click)="updateTaskState(2)" [loading]="updatingState"></button>
+          <button *ngIf="task.state?.state?.toLowerCase() !== 'suspendido'" pButton label="Suspender" icon="ph ph-pause" class="p-button-warning border-round-lg shadow-1 h-3rem" (click)="confirmSuspendTask()" [loading]="updatingState"></button>
+        </ng-container>
+        
+        <button *ngIf="canManageTasks" pButton label="Editar Tarea" icon="ph ph-pencil-simple"
+          class="p-button-primary border-round-lg shadow-1 h-3rem" (click)="editTask(task?.id)"
           [disabled]="!task || loading"></button>
       </div>
     </div>
@@ -95,7 +120,7 @@
               <span class="bg-primary-50 text-primary-700 font-bold px-2 py-1 border-round-md text-sm">{{
                 getTotalChildrenCount(task) }}</span>
             </h3>
-            <button pButton label="Nueva Subtarea" icon="ph ph-plus"
+            <button *ngIf="canManageTasks" pButton label="Nueva Subtarea" icon="ph ph-plus"
               class="p-button-outlined p-button-primary border-round-lg" (click)="createTask(1)"></button>
           </div>
 
@@ -381,4 +406,16 @@
       </div>
     </div>
   </ng-container>
+
+  <!-- Dialog for State Change Comment -->
+  <p-dialog [(visible)]="showStateCommentDialogVisible" [header]="stateCommentDialogHeader" [modal]="true" [style]="{width: '450px'}">
+    <div class="flex flex-column gap-3 mt-2">
+      <p class="m-0 text-color-secondary">{{ stateCommentDialogDescription }}</p>
+      <textarea pInputTextarea [(ngModel)]="stateComment" rows="4" class="w-full text-lg p-3 border-round-lg" placeholder="Escribe tu comentario aquí..."></textarea>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary" (click)="showStateCommentDialogVisible = false"></button>
+      <button pButton label="Confirmar" icon="ph ph-check" class="p-button-primary" (click)="confirmStateWithComment()" [disabled]="stateCommentRequired && !stateComment.trim()"></button>
+    </ng-template>
+  </p-dialog>
 </div>

@@ -230,7 +230,7 @@
               <button pButton type="button" icon="pi pi-eye" class="p-button-text p-button-rounded p-button-sm"
                 (click)="viewTask(task.id)" pTooltip="Ver detalles">
               </button>
-              <button pButton type="button" icon="pi pi-pencil" class="p-button-text p-button-rounded p-button-sm"
+              <button *ngIf="canManageTasks" pButton type="button" icon="pi pi-pencil" class="p-button-text p-button-rounded p-button-sm"
                 (click)="editTask(task.id)" pTooltip="Editar">
               </button>
               <button *ngIf="task.parent" pButton type="button" icon="pi pi-sitemap"
@@ -249,7 +249,7 @@
             <div class="flex flex-column align-items-center justify-content-center p-4">
               <i class="pi pi-inbox text-4xl text-color-secondary mb-2"></i>
               <p class="text-color-secondary">No se encontraron tareas</p>
-              <button pButton type="button" label="Crear primera tarea" icon="pi pi-plus"
+              <button *ngIf="canManageTasks" pButton type="button" label="Crear primera tarea" icon="pi pi-plus"
                 class="p-button-text p-button-sm" (click)="createTask()">
               </button>
             </div>

@@ -85,6 +85,10 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
   members: ProjectMember[] = [];
   loading = true;
 
+  // Privilegios
+  roleType: string | null = null;
+  canManageTasks: boolean = false;
+
   // Filtros
   searchControl = new FormControl('');
   selectedPriorities: string[] = [];
@@ -140,6 +144,10 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    const roleTypeStr = localStorage.getItem('role_type');
+    this.roleType = roleTypeStr ? roleTypeStr.toLowerCase() : null;
+    this.canManageTasks = this.roleType === 'administrator' || this.roleType === 'leader';
+
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
 
     if (!this.projectId) {
@@ -665,5 +673,77 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     };
 
     return priorityMap[priority.toLowerCase()] || priority;
+  }
+  /**
+ * Obtiene el color de fondo para la tarjeta de tarea
+ */
+  public getCardBackgroundColor(task: KanbanTask): string {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const state = task.state?.state?.toLowerCase() || '';
+
+    // 1. ASIGNADO - D6E4F0
+    if (state === 'asignado' || state === 'asignada' || state === 'assigned') {
+      return '#D6E4F0';
+    }
+
+    // 2. EJECUTANDO - D9E2F3
+    if (state === 'ejecutando' || state === 'en progreso' || state === 'in progress' || state === 'progress') {
+      return '#D9E2F3';
+    }
+
+    // 3. SUSPENDIDO - FFF2CC
+    if (state === 'suspendido' || state === 'suspendida' || state === 'paused' || state === 'on hold') {
+      return '#FFF2CC';
+    }
+
+    // 4. TERMINADA (a tiempo) - C6EFCE
+    if (state === 'terminada' || state === 'completed' || state === 'done') {
+      // Verificar si tiene fecha de vencimiento
+      if (task.due_date) {
+        const dueDate = new Date(task.due_date);
+        dueDate.setHours(0, 0, 0, 0);
+
+        // Si la fecha de vencimiento es menor a hoy (terminada después de vencer)
+        if (dueDate < today) {
+          return '#F2DCDB'; // 5. TERMINADA (fuera de plazo)
+        }
+      }
+      return '#C6EFCE'; // 4. TERMINADA (a tiempo)
+    }
+
+    // 6. EN REVISIÓN - FFF9C4
+    if (state === 'revisión' || state === 'review' || state === 'en revisión') {
+      return '#FFF9C4';
+    }
+
+    // 7. FINALIZADA - DAEEF3
+    if (state === 'finalizada' || state === 'finalizado' || state === 'approved' || state === 'aprobada') {
+      return '#DAEEF3';
+    }
+
+    // Si la tarea NO está en ninguno de los estados anteriores (pendiente, etc.)
+    if (task.due_date) {
+      const dueDate = new Date(task.due_date);
+      dueDate.setHours(0, 0, 0, 0);
+
+      // Calcular diferencia en días
+      const diffTime = dueDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // Si está vencida (fecha pasada)
+      if (dueDate < today) {
+        return '#F4CCCC'; // Rojo claro - Vencida sin terminar
+      }
+
+      // Si está por vencer en 72 horas (3 días) o menos
+      if (diffDays <= 3) {
+        return '#FCE4CC'; // Naranja claro - A 72 horas de vencer
+      }
+    }
+
+    // Color por defecto si no hay estado específico
+    return '#F9FAFB'; // Gris muy claro por defecto
   }
 }
