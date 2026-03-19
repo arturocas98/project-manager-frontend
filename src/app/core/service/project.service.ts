@@ -184,19 +184,37 @@ export class ProjectService {
   getComments(projectId: number, taskId:number): Observable<CommentResponse[]> {
     // GET /projects/{project}/incidences/{incidence}/comments
     return this.apiService
-      .get<{ data: CommentResponse }[]>(`projects/${projectId}/incidences/${taskId}/comments`)
+      .get<{ data: CommentResponse, meta?: any }[]>(`projects/${projectId}/incidences/${taskId}/comments`)
       .pipe(
-        map(responseArray => responseArray.map(item => item.data)) // extraemos solo data
+        map(responseArray => responseArray.map(item => {
+            const comment = item.data;
+            if (item.meta) {
+                comment.meta = item.meta as any;
+            }
+            return comment;
+        }))
       );
   }
 
 // Crear un nuevo comentario
-  createComment(projectId: number, taskId: number, description: string): Observable<CommentResponse> {
+  createComment(projectId: number, taskId: number, description: string, file?: File): Observable<CommentResponse> {
+    const formData = new FormData();
+    formData.append('description', description);
+    if (file) {
+      formData.append('file', file);
+    }
+
     // POST /projects/{project}/incidences/{incidence}/comments
     return this.apiService
-      .post<{ data: CommentResponse }>(`projects/${projectId}/incidences/${taskId}/comments`, { description })
+      .postFull<CommentResponse>(`projects/${projectId}/incidences/${taskId}/comments`, formData, { omitContentType: true })
       .pipe(
-        map(res => res.data) // extraemos solo data
+        map(res => {
+            const comment = res.data;
+            if (res.meta) {
+                comment.meta = res.meta as any;
+            }
+            return comment;
+        })
       );
   }
 

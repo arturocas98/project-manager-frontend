@@ -79,10 +79,12 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   // Para comentarios
   comments: CommentResponse[] = [];
   newComment: string = '';
+  selectedFile: File | null = null;
   loadingComments: boolean = false;
   submittingComment: boolean = false;
   commentMenuItems: { [key: number]: MenuItem[] } = {};
 
+  currentUserId: number | null = null;
   roleType: string | null = null;
   canManageTasks: boolean = false;
 
@@ -133,6 +135,16 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     const roleTypeStr = localStorage.getItem('role_type');
     this.roleType = roleTypeStr ? roleTypeStr.toLowerCase() : null;
     this.canManageTasks = this.roleType === 'administrator' || this.roleType === 'leader';
+
+    const profileStr = localStorage.getItem('profile');
+    if (profileStr) {
+      try {
+        const profile = JSON.parse(profileStr);
+        this.currentUserId = profile.id || null;
+      } catch (e) {
+        console.error('Error parsing profile', e);
+      }
+    }
 
     this.projectId = Number(this.route.parent?.snapshot.paramMap.get('id'));
 
@@ -223,23 +235,53 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Manejo de selección de archivo
+   */
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      // Validar tamaño máximo 10MB
+      const maxSizeInBytes = 10 * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        this.showError('Archivo demasiado grande', 'El archivo no debe exceder los 10MB.');
+        event.target.value = ''; // Limpiar input
+        this.selectedFile = null;
+        return;
+      }
+      this.selectedFile = file;
+    } else {
+      this.selectedFile = null;
+    }
+  }
+
+  /**
+   * Eliminar archivo seleccionado
+   */
+  removeSelectedFile(): void {
+    this.selectedFile = null;
+    // Omitiendo la limpieza del input ref por ahora, ya que Angular se encargará del binding de UI cuando agreguemos el html
+  }
+
+  /**
    * Publica un nuevo comentario
    */
   submitComment(): void {
-    if (!this.newComment.trim()) {
-      this.showError('Error', 'El comentario no puede estar vacío');
+    if (!this.newComment.trim() && !this.selectedFile) {
+      this.showError('Error', 'El comentario o el archivo no pueden estar vacíos');
       return;
     }
 
     this.submittingComment = true;
 
-    const commentSub = this.projectService.createComment(this.projectId, this.taskId, this.newComment).subscribe({
+    const commentSub = this.projectService.createComment(this.projectId, this.taskId, this.newComment, this.selectedFile || undefined).subscribe({
       next: newComment => {
         this.comments = [newComment, ...this.comments];
         this.buildCommentMenuItems();
         this.newComment = '';
+        this.selectedFile = null; // Limpiar archivo
         this.submittingComment = false;
         this.showSuccess('Comentario agregado', 'El comentario se publicó correctamente');
+        this.loadComments();
       },
       error: error => {
         console.error('Error creating comment:', error);
@@ -502,9 +544,9 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
   updateTaskState(newStateId: number, comment?: string) {
     if (!this.task || !this.projectId || !this.taskId) return;
-    
+
     this.updatingState = true;
-    
+
     // Mapeo inverso de id de prioridad
     const priorityMap: Record<string, number> = {
       'low': 1, 'medium': 2, 'high': 3, 'critical': 4

@@ -14,6 +14,22 @@ export interface Incidence {
   name: string;
 }
 
+export interface CommentMedia {
+  id: number;
+  name: string;
+  url: string;
+  size: number;
+  mime_type: string;
+}
+
+export interface CommentMeta {
+  timestamps?: {
+      created: string;
+      updated: string;
+  };
+  attachments?: CommentMedia[];
+}
+
 export interface CommentResponse {
   id: number;
   description: string;
@@ -21,4 +37,5 @@ export interface CommentResponse {
   updated_at: string;
   incidence: Incidence;
   createdBy: CreatedBy;
+  meta?: CommentMeta;
 }

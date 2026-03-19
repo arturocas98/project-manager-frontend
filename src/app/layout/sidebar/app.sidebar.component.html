@@ -1,13 +1,14 @@
-<div
-  class="layout-sidebar surface-section shadow-2 h-screen flex flex-column select-none"
-  (mouseenter)="onMouseEnter()"
+<div class="layout-sidebar surface-section shadow-2 h-screen flex flex-column select-none" (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()">
 
   <!-- NAVBAR / BRANDING (FIJO) -->
-  <div class="flex align-items-center justify-content-between px-4 py-3 border-bottom-1 surface-border flex-shrink-0 bg-transparent">
-    <a [routerLink]="['/']" class="flex align-items-center gap-3 no-underline cursor-pointer outline-none transition-colors hover:surface-hover border-round-xl p-2 -ml-2">
-      <div class="w-3rem h-3rem flex align-items-center justify-content-center bg-primary-50 border-round-lg shadow-1 border-1 border-primary-100">
-        <img src="assets/General/SGR.png" alt="Logo SmartGob" class="w-2rem h-2rem object-contain block"/>
+  <div
+    class="flex align-items-center justify-content-between px-4 py-3 border-bottom-1 surface-border flex-shrink-0 bg-transparent">
+    <a [routerLink]="['/']"
+      class="flex align-items-center gap-3 no-underline cursor-pointer outline-none transition-colors hover:surface-hover border-round-xl p-2 -ml-2">
+      <div
+        class="w-3rem h-3rem flex align-items-center justify-content-center bg-primary-50 border-round-lg shadow-1 border-1 border-primary-100">
+        <img src="assets/General/SGR.png" alt="Logo SmartGob" class="w-2rem h-2rem object-contain block" />
       </div>
       <div>
         <p class="text-color font-bold text-xl m-0 tracking-wide line-height-2">SmartGob</p>

@@ -10,6 +10,7 @@ export interface ExtraKeys {
     access_token?: string;
     'X-Country'?: string;
     'X-Currency'?: string;
+    omitContentType?: boolean;
     [key: string]: any;
 }
 
@@ -27,13 +28,18 @@ export class HttpHeadersService {
             };
         }
 
-        let headers = new HttpHeaders({
+        let headerOptions: any = {
             'Cache-Control': 'no-cache',
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Origin': '*',
-            'global-localization': this.getSelectedLanguage(),
-            'Content-Type': 'application/json; charset=utf-8'
-        });
+            'global-localization': this.getSelectedLanguage()
+        };
+
+        if (!extraKeys?.omitContentType) {
+            headerOptions['Content-Type'] = 'application/json; charset=utf-8';
+        }
+
+        let headers = new HttpHeaders(headerOptions);
 
         const isLoggedIn = this.localStorage.getBoolAsync('isLoggedIn', false);
 

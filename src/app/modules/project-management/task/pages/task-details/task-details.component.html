@@ -64,7 +64,6 @@
         <!-- Acciones Tester -->
         <ng-container *ngIf="roleType === 'tester'">
           <ng-container *ngIf="task.state?.state?.toLowerCase() === 'terminado' || task.state?.state?.toLowerCase() === 'terminada'">
-            <button pButton label="Devolver" icon="ph ph-arrow-u-down-left" class="p-button-danger border-round-lg shadow-1 h-3rem" (click)="showStateCommentDialog('Devolver Tarea', 'Obligatorio: Añade un comentario explicando la devolución', 2, true)" [loading]="updatingState"></button>
             <button pButton label="Revisar" icon="ph ph-magnifying-glass" class="p-button-warning border-round-lg shadow-1 h-3rem" (click)="updateTaskState(6)" [loading]="updatingState"></button>
           </ng-container>
           <ng-container *ngIf="task.state?.state?.toLowerCase() === 'en revisión' || task.state?.state?.toLowerCase() === 'en revision'">
@@ -78,7 +77,7 @@
           <button *ngIf="task.state?.state?.toLowerCase() === 'suspendido'" pButton label="Ejecutar" icon="ph ph-play" class="p-button-success border-round-lg shadow-1 h-3rem" (click)="updateTaskState(2)" [loading]="updatingState"></button>
           <button *ngIf="task.state?.state?.toLowerCase() !== 'suspendido'" pButton label="Suspender" icon="ph ph-pause" class="p-button-warning border-round-lg shadow-1 h-3rem" (click)="confirmSuspendTask()" [loading]="updatingState"></button>
         </ng-container>
-        
+
         <button *ngIf="canManageTasks" pButton label="Editar Tarea" icon="ph ph-pencil-simple"
           class="p-button-primary border-round-lg shadow-1 h-3rem" (click)="editTask(task?.id)"
           [disabled]="!task || loading"></button>
@@ -204,9 +203,28 @@
                 placeholder="Escribe una actualización, nota o comentario importante..." rows="3"
                 class="w-full p-4 border-round-xl surface-white border-1 surface-border hover:border-primary focus:border-primary transition-colors text-lg"
                 [disabled]="submittingComment"></textarea>
-              <div class="flex justify-content-end mt-3">
+
+              <!-- Archivo seleccionado (Previa) -->
+              <div *ngIf="selectedFile" class="mt-3 p-3 surface-card border-round-lg flex align-items-center justify-content-between border-1 surface-border">
+                  <div class="flex align-items-center gap-3">
+                      <div class="w-2rem h-2rem flex align-items-center justify-content-center border-circle bg-blue-50">
+                          <i class="ph ph-file text-blue-500 text-lg"></i>
+                      </div>
+                      <div class="flex flex-column">
+                          <span class="font-medium text-color text-sm">{{ selectedFile.name }}</span>
+                          <span class="text-xs text-color-secondary">{{ (selectedFile.size / 1048576) | number:'1.1-2' }} MB</span>
+                      </div>
+                  </div>
+                  <button pButton icon="ph ph-x" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="removeSelectedFile()" pTooltip="Quitar archivo"></button>
+              </div>
+
+              <div class="flex justify-content-between align-items-center mt-3">
+                <div>
+                   <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none">
+                   <button pButton icon="ph ph-paperclip" label="Adjuntar Archivo" class="p-button-text p-button-secondary font-bold" (click)="fileInput.click()" [disabled]="submittingComment"></button>
+                </div>
                 <button pButton label="Publicar Nota" icon="ph ph-paper-plane-right"
-                  [disabled]="!newComment.trim() || submittingComment" [loading]="submittingComment"
+                  [disabled]="(!newComment.trim() && !selectedFile) || submittingComment" [loading]="submittingComment"
                   (click)="submitComment()" class="p-button-primary border-round-lg px-5 font-bold shadow-1"></button>
               </div>
             </div>
@@ -247,15 +265,33 @@
                     </span>
                   </div>
 
-                  <button pButton icon="ph ph-dots-three-outline-vertical"
-                    class="p-button-rounded p-button-text p-button-sm text-color-secondary hover:surface-card"
-                    (click)="menu.toggle($event)"></button>
-                  <p-menu #menu [model]="commentMenuItems[comment.id]" [popup]="true" appendTo="body"></p-menu>
+                  <ng-container *ngIf="comment.createdBy?.id == currentUserId">
+                    <button pButton icon="ph ph-dots-three-outline-vertical"
+                      class="p-button-rounded p-button-text p-button-sm text-color-secondary hover:surface-card"
+                      (click)="menu.toggle($event)"></button>
+                    <p-menu #menu [model]="commentMenuItems[comment.id]" [popup]="true" appendTo="body"></p-menu>
+                  </ng-container>
                 </div>
 
                 <div
                   class="text-color line-height-3 text-lg white-space-pre-wrap surface-card p-4 border-round-xl shadow-1">
                   {{ comment.description }}
+                </div>
+
+                <!-- Archivos adjuntos -->
+                <div *ngIf="comment.meta?.attachments?.length" class="mt-3 flex flex-wrap gap-2">
+                   <div *ngFor="let m of comment.meta?.attachments" class="surface-ground p-3 border-round-lg flex align-items-center gap-3 border-1 surface-border hover:border-primary transition-colors">
+                       <div class="w-2rem h-2rem flex align-items-center justify-content-center border-circle bg-blue-50">
+                           <i class="ph ph-file-text text-blue-500 text-lg"></i>
+                       </div>
+                       <div class="flex flex-column mr-3">
+                           <span class="font-medium text-color text-sm">{{ m.name }}</span>
+                           <span class="text-xs text-color-secondary">{{ (m.size / 1048576) | number:'1.1-2' }} MB</span>
+                       </div>
+                       <a [href]="m.url" target="_blank" class="p-button p-button-rounded p-button-text p-button-sm ml-auto p-0 w-2rem h-2rem flex align-items-center justify-content-center" title="Descargar">
+                           <i class="ph ph-download-simple text-lg"></i>
+                       </a>
+                   </div>
                 </div>
 
                 <div *ngIf="comment.incidence" class="mt-3 flex align-items-center">
@@ -329,8 +365,7 @@
             </div>
             <div class="flex align-items-center justify-content-between py-2 border-bottom-1 surface-border">
               <span class="text-color-secondary text-sm font-medium">Tipo de Tarea</span>
-              <span class="font-bold text-color bg-surface-100 px-3 py-1 border-round-md">{{ task.type?.type || 'No
-                definido' }}</span>
+              <span class="font-bold text-color bg-surface-100 px-3 py-1 border-round-md">{{ task.type?.type || 'No definido' }}</span>
             </div>
             <div class="flex align-items-center justify-content-between py-2">
               <span class="text-color-secondary text-sm font-medium">Prioridad</span>
