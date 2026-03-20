@@ -81,7 +81,7 @@ export class TeamComponent implements OnInit {
   // Formularios
   teamFormData: CreateTeamRequest = {
     name: '',
-    type: 'default'
+    type: 'DEV'
   };
 
   // Filtros
@@ -102,9 +102,11 @@ export class TeamComponent implements OnInit {
 
   // Opciones para dropdowns
   typeOptions = [
-    { label: 'Default', value: 'default' },
-    { label: 'Premium', value: 'premium' },
-    { label: 'Enterprise', value: 'enterprise' }
+    { label: 'administrator', value: 'ADM' },
+    { label: 'leader', value: 'LDR' },
+    { label: 'developer', value: 'DEV' },
+    { label: 'tester', value: 'TST' },
+    { label: 'documenter', value: 'DOC' }
   ];
 
   sortByOptions = [
@@ -141,6 +143,8 @@ export class TeamComponent implements OnInit {
         // Asumiendo que ApiService ya extrajo el data
         this.teams = response.data || response;
         console.log(this.teams);
+        console.log("Teamss");
+        console.log(response);
         this.totalRecords = response.meta?.total || this.teams.length;
         this.loading = false;
       },
@@ -168,8 +172,11 @@ export class TeamComponent implements OnInit {
 
   getTagSeverity(type: string): string {
     switch (type) {
-      case 'premium': return 'warning';
-      case 'enterprise': return 'success';
+      case 'ADM': return 'danger';
+      case 'LDR': return 'warning';
+      case 'DEV': return 'info';
+      case 'TST': return 'success';
+      case 'DOC': return 'help';
       default: return 'info';
     }
   }
@@ -185,7 +192,7 @@ export class TeamComponent implements OnInit {
   // Diálogo de equipo
   showTeamDialog() {
     this.editingTeam = false;
-    this.teamFormData = { name: '', type: 'default' };
+    this.teamFormData = { name: '', type: 'DEV' };
     this.teamDialogVisible = true;
   }
 
@@ -197,7 +204,7 @@ export class TeamComponent implements OnInit {
     this.editingTeam = true;
     this.teamFormData = {
       name: team.name,
-      type: team.type as 'default' | 'premium' | 'enterprise' // Type assertion
+      type: team.type
     };
     this.selectedTeam = team;
     this.teamDialogVisible = true;
@@ -322,7 +329,7 @@ export class TeamComponent implements OnInit {
 
         // Refrescar tabla principal en background
         this.loadTeams();
-        
+
         // Actualizar lista filtrada
         this.filterProfiles();
       },

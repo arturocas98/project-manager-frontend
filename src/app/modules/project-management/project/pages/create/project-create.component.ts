@@ -20,6 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { Profile } from '../../../../../shared/models/auth';
 import { InputTextModule } from 'primeng/inputtext';
 import { Router } from '@angular/router';
+import { Team } from '../../../../../shared/models/team-models/team.model';
 
 interface SelectedMember {
   user_id: number;
@@ -81,11 +82,17 @@ export class ProjectCreateComponent implements OnInit {
     last_phase: [''],
   });
 
-  // Variables para miembros
+  // Variables para miembros individuales
   allUsers: Profile[] = [];
   userOptions: { label: string; value: number }[] = [];
-  availableUserOptions: { label: string; value: number }[] = []; // <-- NUEVA VARIABLE
+  availableUserOptions: { label: string; value: number }[] = [];
   selectedMembers: SelectedMember[] = [];
+
+  // Variables para equipos
+  allTeams: Team[] = [];
+  teamOptions: { label: string; value: number }[] = [];
+  selectedTeamIds: number[] = [];
+  previousTeamIds: number[] = [];
 
   // Variables para selectores de miembros
   selectedUserId: number | null = null;
@@ -144,6 +151,63 @@ export class ProjectCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAllUsers();
+    this.loadAllTeams();
+  }
+
+  loadAllTeams(): void {
+    this.authService.getTeams().subscribe({
+      next: teams => {
+        console.log("Teams");
+        console.log(teams);
+        this.allTeams = teams;
+        this.teamOptions = teams.map(team => ({
+          label: `${team.name} (${team.type})`,
+          value: team.id
+        }));
+      },
+      error: error => console.error('Error cargando equipos:', error)
+    });
+  }
+
+  onTeamsChange(event: any): void {
+    const currentTeamIds = event.value as number[];
+
+    // Equipos añadidos y removidos
+    const addedTeams = currentTeamIds.filter(id => !this.previousTeamIds.includes(id));
+    const removedTeams = this.previousTeamIds.filter(id => !currentTeamIds.includes(id));
+
+    // Remover miembros del equipo que fue deseleccionado
+    removedTeams.forEach(teamId => {
+      const team = this.allTeams.find(t => t.id === teamId);
+      if (team && team.members) {
+        team.members.forEach((member: any) => {
+          this.selectedMembers = this.selectedMembers.filter(m => !(m.user_id === member.id && m.role_type === team.type));
+        });
+      }
+    });
+
+    // Añadir miembros del equipo seleccionado
+    addedTeams.forEach(teamId => {
+      const team = this.allTeams.find(t => t.id === teamId);
+      if (team && team.members) {
+        team.members.forEach((member: any) => {
+          if (!this.selectedMembers.some(m => m.user_id === member.id)) {
+            const role = this.roleOptions.find(r => r.value === team.type);
+            this.selectedMembers.push({
+              user_id: member.id,
+              name: member.name,
+              email: member.email,
+              role_type: team.type,
+              role_label: role?.label || team.type,
+              profile_photo: typeof member.photo === 'string' ? member.photo : undefined,
+            });
+          }
+        });
+      }
+    });
+
+    this.previousTeamIds = [...currentTeamIds];
+    this.updateAvailableUsers();
   }
 
   private setupEndDateCalculation(): void {
@@ -407,31 +471,40 @@ export class ProjectCreateComponent implements OnInit {
   }
 
   /**
-   * Asigna los miembros seleccionados al proyecto creado
+   * Asigna los miembros seleccionados (individuales y por equipos) al proyecto creado
    */
   assignMembersToProject(projectId: number): void {
-    let assignedCount = 0;
-    const totalMembers = this.selectedMembers.length;
+    const finalMembersMap = new Map<number, ProjectMemberRequest>();
 
+    // 1. Añadir miembros individuales
     this.selectedMembers.forEach(member => {
-      const memberData: ProjectMemberRequest = {
+      finalMembersMap.set(member.user_id, {
         user_id: member.user_id,
         role_type: member.role_type,
-      };
+      });
+    });
 
+    const finalMembers = Array.from(finalMembersMap.values());
+    const totalMembers = finalMembers.length;
+    let assignedCount = 0;
+
+    if (totalMembers === 0) {
+      this.finishProjectCreation(this.createdProject);
+      return;
+    }
+
+    finalMembers.forEach(memberData => {
       this.projectService.addMember(projectId, memberData).subscribe({
         next: () => {
           assignedCount++;
-
           // Cuando todos los miembros hayan sido asignados
           if (assignedCount === totalMembers) {
             this.finishProjectCreation(this.createdProject);
           }
         },
         error: error => {
-          console.error(`Error asignando miembro ${member.name}:`, error);
+          console.error(`Error asignando miembro con ID ${memberData.user_id}:`, error);
           assignedCount++;
-
           // Continuar con los demás aunque uno falle
           if (assignedCount === totalMembers) {
             this.messageService.add({
@@ -458,6 +531,8 @@ export class ProjectCreateComponent implements OnInit {
     });
 
     this.selectedMembers = [];
+    this.selectedTeamIds = [];
+    this.previousTeamIds = [];
     this.updateAvailableUsers();
 
     this.successProjectName = project.client || project.ContractNo;

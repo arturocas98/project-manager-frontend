@@ -12,10 +12,7 @@
       </h1>
       <p class="text-color-secondary mt-2 mb-0">Administra los equipos de trabajo y sus miembros de forma eficiente.</p>
     </div>
-    <button
-      pButton
-      label="Nuevo Equipo"
-      icon="ph-bold ph-plus"
+    <button pButton label="Nuevo Equipo" icon="ph-bold ph-plus"
       class="p-button-primary border-round-xl shadow-2 font-bold px-4 py-3 transition-colors transition-duration-200"
       (click)="showTeamDialog()">
     </button>
@@ -26,47 +23,24 @@
     <div class="grid formgrid p-fluid">
       <div class="col-12 md:col-4">
         <span class="p-input-icon-left w-full custom-search">
-          <input
-            pInputText
-            type="text"
-            [(ngModel)]="filters.search"
-            (input)="onFilterChange()"
-            placeholder="Buscar por nombre..."
-            class="w-full border-round-lg pl-5" />
+          <input pInputText type="text" [(ngModel)]="filters.search" (input)="onFilterChange()"
+            placeholder="Buscar por nombre..." class="w-full border-round-lg pl-5" />
         </span>
       </div>
       <div class="col-12 md:col-3">
-        <p-dropdown
-          [options]="typeOptions"
-          [(ngModel)]="filters.type"
-          (onChange)="loadTeams()"
-          placeholder="Todos los tipos"
-          optionLabel="label"
-          optionValue="value"
-          styleClass="w-full border-round-lg"
+        <p-dropdown [options]="typeOptions" [(ngModel)]="filters.type" (onChange)="loadTeams()"
+          placeholder="Todos los tipos" optionLabel="label" optionValue="value" styleClass="w-full border-round-lg"
           [showClear]="true">
         </p-dropdown>
       </div>
       <div class="col-12 md:col-3">
-        <p-dropdown
-          [options]="sortByOptions"
-          [(ngModel)]="filters.sort_by"
-          (onChange)="loadTeams()"
-          placeholder="Ordenar por"
-          optionLabel="label"
-          optionValue="value"
-          styleClass="w-full border-round-lg">
+        <p-dropdown [options]="sortByOptions" [(ngModel)]="filters.sort_by" (onChange)="loadTeams()"
+          placeholder="Ordenar por" optionLabel="label" optionValue="value" styleClass="w-full border-round-lg">
         </p-dropdown>
       </div>
       <div class="col-12 md:col-2">
-        <p-dropdown
-          [options]="sortOrderOptions"
-          [(ngModel)]="filters.sort_order"
-          (onChange)="loadTeams()"
-          placeholder="Orden"
-          optionLabel="label"
-          optionValue="value"
-          styleClass="w-full border-round-lg">
+        <p-dropdown [options]="sortOrderOptions" [(ngModel)]="filters.sort_order" (onChange)="loadTeams()"
+          placeholder="Orden" optionLabel="label" optionValue="value" styleClass="w-full border-round-lg">
         </p-dropdown>
       </div>
     </div>
@@ -74,27 +48,25 @@
 
   <!-- Data Table -->
   <div class="surface-card shadow-1 border-round-xl overflow-hidden border-1 surface-border">
-    <p-table
-      #dt
-      [value]="teams"
-      [loading]="loading"
-      [paginator]="true"
-      [rows]="filters.per_page || 10"
-      [totalRecords]="totalRecords"
-      [lazy]="true"
-      (onLazyLoad)="loadTeamsLazy($event)"
-      dataKey="id"
-      [rowHover]="true"
+    <p-table #dt [value]="teams" [loading]="loading" [paginator]="true" [rows]="filters.per_page || 10"
+      [totalRecords]="totalRecords" [lazy]="true" (onLazyLoad)="loadTeamsLazy($event)" dataKey="id" [rowHover]="true"
       styleClass="p-datatable-lg border-none custom-table">
 
       <ng-template pTemplate="header">
         <tr>
-          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Nombre</th>
-          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Tipo</th>
-          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Miembros</th>
-          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Creador</th>
-          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Fecha Creación</th>
-          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3 text-center" style="width: 200px">Acciones</th>
+          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Nombre
+          </th>
+          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Tipo
+          </th>
+          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Miembros
+          </th>
+          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Creador
+          </th>
+          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Fecha
+            Creación</th>
+          <th
+            class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3 text-center"
+            style="width: 200px">Acciones</th>
         </tr>
       </ng-template>
 
@@ -102,32 +74,28 @@
         <tr class="transition-colors transition-duration-200">
           <td class="font-medium text-color border-bottom-1 surface-border py-3">
             <div class="flex align-items-center gap-3">
-              <div class="w-2.5rem h-2.5rem border-round-md srufave-card flex align-items-center justify-content-center text-primary font-bold shadow-1">
+              <div
+                class="w-2.5rem h-2.5rem border-round-md srufave-card flex align-items-center justify-content-center text-primary font-bold shadow-1">
                 {{ team.name.charAt(0) | uppercase }}
               </div>
               <span class="font-bold">{{ team.name }}</span>
             </div>
           </td>
           <td class="border-bottom-1 surface-border py-3">
-            <p-tag
-              [value]="team.type | uppercase"
-              [severity]="getTagSeverity(team.type)"
+            <p-tag [value]="team.type | uppercase" [severity]="getTagSeverity(team.type)"
               styleClass="border-round-xl px-3 font-bold text-xs shadow-1">
             </p-tag>
           </td>
           <td class="border-bottom-1 surface-border py-3">
             <div class="flex align-items-center gap-2">
               <p-avatarGroup styleClass="mb-1">
-                <p-avatar
-                  *ngFor="let member of (team.members || []).slice(0, 3)"
-                  [label]="member.name?.charAt(0) || ''"
-                  shape="circle"
-                  size="normal"
-                  styleClass="bg-primary text-white font-bold border-2 border-white shadow-1"
-                  [pTooltip]="member.name">
+                <p-avatar *ngFor="let member of (team.members || []).slice(0, 3)" [label]="member.name?.charAt(0) || ''"
+                  shape="circle" size="normal"
+                  styleClass="bg-primary text-white font-bold border-2 border-white shadow-1" [pTooltip]="member.name">
                 </p-avatar>
               </p-avatarGroup>
-              <div *ngIf="(team.members?.length || 0) > 3" class="w-2rem h-2rem flex align-items-center justify-content-center surface-card text-color-secondary border-round-circle text-xs font-bold border-2 border-white shadow-1 cursor-pointer">
+              <div *ngIf="(team.members?.length || 0) > 3"
+                class="w-2rem h-2rem flex align-items-center justify-content-center surface-card text-color-secondary border-round-circle text-xs font-bold border-2 border-white shadow-1 cursor-pointer">
                 +{{ team.members.length - 3 }}
               </div>
               <div *ngIf="(team.members?.length || 0) === 0" class="text-sm text-color-secondary font-italic">
@@ -137,12 +105,8 @@
           </td>
           <td class="border-bottom-1 surface-border py-3">
             <div class="flex align-items-center gap-2" *ngIf="team.created_by">
-              <p-avatar
-                [label]="team.created_by.name?.charAt(0) || ''"
-                shape="circle"
-                size="normal"
-                styleClass="bg-indigo-500 text-white font-bold"
-                [pTooltip]="team.created_by.name">
+              <p-avatar [label]="team.created_by.name?.charAt(0) || ''" shape="circle" size="normal"
+                styleClass="bg-indigo-500 text-white font-bold" [pTooltip]="team.created_by.name">
               </p-avatar>
               <span class="text-color text-sm font-medium">{{ team.created_by.name }}</span>
             </div>
@@ -155,37 +119,21 @@
           </td>
           <td class="border-bottom-1 surface-border py-3 text-center">
             <div class="flex gap-2 justify-content-center">
-              <button
-                pButton
-                icon="ph-bold ph-user-plus"
+              <button pButton icon="ph-bold ph-user-plus"
                 class="p-button-rounded p-button-success p-button-outlined p-button-sm transition-all transition-duration-200 hover:surface-card0 hover:text-white"
-                (click)="openAddMemberDialog(team)"
-                pTooltip="Agregar miembro"
-                tooltipPosition="top">
+                (click)="openAddMemberDialog(team)" pTooltip="Agregar miembro" tooltipPosition="top">
               </button>
-              <button
-                pButton
-                icon="ph-bold ph-eye"
+              <button pButton icon="ph-bold ph-eye"
                 class="p-button-rounded p-button-info p-button-outlined p-button-sm transition-all transition-duration-200 hover:bg-blue-500 hover:text-white"
-                (click)="viewTeamDetails(team)"
-                pTooltip="Ver detalles"
-                tooltipPosition="top">
+                (click)="viewTeamDetails(team)" pTooltip="Ver detalles" tooltipPosition="top">
               </button>
-              <button
-                pButton
-                icon="ph-bold ph-pencil-simple"
+              <button pButton icon="ph-bold ph-pencil-simple"
                 class="p-button-rounded p-button-warning p-button-outlined p-button-sm transition-all transition-duration-200 hover:bg-yellow-500 hover:text-white"
-                (click)="editTeam(team)"
-                pTooltip="Editar"
-                tooltipPosition="top">
+                (click)="editTeam(team)" pTooltip="Editar" tooltipPosition="top">
               </button>
-              <button
-                pButton
-                icon="ph-bold ph-trash"
+              <button pButton icon="ph-bold ph-trash"
                 class="p-button-rounded p-button-danger p-button-outlined p-button-sm transition-all transition-duration-200 hover:bg-red-500 hover:text-white"
-                (click)="confirmDeleteTeam(team)"
-                pTooltip="Eliminar"
-                tooltipPosition="top">
+                (click)="confirmDeleteTeam(team)" pTooltip="Eliminar" tooltipPosition="top">
               </button>
             </div>
           </td>
@@ -207,19 +155,15 @@
   </div>
 
   <!-- Dialog for Create/Edit Team -->
-  <p-dialog
-    [(visible)]="teamDialogVisible"
-    [style]="{width: '450px'}"
-    [header]="editingTeam ? 'Editar Equipo' : 'Nuevo Equipo'"
-    [modal]="true"
-    styleClass="p-fluid custom-dialog border-round-xl shadow-4"
-    [draggable]="false"
-    [resizable]="false"
+  <p-dialog [(visible)]="teamDialogVisible" [style]="{width: '450px'}"
+    [header]="editingTeam ? 'Editar Equipo' : 'Nuevo Equipo'" [modal]="true"
+    styleClass="p-fluid custom-dialog border-round-xl shadow-4" [draggable]="false" [resizable]="false"
     (onHide)="hideTeamDialog()">
 
     <ng-template pTemplate="header">
       <div class="flex align-items-center gap-2">
-        <div class="w-2.5rem h-2.5rem border-round-circle srufave-card flex align-items-center justify-content-center text-primary">
+        <div
+          class="w-2.5rem h-2.5rem border-round-circle srufave-card flex align-items-center justify-content-center text-primary">
           <i [class]="editingTeam ? 'ph-bold ph-pencil-simple text-xl' : 'ph-bold ph-plus text-xl'"></i>
         </div>
         <span class="text-xl font-bold">{{ editingTeam ? 'Editar Equipo' : 'Crear Equipo' }}</span>
@@ -228,58 +172,46 @@
 
     <div class="pt-3">
       <div class="field mb-4">
-        <label for="name" class="font-bold text-color-secondary block mb-2 text-sm">Nombre del Equipo <span class="text-pink-500">*</span></label>
+        <label for="name" class="font-bold text-color-secondary block mb-2 text-sm">Nombre del Equipo <span
+            class="text-pink-500">*</span></label>
         <span class="p-input-icon-left w-full">
           <i class="ph ph-users z-1 relative"></i>
-          <input
-            id="name"
-            pInputText
-            [(ngModel)]="teamFormData.name"
-            required
-            class="w-full border-round-lg pl-5"
-            placeholder="Ej: Desarrollo Frontend"
-            autofocus />
+          <input id="name" pInputText [(ngModel)]="teamFormData.name" required class="w-full border-round-lg pl-5"
+            placeholder="Ej: Desarrollo Frontend" autofocus />
         </span>
+      </div>
+      <div class="field mb-4">
+        <label for="type" class="font-bold text-color-secondary block mb-2 text-sm">Tipo de Equipo <span
+            class="text-pink-500">*</span></label>
+        <p-dropdown id="type" [options]="typeOptions" [(ngModel)]="teamFormData.type"
+          placeholder="Seleccionar tipo de equipo" optionLabel="label" optionValue="value" [required]="true"
+          styleClass="w-full border-round-lg" appendTo="body">
+        </p-dropdown>
       </div>
     </div>
 
     <ng-template pTemplate="footer">
       <div class="flex justify-content-end gap-3 border-top-1 surface-border pt-4 mt-2">
-        <button
-          pButton
-          label="Cancelar"
-          icon="ph-bold ph-x"
-          (click)="hideTeamDialog()"
-          class="p-button-text p-button-secondary font-bold"
-          type="button">
+        <button pButton label="Cancelar" icon="ph-bold ph-x" (click)="hideTeamDialog()"
+          class="p-button-text p-button-secondary font-bold" type="button">
         </button>
-        <button
-          pButton
-          [label]="editingTeam ? 'Guardar Cambios' : 'Crear Equipo'"
-          icon="ph-bold ph-check"
-          (click)="saveTeam()"
-          [disabled]="!teamFormData.name || !teamFormData.type"
-          class="p-button-primary border-round-lg font-bold shadow-2 px-4"
-          type="button">
+        <button pButton [label]="editingTeam ? 'Guardar Cambios' : 'Crear Equipo'" icon="ph-bold ph-check"
+          (click)="saveTeam()" [disabled]="!teamFormData.name || !teamFormData.type"
+          class="p-button-primary border-round-lg font-bold shadow-2 px-4" type="button">
         </button>
       </div>
     </ng-template>
   </p-dialog>
 
   <!-- Dialog for Add Member -->
-  <p-dialog
-    [(visible)]="memberDialogVisible"
-    [style]="{width: '500px'}"
-    [modal]="true"
-    styleClass="p-fluid custom-dialog border-round-xl shadow-4"
-    [draggable]="false"
-    [resizable]="false"
-    contentStyleClass="p-0"
-    (onHide)="closeMemberDialog()">
+  <p-dialog [(visible)]="memberDialogVisible" [style]="{width: '500px'}" [modal]="true"
+    styleClass="p-fluid custom-dialog border-round-xl shadow-4" [draggable]="false" [resizable]="false"
+    contentStyleClass="p-0" (onHide)="closeMemberDialog()">
 
     <ng-template pTemplate="header">
       <div class="flex align-items-center gap-2">
-        <div class="w-2.5rem h-2.5rem border-round-circle surface-card flex align-items-center justify-content-center text-green-500">
+        <div
+          class="w-2.5rem h-2.5rem border-round-circle surface-card flex align-items-center justify-content-center text-green-500">
           <i class="ph-bold ph-user-plus text-xl text-green-600"></i>
         </div>
         <span class="text-xl font-bold">Agregar Miembro a {{selectedTeam?.name}}</span>
@@ -288,14 +220,8 @@
 
     <div class="p-4 surface-50 border-bottom-1 surface-border">
       <span class="p-input-icon-left w-full shadow-1 border-round-lg surface-card">
-        <i class="ph ph-magnifying-glass text-color-secondary z-1 relative"></i>
-        <input
-          pInputText
-          type="text"
-          [(ngModel)]="memberSearchTerm"
-          (input)="filterProfiles()"
-          placeholder="Buscar usuario por nombre o correo..."
-          class="w-full border-round-lg border-none pl-5" />
+        <input pInputText type="text" [(ngModel)]="memberSearchTerm" (input)="filterProfiles()"
+          placeholder="Buscar usuario por nombre o correo..." class="w-full border-round-lg border-none pl-5" />
       </span>
     </div>
 
@@ -304,12 +230,11 @@
     </div>
 
     <div *ngIf="!loadingProfiles" class="overflow-y-auto w-full custom-scroll" style="max-height: 350px;">
-      <div *ngFor="let profile of filteredProfiles" class="border-bottom-1 surface-border p-3 hover:surface-hover transition-colors transition-duration-150 flex align-items-center justify-content-between cursor-pointer" (click)="!isUserInTeam(profile.id) && addMemberToTeam(profile.id)">
+      <div *ngFor="let profile of filteredProfiles"
+        class="border-bottom-1 surface-border p-3 hover:surface-hover transition-colors transition-duration-150 flex align-items-center justify-content-between cursor-pointer"
+        (click)="!isUserInTeam(profile.id) && addMemberToTeam(profile.id)">
         <div class="flex align-items-center gap-3">
-          <p-avatar
-            [label]="profile.name.charAt(0)"
-            shape="circle"
-            size="large"
+          <p-avatar [label]="profile.name.charAt(0)" shape="circle" size="large"
             styleClass="bg-primary text-white font-bold shadow-1">
           </p-avatar>
           <div>
@@ -318,26 +243,20 @@
               <i class="ph ph-envelope-simple"></i>
               {{ profile.email }}
             </div>
-            <p-tag
-              [value]="profile.role | uppercase"
-              [severity]="getRoleSeverity(profile.role)"
+            <p-tag [value]="profile.role | uppercase" [severity]="getRoleSeverity(profile.role)"
               styleClass="text-xs px-2 py-1 font-bold">
             </p-tag>
           </div>
         </div>
-        <button
-          pButton
-          icon="ph-bold ph-plus"
-          class="p-button-rounded p-button-success shadow-2"
-          (click)="addMemberToTeam(profile.id); $event.stopPropagation()"
-          [loading]="addingMemberId === profile.id"
+        <button pButton icon="ph-bold ph-plus" class="p-button-rounded p-button-success shadow-2"
+          (click)="addMemberToTeam(profile.id); $event.stopPropagation()" [loading]="addingMemberId === profile.id"
           [disabled]="isUserInTeam(profile.id) || addingMemberId === profile.id"
-          [pTooltip]="isUserInTeam(profile.id) ? 'Ya es miembro' : 'Agregar al equipo'"
-          type="button">
+          [pTooltip]="isUserInTeam(profile.id) ? 'Ya es miembro' : 'Agregar al equipo'" type="button">
         </button>
       </div>
 
-      <div *ngIf="filteredProfiles.length === 0" class="text-center p-5 text-color-secondary flex flex-column align-items-center">
+      <div *ngIf="filteredProfiles.length === 0"
+        class="text-center p-5 text-color-secondary flex flex-column align-items-center">
         <div class="w-4rem h-4rem border-round-circle surface-100 flex align-items-center justify-content-center mb-3">
           <i class="ph ph-user-minus text-3xl text-color-secondary"></i>
         </div>
@@ -347,40 +266,28 @@
     </div>
 
     <div class="p-3 border-top-1 surface-border flex justify-content-end surface-50 border-bottom-xl">
-      <button
-        pButton
-        label="Cerrar"
-        icon="ph-bold ph-x"
-        (click)="closeMemberDialog()"
-        class="p-button-text p-button-secondary font-bold"
-        type="button">
+      <button pButton label="Cerrar" icon="ph-bold ph-x" (click)="closeMemberDialog()"
+        class="p-button-text p-button-secondary font-bold" type="button">
       </button>
     </div>
   </p-dialog>
 
   <!-- Dialog de detalles del equipo -->
-  <p-dialog
-    [(visible)]="detailsDialogVisible"
-    [style]="{width: '600px'}"
-    [modal]="true"
-    styleClass="p-fluid custom-dialog border-round-xl shadow-4"
-    [draggable]="false"
-    [resizable]="false"
-    contentStyleClass="p-0"
-    (onHide)="closeDetailsDialog()">
+  <p-dialog [(visible)]="detailsDialogVisible" [style]="{width: '600px'}" [modal]="true"
+    styleClass="p-fluid custom-dialog border-round-xl shadow-4" [draggable]="false" [resizable]="false"
+    contentStyleClass="p-0" (onHide)="closeDetailsDialog()">
 
     <ng-template pTemplate="header">
       <div class="flex align-items-center gap-3 w-full border-bottom-1 surface-border pb-3">
-        <div class="w-3rem h-3rem border-round-xl bg-primary flex align-items-center justify-content-center text-white shadow-2">
+        <div
+          class="w-3rem h-3rem border-round-xl bg-primary flex align-items-center justify-content-center text-white shadow-2">
           <span class="text-xl font-bold">{{ selectedTeam?.name?.charAt(0) | uppercase }}</span>
         </div>
         <div>
           <h2 class="m-0 text-xl font-bold text-color">{{ selectedTeam?.name }}</h2>
           <div class="flex gap-2 mt-1">
-            <p-tag
-              [value]="(selectedTeam?.type ?? '') | uppercase"
-              [severity]="getTagSeverity(selectedTeam?.type ?? 'default')"
-              styleClass="text-xs">
+            <p-tag [value]="(selectedTeam?.type ?? '') | uppercase"
+              [severity]="getTagSeverity(selectedTeam?.type ?? 'default')" styleClass="text-xs">
             </p-tag>
             <span class="text-sm text-color-secondary flex align-items-center gap-1">
               <i class="ph ph-calendar-blank"></i>
@@ -395,11 +302,9 @@
       <h3 class="text-sm font-bold text-color-secondary uppercase mb-3 flex align-items-center gap-2">
         <i class="ph-bold ph-user-circle"></i> Creador del Equipo
       </h3>
-      <div class="flex align-items-center gap-3 p-3 surface-card border-1 surface-border border-round-lg shadow-1" *ngIf="selectedTeam.created_by">
-        <p-avatar
-          [label]="selectedTeam.created_by.name?.charAt(0) || ''"
-          shape="circle"
-          size="large"
+      <div class="flex align-items-center gap-3 p-3 surface-card border-1 surface-border border-round-lg shadow-1"
+        *ngIf="selectedTeam.created_by">
+        <p-avatar [label]="selectedTeam.created_by.name?.charAt(0) || ''" shape="circle" size="large"
           styleClass="bg-indigo-500 text-white font-bold shadow-1">
         </p-avatar>
         <div class="flex-1">
@@ -416,17 +321,16 @@
         <h3 class="text-sm font-bold text-color-secondary uppercase m-0 flex align-items-center gap-2">
           <i class="ph-bold ph-users"></i> Miembros ({{ selectedTeam.members?.length || 0 }})
         </h3>
-        <button pButton label="Agregar" icon="ph-bold ph-plus" class="p-button-sm p-button-success p-button-outlined border-round-lg font-bold w-auto px-3" (click)="openAddMemberDialog(selectedTeam)"></button>
+        <button pButton label="Agregar" icon="ph-bold ph-plus"
+          class="p-button-sm p-button-success p-button-outlined border-round-lg font-bold w-auto px-3"
+          (click)="openAddMemberDialog(selectedTeam)"></button>
       </div>
 
       <div class="flex flex-column gap-2 max-h-20rem overflow-y-auto pr-2 custom-scroll">
         <div *ngFor="let member of selectedTeam.members || []"
-             class="flex align-items-center justify-content-between p-3 surface-ground border-round-lg hover:surface-hover transition-colors transition-duration-150 border-1 surface-border">
+          class="flex align-items-center justify-content-between p-3 surface-ground border-round-lg hover:surface-hover transition-colors transition-duration-150 border-1 surface-border">
           <div class="flex align-items-center gap-3">
-            <p-avatar
-              [label]="member.name?.charAt(0) || ''"
-              shape="circle"
-              size="normal"
+            <p-avatar [label]="member.name?.charAt(0) || ''" shape="circle" size="normal"
               styleClass="bg-primary text-white font-bold shadow-1">
             </p-avatar>
             <div>
@@ -437,18 +341,15 @@
               </div>
             </div>
           </div>
-          <button
-            pButton
-            icon="ph-bold ph-trash"
-            class="p-button-rounded p-button-danger p-button-text hover:bg-red-50"
-            (click)="confirmRemoveMember(member.id)"
-            pTooltip="Eliminar del equipo"
-            type="button">
+          <button pButton icon="ph-bold ph-trash" class="p-button-rounded p-button-danger p-button-text hover:bg-red-50"
+            (click)="confirmRemoveMember(member.id)" pTooltip="Eliminar del equipo" type="button">
           </button>
         </div>
 
-        <div *ngIf="(selectedTeam.members?.length || 0) === 0" class="text-center p-5 surface-ground border-round-lg border-1 surface-border border-dashed">
-          <div class="w-3rem h-3rem border-round-circle surface-card flex align-items-center justify-content-center text-color-secondary mx-auto mb-2">
+        <div *ngIf="(selectedTeam.members?.length || 0) === 0"
+          class="text-center p-5 surface-ground border-round-lg border-1 surface-border border-dashed">
+          <div
+            class="w-3rem h-3rem border-round-circle surface-card flex align-items-center justify-content-center text-color-secondary mx-auto mb-2">
             <i class="ph ph-users text-xl"></i>
           </div>
           <span class="block font-medium text-color mb-1">El equipo no tiene miembros</span>
@@ -458,13 +359,8 @@
     </div>
 
     <div class="p-3 surface-50 flex justify-content-end border-bottom-xl">
-      <button
-        pButton
-        label="Cerrar"
-        icon="ph-bold ph-x"
-        (click)="closeDetailsDialog()"
-        class="p-button-text p-button-secondary font-bold"
-        type="button">
+      <button pButton label="Cerrar" icon="ph-bold ph-x" (click)="closeDetailsDialog()"
+        class="p-button-text p-button-secondary font-bold" type="button">
       </button>
     </div>
   </p-dialog>

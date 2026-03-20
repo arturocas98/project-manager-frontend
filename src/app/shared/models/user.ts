@@ -41,7 +41,7 @@ export interface Profile {
 }
 
 export interface LoginData {
-  email: string;
+  id_card: string;
   password: string;
   remember?: boolean;
 }

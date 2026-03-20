@@ -31,7 +31,7 @@ export class LoginComponent {
     private messageService: MessageService
   ) {
     this.ngForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      id_card: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false],
     });
@@ -51,6 +51,7 @@ export class LoginComponent {
       ...this.ngForm.value,
       lang: this.translateService.currentLang,
     };
+    console.log(data);
     this.authService.login(data).subscribe({
       next: response => {
         localStorage.setItem(LOCAL_STORAGE_KEYS.token, response.data.access_token);

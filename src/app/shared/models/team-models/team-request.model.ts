@@ -1,11 +1,11 @@
-  export interface CreateTeamRequest {
+export interface CreateTeamRequest {
   name: string;
-  type?: 'default' | 'premium' | 'enterprise';
+  type?: string;
 }
 
 export interface UpdateTeamRequest {
   name?: string;
-  type?: 'default' | 'premium' | 'enterprise';
+  type?: string;
 }
 
 export interface TeamMemberRequest {

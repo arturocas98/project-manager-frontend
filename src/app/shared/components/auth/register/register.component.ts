@@ -22,6 +22,7 @@ export class RegisterComponent {
     this.ngForm = this.fb.group(
       {
         name: ['', [Validators.required, Validators.minLength(3)]],
+        id_card: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
         email: ['', [Validators.required, Validators.email]],
         password: ['', [Validators.required, Validators.minLength(6)]],
         password_confirmation: ['', [Validators.required, Validators.minLength(6)]],
@@ -62,6 +63,7 @@ export class RegisterComponent {
 
     const formValue: RegisterData = this.getSelectedValues([
       "name",
+      "id_card",
       "email",
       "password"
     ]);

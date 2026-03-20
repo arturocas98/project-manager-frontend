@@ -17,7 +17,7 @@ import {
 import { Team, TeamManagement } from "../../shared/models/team-models/team.model";
 
 export interface LoginData {
-  email: string;
+  id_card: string;
   password: string;
 }
 
@@ -31,6 +31,7 @@ interface LoginResponseData {
 
 export interface RegisterData {
   name: string;
+  id_card: string;
   email: string;
   password: string;
 }

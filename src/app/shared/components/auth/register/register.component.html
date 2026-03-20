@@ -64,95 +64,118 @@
                  <form [formGroup]="ngForm"  class="w-full">
                     <div class="flex flex-column">
                         <!-- Username Input -->
-                        <div class="mb-2">
+                        <div class="mb-4">
                             <label for="username" class="block text-900 font-medium mb-2">{{'register.username' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon surface-card">
-                                    <i class="pi pi-user"></i>
+                                <span class="p-inputgroup-addon bg-surface-50 border-right-none border-round-left-lg">
+                                    <i class="ph ph-user text-xl text-500"></i>
                                 </span>
                                 <input
                                         formControlName="name"
                                         id="username"
                                         type="text"
                                         pInputText
-                                        class="w-full p-3"
+                                        class="w-full p-3 border-round-right-lg focus:border-primary border-left-none"
                                         [placeholder]="'register.usernamePlaceholder' | translate"
                                         [ngClass]="{'p-invalid': ngForm.get('name')?.invalid && ngForm.get('name')?.touched}">
                             </div>
                             <small *ngIf="ngForm.get('name')?.invalid && ngForm.get('name')?.touched"
-                                   class="p-error block mt-2">
+                                   class="p-error block mt-2 font-medium">
                                 {{'validation.usernameRequired' | translate }}
                             </small>
                         </div>
 
+                        <!-- ID Card Input -->
+                        <div class="mb-4">
+                            <label for="id_card" class="block text-900 font-medium mb-2">Cedula</label>
+                            <div class="p-inputgroup">
+                                <span class="p-inputgroup-addon bg-surface-50 border-right-none border-round-left-lg">
+                                    <i class="ph ph-identification-card text-xl text-500"></i>
+                                </span>
+                                <input
+                                        formControlName="id_card"
+                                        id="id_card"
+                                        type="text"
+                                        maxlength="10"
+                                        pInputText
+                                        class="w-full p-3 border-round-right-lg focus:border-primary border-left-none"
+                                        [placeholder]="'0923538235'"
+                                        [ngClass]="{'p-invalid': ngForm.get('id_card')?.invalid && ngForm.get('id_card')?.touched}">
+                            </div>
+                            <small *ngIf="ngForm.get('id_card')?.invalid && ngForm.get('id_card')?.touched"
+                                   class="p-error block mt-2 font-medium">
+                                Cedula requerida
+                            </small>
+                        </div>
+
                         <!-- Email Input -->
-                        <div class="mb-2">
+                        <div class="mb-4">
                             <label for="email" class="block text-900 font-medium mb-2">{{'register.email' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon surface-card">
-                                    <i class="pi pi-envelope"></i>
+                                <span class="p-inputgroup-addon bg-surface-50 border-right-none border-round-left-lg">
+                                    <i class="ph ph-envelope text-xl text-500"></i>
                                 </span>
                                 <input
                                         formControlName="email"
                                         id="email"
                                         type="email"
                                         pInputText
-                                        class="w-full p-3"
+                                        class="w-full p-3 border-round-right-lg focus:border-primary border-left-none"
                                         [placeholder]="'register.emailPlaceholder' | translate"
                                         [ngClass]="{'p-invalid': ngForm.get('email')?.invalid && ngForm.get('email')?.touched}">
                             </div>
                             <small *ngIf="ngForm.get('email')?.invalid && ngForm.get('email')?.touched"
-                                   class="p-error block mt-2">
+                                   class="p-error block mt-2 font-medium">
                                 {{'validation.emailInvalid' | translate }}
                             </small>
                         </div>
 
                         <!-- Password Input -->
-                        <div class="mb-2">
+                        <div class="mb-4">
                             <label for="password" class="block text-900 font-medium mb-2">{{'register.password' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon surface-card">
-                                    <i class="pi pi-lock"></i>
+                                <span class="p-inputgroup-addon bg-surface-50 border-right-none border-round-left-lg">
+                                    <i class="ph ph-lock-key text-xl text-500"></i>
                                 </span>
                                 <input
                                         formControlName="password"
                                         id="password"
                                         [type]="showPassword ? 'text' : 'password'"
                                         pInputText
-                                        class="w-full p-3"
+                                        class="w-full p-3 focus:border-primary border-x-none"
                                         [placeholder]="'register.passwordPlaceholder' | translate"
                                         [ngClass]="{'p-invalid': ngForm.get('password')?.invalid && ngForm.get('password')?.touched}">
-                                <span class="p-inputgroup-addon cursor-pointer" (click)="showPassword = !showPassword ">
-                                    <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                                <span class="p-inputgroup-addon cursor-pointer bg-surface-50 border-left-none border-round-right-lg" (click)="showPassword = !showPassword ">
+                                    <i class="text-xl text-500" [class]="showPassword ? 'ph ph-eye-slash' : 'ph ph-eye'"></i>
                                 </span>
                             </div>
                             <small *ngIf="ngForm.get('password')?.invalid && ngForm.get('password')?.touched"
-                                   class="p-error block mt-2">
+                                   class="p-error block mt-2 font-medium">
                                 {{'validation.passwordMinLength' | translate }}
                             </small>
                         </div>
 
                         <!-- Confirm Password Input -->
-                        <div class="mb-2">
+                        <div class="mb-4">
                             <label for="passwordConfirm" class="block text-900 font-medium mb-2">{{'register.confirmPassword' | translate }}</label>
                             <div class="p-inputgroup">
-                                <span class="p-inputgroup-addon surface-card">
-                                    <i class="pi pi-lock"></i>
+                                <span class="p-inputgroup-addon bg-surface-50 border-right-none border-round-left-lg">
+                                    <i class="ph ph-lock-key text-xl text-500"></i>
                                 </span>
                                 <input
                                         formControlName="password_confirmation"
                                         id="passwordConfirm"
                                         [type]="showConfirmPassword ? 'text' : 'password'"
                                         pInputText
-                                        class="w-full p-3"
+                                        class="w-full p-3 focus:border-primary border-x-none"
                                         [placeholder]="'register.confirmPasswordPlaceholder' | translate"
                                         [ngClass]="{'p-invalid': ngForm.get('password_confirmation')?.invalid && ngForm.get('password_confirmation')?.touched}">
-                                <span class="p-inputgroup-addon cursor-pointer" (click)="showConfirmPassword = !showConfirmPassword">
-                                    <i [class]="showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+                                <span class="p-inputgroup-addon cursor-pointer bg-surface-50 border-left-none border-round-right-lg" (click)="showConfirmPassword = !showConfirmPassword">
+                                    <i class="text-xl text-500" [class]="showConfirmPassword ? 'ph ph-eye-slash' : 'ph ph-eye'"></i>
                                 </span>
                             </div>
                             <small *ngIf="ngForm.get('password_confirmation')?.invalid && ngForm.get('password_confirmation')?.touched"
-                                   class="p-error block mt-2">
+                                   class="p-error block mt-2 font-medium">
                                 {{'validation.passwordsMustMatch' | translate }}
                             </small>
                         </div>

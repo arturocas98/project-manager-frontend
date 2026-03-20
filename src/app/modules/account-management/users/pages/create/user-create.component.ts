@@ -74,6 +74,7 @@ export class UserCreateComponent {
 
     this.userForm = this.fb.group({
       name: ['', [Validators.required]],
+      id_card: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
       expires_at: [''],

@@ -18,6 +18,13 @@
             <input formControlName="name" id="name" type="text" pInputText />
           </div>
           <div class="field mb-4 col-6">
+            <label for="id_card" class="font-medium text-900">Cédula</label>
+            <input formControlName="id_card" id="id_card" type="text" pInputText pKeyFilter="int" maxlength="10" />
+            <small *ngIf="userForm.get('id_card')?.invalid && userForm.get('id_card')?.touched" class="p-error block mt-1">
+              Debe ingresar una cédula válida de 10 dígitos.
+            </small>
+          </div>
+          <div class="field mb-4 col-6">
             <label for="email" class="font-medium text-900">{{ 'user.email' | translate }}</label>
             <input formControlName="email" id="email" type="email" pInputText />
           </div>
