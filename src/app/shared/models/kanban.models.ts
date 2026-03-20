@@ -27,7 +27,7 @@ export interface KanbanTask {
 
   type: {
     id: number;
-    type: 'task' | 'bug' | 'subtask' | 'history_user';
+    type: string;
   };
 
   category: {

@@ -20,6 +20,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CalendarModule } from 'primeng/calendar';
 import { BadgeModule } from 'primeng/badge';
+import {OverlayPanelModule} from "primeng/overlaypanel";
 
 interface PriorityOption {
   label: string;
@@ -41,6 +42,10 @@ interface AssigneeOption {
 interface ColumnOption {
   title: string;
   id: number;
+}
+
+export interface HierarchicalTask extends KanbanTask {
+  children?: HierarchicalTask[];
 }
 
 @Component({
@@ -65,7 +70,8 @@ interface ColumnOption {
     FormsModule,
     ReactiveFormsModule,
     DatePipe,
-    SlicePipe
+    SlicePipe,
+    OverlayPanelModule
   ],
   templateUrl: './list-kanban.component.html',
 })
@@ -80,6 +86,8 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
   members: ProjectMember[] = [];
   allTasks: KanbanTask[] = [];
   filteredTasks: KanbanTask[] = [];
+  hierarchicalTasks: HierarchicalTask[] = [];
+  expandedRows: { [key: string]: boolean } = {};
   loading = true;
 
   // Filtros
@@ -99,17 +107,18 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
 
   // Opciones para filtros
   priorityOptions: PriorityOption[] = [
-    { label: 'Critical', value: 'critical', icon: 'pi pi-exclamation-triangle' },
-    { label: 'High', value: 'high', icon: 'pi pi-arrow-up' },
-    { label: 'Medium', value: 'medium', icon: 'pi pi-minus' },
-    { label: 'Low', value: 'low', icon: 'pi pi-arrow-down' }
+    { label: 'Critical', value: 'critical', icon: 'ph ph-warning' },
+    { label: 'High', value: 'high', icon: 'ph ph-arrow-up' },
+    { label: 'Medium', value: 'medium', icon: 'ph ph-minus' },
+    { label: 'Low', value: 'low', icon: 'ph ph-arrow-down' }
   ];
 
   typeOptions: TypeOption[] = [
-    { label: 'Tarea', value: 'task', icon: 'pi pi-check-square' },
-    { label: 'Bug', value: 'bug', icon: 'pi pi-exclamation-triangle' },
-    { label: 'Subtarea', value: 'subtask', icon: 'pi pi-sitemap' },
-    { label: 'Historia de Usuario', value: 'history_user', icon: 'pi pi-history' }
+    { label: 'Epic', value: 'epic', icon: 'ph ph-star' },
+    { label: 'Historia de Usuario', value: 'history_user', icon: 'ph ph-books' },
+    { label: 'Tarea', value: 'task', icon: 'ph ph-check-square' },
+    { label: 'Bug', value: 'bug', icon: 'ph ph-bug' },
+    { label: 'Subtarea', value: 'subtask', icon: 'ph ph-tree-structure' }
   ];
 
   // Opciones para dropdowns de la tabla
@@ -120,33 +129,36 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
   sortMenuItems: MenuItem[] = [
     {
       label: 'Más recientes',
-      icon: 'pi pi-sort-amount-down',
+      icon: 'ph ph-sort-descending',
       command: () => this.sortByDate('desc')
     },
     {
       label: 'Más antiguos',
-      icon: 'pi pi-sort-amount-up-alt',
+      icon: 'ph ph-sort-ascending',
       command: () => this.sortByDate('asc')
     },
     {
       label: 'Por prioridad',
-      icon: 'pi pi-exclamation-triangle',
+      icon: 'ph ph-warning',
       command: () => this.sortByPriority()
     },
     {
       label: 'Por tipo',
-      icon: 'pi pi-tag',
+      icon: 'ph ph-tag',
       command: () => this.sortByType()
     },
     {
       label: 'Por estado',
-      icon: 'pi pi-tags',
+      icon: 'ph ph-tags',
       command: () => this.sortByState()
     }
   ];
 
   roleType: string | null = null;
   canManageTasks: boolean = false;
+
+  // --- AVATAR FILTER ---
+  selectedAvatarMember: ProjectMember | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -228,7 +240,56 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Aplica filtros locales (por columna seleccionada)
+   * Construye el árbol de tareas basado en su parent_id
+   */
+  private buildHierarchy(): void {
+    const taskMap = new Map<number, HierarchicalTask>();
+
+    // Primero, creamos una copia de cada tarea y la metemos al mapa
+    this.filteredTasks.forEach(task => {
+      taskMap.set(task.id, { ...task, children: [] });
+    });
+
+    const roots: HierarchicalTask[] = [];
+
+    // Luego, asignamos cada tarea a su padre correspondiente
+    taskMap.forEach(task => {
+      if (task.parent && taskMap.has(task.parent.id)) {
+        const parent = taskMap.get(task.parent.id)!;
+        parent.children!.push(task);
+      } else {
+        // Tareas raíz (epics o historias huérfanas)
+        roots.push(task);
+      }
+    });
+
+    // Opcionalmente ordenar hijos por tipo
+    const sortByHierarchy = (tasks: HierarchicalTask[]) => {
+      const typeDesc: Record<string, number> = {
+        'epic': 0,
+        'history_user': 1,
+        'task': 2,
+        'bug': 3,
+        'subtask': 4
+      };
+      tasks.sort((a, b) => {
+        const t1 = typeDesc[a.type?.type?.toLowerCase() || 'task'] ?? 99;
+        const t2 = typeDesc[b.type?.type?.toLowerCase() || 'task'] ?? 99;
+        return t1 - t2;
+      });
+      tasks.forEach(t => {
+        if (t.children && t.children.length > 0) {
+          sortByHierarchy(t.children);
+        }
+      });
+    };
+
+    sortByHierarchy(roots);
+    this.hierarchicalTasks = roots;
+  }
+
+  /**
+   * Aplica filtros locales (por columna seleccionada o por avatar)
    */
   private applyLocalFilters(): void {
     let filtered = [...this.allTasks];
@@ -241,7 +302,29 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Filtro estilo Jira por Avatar (Rol)
+    if (this.selectedAvatarMember) {
+      const role = this.selectedAvatarMember.role.type.toLowerCase();
+      const memberId = this.selectedAvatarMember.user.id;
+
+      filtered = filtered.filter(task => {
+        if (role === 'administrator' || role === 'leader' || role === 'adm' || role === 'ldr') {
+          return task.created_by?.id === memberId;
+        } else if (role === 'developer' || role === 'dev') {
+          return task.assigned_to?.id === memberId;
+        } else if (role === 'tester' || role === 'tst') {
+          const st = task.state?.state?.toLowerCase() || '';
+          return st.includes('terminada') || st.includes('revisión') || st.includes('review') || st.includes('completed') || st.includes('done');
+        } else if (role === 'documenter' || role === 'doc') {
+          const st = task.state?.state?.toLowerCase() || '';
+          return st.includes('finalizada') || st.includes('aprobada');
+        }
+        return true;
+      });
+    }
+
     this.filteredTasks = filtered;
+    this.buildHierarchy();
   }
 
   /**
@@ -377,10 +460,23 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
     this.selectedTypes = [];
     this.selectedAssignees = [];
     this.selectedColumn = null;
+    this.selectedAvatarMember = null;
     this.searchControl.setValue('');
     this.kanbanService.resetFilters();
     this.filtersActive = false;
     this.showFiltersPanel = false;
+    this.applyLocalFilters();
+  }
+
+  /**
+   * Alterna el filtro de avatar
+   */
+  toggleAvatarFilter(member: ProjectMember): void {
+    if (this.selectedAvatarMember?.user.id === member.user.id) {
+      this.selectedAvatarMember = null;
+    } else {
+      this.selectedAvatarMember = member;
+    }
     this.applyLocalFilters();
   }
 
@@ -507,11 +603,12 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
    */
   getTypeIcon(type: string): string {
     switch (type?.toLowerCase()) {
-      case 'bug': return 'pi pi-bug';
-      case 'task': return 'pi pi-check-square';
-      case 'subtask': return 'pi pi-sitemap';
-      case 'history_user': return 'pi pi-history';
-      default: return 'pi pi-tag';
+      case 'bug': return 'ph ph-bug';
+      case 'task': return 'ph ph-check-square';
+      case 'subtask': return 'ph ph-tree-structure';
+      case 'history_user': return 'ph ph-books';
+      case 'epic': return 'ph ph-star';
+      default: return 'ph ph-tag';
     }
   }
 
@@ -560,6 +657,8 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
    * Obtiene color de acento para la tarea
    */
   getTaskAccentColor(task: KanbanTask): string {
+    if (!task) return 'cccccc';
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -631,10 +730,10 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
    */
   getTextColorForBackground(hexColor: string | undefined): string {
     if (!hexColor) return '#ffffff';
-    
+
     const hex = hexColor.replace('#', '');
     if (hex.length !== 6 && hex.length !== 3) return '#ffffff';
-    
+
     let r, g, b;
     if (hex.length === 3) {
       r = parseInt(hex[0] + hex[0], 16);
@@ -645,7 +744,7 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
       g = parseInt(hex.substring(2, 4), 16);
       b = parseInt(hex.substring(4, 6), 16);
     }
-    
+
     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? '#1f2937' : '#ffffff';
   }
@@ -664,8 +763,8 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
       'finalizada': 'DAEEF3'
     };
 
-    const finalHex = (stateName && stateColors[stateName.toLowerCase()]) 
-      ? stateColors[stateName.toLowerCase()] 
+    const finalHex = (stateName && stateColors[stateName.toLowerCase()])
+      ? stateColors[stateName.toLowerCase()]
       : (defaultColorHex || 'ffffff');
 
     const textColor = this.getTextColorForBackground(finalHex);
@@ -688,9 +787,9 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
       'medium': 'FFF59D',
       'low': 'C8E6C9'
     };
-    
-    const finalHex = (priority && priorityColors[priority.toLowerCase()]) 
-      ? priorityColors[priority.toLowerCase()] 
+
+    const finalHex = (priority && priorityColors[priority.toLowerCase()])
+      ? priorityColors[priority.toLowerCase()]
       : 'ffffff';
 
     const textColor = this.getTextColorForBackground(finalHex);

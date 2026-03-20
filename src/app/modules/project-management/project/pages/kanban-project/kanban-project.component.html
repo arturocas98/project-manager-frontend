@@ -58,13 +58,36 @@
         <div class="flex align-items-center gap-2">
           <span class="text-color-secondary text-sm font-medium hidden md:inline">Equipo:</span>
           <div class="flex -space-x-2">
-            <p-avatar *ngFor="let member of members | slice:0:5" [label]="member.user.name[0]" shape="circle"
-              styleClass="border-circle border-2 border-white bg-indigo-100 text-indigo-800 text-sm font-bold shadow-1 cursor-pointer hover:z-5 transition-transform hover:scale-110"
+            <p-avatar *ngFor="let member of members | slice:0:3" [label]="member.user.name[0]" shape="circle"
+              class="border-circle border-2 cursor-pointer transition-transform transition-duration-200"
+              [class.border-white]="selectedAvatarMember?.user?.id !== member.user.id"
+              [class.border-primary]="selectedAvatarMember?.user?.id === member.user.id"
+              [ngStyle]="selectedAvatarMember?.user?.id === member.user.id ? {'transform': 'scale(1.1)', 'z-index': 10} : {}"
+              styleClass="bg-indigo-100 text-indigo-800 text-sm font-bold shadow-1 hover:z-5 transition-transform hover:scale-110"
+              (click)="toggleAvatarFilter(member)"
               [pTooltip]="member.user.name + ' (' + member.role.type + ')'" tooltipPosition="bottom"></p-avatar>
-            <p-avatar *ngIf="members.length > 5" label="+{{ members.length - 5 }}" shape="circle"
-              styleClass="border-circle border-2 border-white bg-surface-200 text-color-secondary text-sm font-bold shadow-1"
-              [pTooltip]="'Y ' + (members.length - 5) + ' miembros más'"></p-avatar>
+            <p-avatar *ngIf="members.length > 3" label="+{{ members.length - 3 }}" shape="circle"
+              styleClass="border-circle border-2 border-white bg-surface-200 text-color-secondary text-sm font-bold shadow-1 cursor-pointer hover:bg-surface-300 transition-colors"
+              (click)="op.toggle($event)"
+              [pTooltip]="'Ver ' + (members.length - 3) + ' miembros adicionales'" tooltipPosition="bottom"></p-avatar>
           </div>
+
+          <p-overlayPanel #op styleClass="shadow-4">
+              <div class="flex flex-column gap-2 p-2 min-w-15rem max-h-20rem overflow-y-auto w-full">
+                  <span class="font-bold text-sm mb-2 border-bottom-1 border-gray-200 pb-2">Seleccionar miembro:</span>
+                  <div *ngFor="let member of members | slice:3" class="flex align-items-center gap-2 cursor-pointer p-2 hover:surface-hover border-round transition-colors"
+                       (click)="toggleAvatarFilter(member); op.hide()">
+                      <p-avatar [label]="member.user.name[0]" shape="circle" size="normal"
+                          [style]="{ 'background-color': '#6b7280', color: 'white' }">
+                      </p-avatar>
+                      <div class="flex flex-column flex-1">
+                          <span class="font-medium text-sm" [class.text-primary]="selectedAvatarMember?.user?.id === member.user.id">{{ member.user.name }}</span>
+                          <span class="text-xs text-color-secondary">{{ member.role.type }}</span>
+                      </div>
+                      <i *ngIf="selectedAvatarMember?.user?.id === member.user.id" class="ph ph-check text-primary text-xl ml-2"></i>
+                  </div>
+              </div>
+          </p-overlayPanel>
         </div>
 
       </div>
@@ -163,8 +186,9 @@
 
           <!-- Tarea: Descripción -->
           <p *ngIf="task.description" class="text-xs text-gray-600 line-height-3 m-0 mb-3 block overflow-hidden"
-             style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
-            {{ task.description }}
+             style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;"
+             [pTooltip]="task.description.length > 20 ? task.description : ''">
+            {{ task.description | slice:0:20 }}{{ task.description.length > 20 ? '...' : '' }}
           </p>
 
           <!-- Tarea: Parent Subtarea -->

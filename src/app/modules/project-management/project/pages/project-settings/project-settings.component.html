@@ -4,7 +4,7 @@
     <!-- Círculos de fondo decorativos -->
     <div class="absolute top-0 left-0 w-15rem h-15rem bg-indigo-50 border-circle opacity-50" style="transform: translate(-50%, -50%);"></div>
     <div class="absolute bottom-0 right-0 w-20rem h-20rem bg-blue-50 border-circle opacity-50" style="transform: translate(30%, 30%);"></div>
-    
+
     <div class="flex align-items-center gap-4 z-1">
       <div class="w-4rem h-4rem border-circle bg-white flex align-items-center justify-content-center text-indigo-600 shadow-2 flex-shrink-0">
         <i class="ph ph-gear text-3xl"></i>
@@ -14,7 +14,7 @@
         <p class="text-color-secondary m-0 text-lg">Administra los detalles generales, fechas y el equipo asignado.</p>
       </div>
     </div>
-    
+
     <div class="hidden md:block z-1">
       <img src="assets/General/Cartoon_project-settings.png" alt="Configuración" class="h-8rem w-auto object-fit-contain drop-shadow-2">
     </div>
@@ -41,7 +41,7 @@
     <!-- Columna Izquierda: Formularios (8 / 12) -->
     <div class="col-12 xl:col-8 flex flex-column gap-4">
       <form [formGroup]="projectForm" (ngSubmit)="onUpdate()" class="flex flex-column gap-4 m-0">
-        
+
         <!-- Información General -->
         <div class="surface-card p-5 border-round-2xl shadow-1">
           <div class="flex align-items-center gap-2 mb-5 pb-3 border-bottom-1 surface-border">
@@ -79,7 +79,7 @@
                 <span class="p-inputgroup-addon bg-surface-50 border-surface-200">
                   <i class="ph ph-buildings text-color-secondary"></i>
                 </span>
-                <input pInputText formControlName="client" class="w-full" placeholder="Ej: TECHTOGO">
+                <input pInputText formControlName="client" class="w-full" placeholder="Ej: TECH2GO">
               </div>
             </div>
 
@@ -184,7 +184,7 @@
           </div>
 
           <div *ngFor="let memberItem of member" class="surface-card p-3 mb-3 border-round-lg shadow-none border-1 surface-border hover:border-indigo-200 transition-colors flex align-items-center justify-content-between cursor-default">
-            
+
             <div class="flex align-items-center gap-3 overflow-hidden">
               <div class="w-3rem h-3rem border-circle bg-indigo-100 flex align-items-center justify-content-center text-indigo-700 font-bold text-lg flex-shrink-0">
                 {{ getInitials(memberItem.user.name) }}

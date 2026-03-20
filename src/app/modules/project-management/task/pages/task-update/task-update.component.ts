@@ -498,10 +498,11 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.deleting = false;
         console.error('Error deleting task:', error);
+        const errorMsg = error.error?.message || error.message || 'No se pudo eliminar la tarea';
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo eliminar la tarea',
+          detail: errorMsg,
           life: 5000
         });
       }
@@ -531,10 +532,10 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       header: '¡Tarea Actualizada!',
       acceptLabel: 'Ver Tareas',
       rejectLabel: 'Cerrar',
-      acceptIcon: 'pi pi-eye',
-      rejectIcon: 'pi pi-times',
-      acceptButtonStyleClass: 'p-button-success p-button-raised mr-2 gap-2',
-      rejectButtonStyleClass: 'p-button-text p-button-secondary gap-2',
+      acceptIcon: 'ph ph-eye',
+      rejectIcon: 'ph ph-x',
+      acceptButtonStyleClass: 'p-button-success p-button-raised mr-2 gap-2 border-round-xl shadow-2',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary gap-2 border-round-xl font-bold',
       defaultFocus: 'accept',
       accept: () => {
         this.router.navigate([
@@ -575,10 +576,10 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       header: 'Confirmar Actualización',
       acceptLabel: 'Actualizar',
       rejectLabel: 'Cancelar',
-      acceptIcon: 'pi pi-check',
-      rejectIcon: 'pi pi-times',
-      acceptButtonStyleClass: 'p-button-primary p-button-raised',
-      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      acceptIcon: 'ph ph-check',
+      rejectIcon: 'ph ph-x',
+      acceptButtonStyleClass: 'p-button-primary p-button-raised border-round-xl font-bold px-4 shadow-2',
+      rejectButtonStyleClass: 'p-button-text p-button-secondary font-bold border-round-xl',
       accept: () => {
         this.performUpdate();
       }
@@ -602,10 +603,11 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       error: (error) => {
         this.saving = false;
         console.error('Error updating task:', error);
+        const errorMsg = error.error?.message || error.message || 'No se pudo actualizar la tarea';
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo actualizar la tarea',
+          detail: errorMsg,
           life: 5000
         });
       }
@@ -624,10 +626,10 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
         header: 'Confirmar Cancelación',
         acceptLabel: 'Sí, salir',
         rejectLabel: 'No, continuar editando',
-        acceptIcon: 'pi pi-check',
-        rejectIcon: 'pi pi-times',
-        acceptButtonStyleClass: 'p-button-danger p-button-raised',
-        rejectButtonStyleClass: 'p-button-text p-button-secondary',
+        acceptIcon: 'ph ph-check',
+        rejectIcon: 'ph ph-x',
+        acceptButtonStyleClass: 'p-button-danger p-button-raised font-bold border-round-xl shadow-2',
+        rejectButtonStyleClass: 'p-button-text p-button-secondary font-bold border-round-xl',
         accept: () => {
           this.router.navigate([
             '/project-management/projects/kanban',

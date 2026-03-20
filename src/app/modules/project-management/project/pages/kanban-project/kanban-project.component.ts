@@ -18,6 +18,7 @@ import { TagModule } from 'primeng/tag';
 import { DragDropModule } from 'primeng/dragdrop';
 import { SidebarModule } from 'primeng/sidebar';
 import { CheckboxModule } from 'primeng/checkbox';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -62,6 +63,7 @@ interface TypeOption {
     TagModule,
     SidebarModule,
     CheckboxModule,
+    OverlayPanelModule,
     FormsModule,
     DatePipe,
     CdkDropList,
@@ -81,6 +83,7 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
   private projectId!: number;
 
   // Datos principales
+  originalColumns: KanbanColumn[] = [];
   columns: KanbanColumn[] = [];
   members: ProjectMember[] = [];
   loading = true;
@@ -96,6 +99,9 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
   selectedAssignees: number[] = [];
   filtersActive = false;
   showFiltersPanel = false;
+
+  // Filtro Avatar Local
+  selectedAvatarMember: ProjectMember | null = null;
 
   // Opciones para filtros
   priorityOptions: PriorityOption[] = [
@@ -177,7 +183,8 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: columns => {
-          this.columns = columns;
+          this.originalColumns = columns.map(c => ({...c, tasks: [...c.tasks]}));
+          this.applyLocalAvatarFilter();
           this.loading = false;
         },
         error: error => {
@@ -306,10 +313,57 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     this.selectedPriorities = [];
     this.selectedTypes = [];
     this.selectedAssignees = [];
+    this.selectedAvatarMember = null;
     this.searchControl.setValue('');
     this.kanbanService.resetFilters();
     this.filtersActive = false;
     this.showFiltersPanel = false;
+    this.applyLocalAvatarFilter();
+  }
+
+  /**
+   * Alterna el filtro de avatar
+   */
+  toggleAvatarFilter(member: ProjectMember): void {
+    if (this.selectedAvatarMember?.user.id === member.user.id) {
+      this.selectedAvatarMember = null;
+    } else {
+      this.selectedAvatarMember = member;
+    }
+    this.applyLocalAvatarFilter();
+  }
+
+  /**
+   * Aplica filtro local estilo Jira por Avatar (Rol)
+   */
+  private applyLocalAvatarFilter(): void {
+    if (!this.originalColumns || this.originalColumns.length === 0) return;
+
+    if (!this.selectedAvatarMember) {
+      this.columns = this.originalColumns.map(c => ({...c, tasks: [...c.tasks]}));
+      return;
+    }
+
+    const role = this.selectedAvatarMember.role.type.toLowerCase();
+    const memberId = this.selectedAvatarMember.user.id;
+
+    this.columns = this.originalColumns.map(c => {
+      const filteredTasks = c.tasks.filter(task => {
+        if (role === 'administrator' || role === 'leader' || role === 'adm' || role === 'ldr') {
+          return task.created_by?.id === memberId;
+        } else if (role === 'developer' || role === 'dev') {
+          return task.assigned_to?.id === memberId;
+        } else if (role === 'tester' || role === 'tst') {
+          const st = task.state?.state?.toLowerCase() || '';
+          return st.includes('terminada') || st.includes('revisión') || st.includes('review') || st.includes('completed') || st.includes('done');
+        } else if (role === 'documenter' || role === 'doc') {
+          const st = task.state?.state?.toLowerCase() || '';
+          return st.includes('finalizada') || st.includes('aprobada');
+        }
+        return true; 
+      });
+      return { ...c, tasks: filteredTasks };
+    });
   }
 
   /**

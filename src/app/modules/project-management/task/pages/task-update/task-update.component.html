@@ -1,23 +1,31 @@
-<div class="min-h-screen flex align-items-center justify-content-center px-2 py-2">
+<div class="p-2 md:p-4 border-round-3xl">
 
-  <div class="w-full max-w-6xl surface-card surface-border border-1 border-round-3xl shadow-2xl p-4 md:p-4">
+  <div class="w-full max-w-6xl mx-auto">
 
     <!-- Toast para mensajes -->
     <p-toast position="top-right"></p-toast>
 
-    <!-- Header -->
-    <div class="mb-6 text-center">
-      <h2 class="text-3xl font-bold text-color mb-2">
-        Editar Tarea #{{ taskId }}
-      </h2>
-      <p class="text-color-secondary flex align-items-center justify-content-center gap-2">
-        <i class="pi pi-sitemap text-primary"></i>
-        Modifica la información de la tarea
-      </p>
+    <!-- Header Banner Premium con la Imagen -->
+    <div class="surface-card p-4 md:p-5 border-round-3xl shadow-4 mb-5 flex flex-column md:flex-row align-items-center justify-content-between bg-indigo-50 border-1 border-indigo-100 relative overflow-hidden">
+      <!-- Decoración de fondo -->
+      <div class="absolute top-0 left-0 w-full h-full bg-indigo-50 opacity-50" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+      <div class="z-1 text-center md:text-left">
+        <h2 class="text-3xl md:text-4xl font-bold text-indigo-900 mb-2 mt-0">
+          Editar Tarea #{{ taskId }}
+        </h2>
+        <p class="text-indigo-600 flex align-items-center justify-content-center md:justify-content-start gap-2 m-0 font-medium text-lg">
+          <i class="ph ph-pencil-simple text-xl"></i>
+          Modifica y actualiza los detalles de la tarea
+        </p>
+      </div>
+      <div class="z-1 mt-4 md:mt-0 hidden sm:block">
+        <img src="assets/General/Cartoon_task_edit.png" alt="Editar Tarea" class="h-7rem object-fit-contain drop-shadow-md hover:scale-105 transition-transform transition-duration-300">
+      </div>
     </div>
 
     <!-- Loader -->
-    <div *ngIf="loading" class="flex justify-content-center align-items-center py-6">
+    <div *ngIf="loading" class="flex justify-content-center align-items-center py-6 surface-card border-round-3xl shadow-2">
       <div class="text-center">
         <p-progressSpinner
           styleClass="w-4rem h-4rem"
@@ -25,105 +33,230 @@
           fill="var(--surface-ground)"
           animationDuration=".8s">
         </p-progressSpinner>
-        <p class="mt-3 text-color-secondary">Cargando información de la tarea...</p>
+        <p class="mt-3 text-color-secondary font-medium text-lg">Cargando información de la tarea...</p>
       </div>
     </div>
 
     <!-- Error Message -->
-    <div *ngIf="error && !loading" class="flex justify-content-center align-items-center py-6">
-      <div class="text-center">
-        <i class="pi pi-exclamation-circle text-6xl text-red-500 mb-3"></i>
-        <h3 class="text-xl font-medium text-color mb-2">Error al cargar la tarea</h3>
-        <p class="text-color-secondary mb-4">{{ error }}</p>
+    <div *ngIf="error && !loading" class="flex justify-content-center align-items-center py-6 surface-card border-round-3xl shadow-2">
+      <div class="text-center flex flex-column align-items-center p-5">
+        <div class="w-5rem h-5rem border-circle bg-red-100 flex align-items-center justify-content-center mb-4 text-red-500 shadow-2">
+           <i class="ph ph-warning-circle text-5xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-color mb-2 mt-0">Error al cargar la tarea</h3>
+        <p class="text-color-secondary mb-4 text-lg">{{ error }}</p>
         <button
           pButton
           label="Reintentar"
-          icon="pi pi-refresh"
-          class="p-button-raised"
+          icon="ph ph-arrows-clockwise"
+          class="p-button-raised p-button-danger border-round-xl px-4"
           (click)="loadTaskDetails()">
         </button>
       </div>
     </div>
 
-    <!-- Grid principal: Formulario a la izquierda, Imagen a la derecha -->
-    <div *ngIf="!loading && task" class="grid">
+    <!-- Formulario Principal -->
+    <div *ngIf="!loading && task" class="surface-card border-round-3xl shadow-2 p-4 md:p-6 border-1 surface-border">
 
-      <!-- Columna izquierda - Formulario (70%) -->
-      <div class="col-12 lg:col-7">
-        <form [formGroup]="taskForm"
-              (ngSubmit)="onSubmit()"
-              class="flex flex-column gap-4 pr-0 lg:pr-4">
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="flex flex-column gap-5">
 
-          <!-- Header con información de la tarea -->
-          <div class="surface-ground p-4 border-round-lg">
-            <div class="grid">
-              <div class="col-12 md:col-4">
-                <div class="flex align-items-center gap-2">
-                  <i class="pi pi-hashtag text-primary"></i>
-                  <span class="text-color-secondary">ID:</span>
-                  <span class="font-bold text-color">{{ task.id }}</span>
-                </div>
+        <div class="grid w-full m-0">
+
+          <!-- Columna Izquierda (Contenido Principal) -->
+          <div class="col-12 lg:col-8 lg:pr-5 flex flex-column gap-4">
+
+            <div class="flex align-items-center justify-content-between mb-2">
+               <div class="flex align-items-center gap-3">
+                 <div class="w-3rem h-3rem border-circle bg-blue-100 flex align-items-center justify-content-center text-blue-600 shadow-1">
+                    <i class="ph ph-hash text-xl font-bold"></i>
+                 </div>
+                 <div>
+                    <span class="text-color-secondary text-xs font-medium block text-uppercase tracking-wider">ID Tarea</span>
+                    <span class="font-bold text-color text-2xl">{{ task.id }}</span>
+                 </div>
+               </div>
+
+               <div class="flex align-items-center gap-3" *ngIf="hasChildren">
+                   <div class="w-2.5rem h-2.5rem border-circle bg-orange-100 flex align-items-center justify-content-center text-orange-600 shadow-1">
+                      <i class="ph ph-tree-structure text-lg font-bold"></i>
+                   </div>
+                   <div>
+                      <span class="text-color-secondary text-xs font-medium block text-uppercase tracking-wider mb-1">Subtareas</span>
+                      <span class="font-bold text-lg text-orange-600">{{ childrenCount }} agrupadas</span>
+                   </div>
+               </div>
+            </div>
+
+            <!-- Título -->
+            <div class="mt-2">
+              <label class="block text-color font-bold mb-2 text-lg">
+                Título de la Tarea <span class="text-red-500">*</span>
+              </label>
+              <div class="p-inputgroup shadow-1 border-round-xl overflow-hidden p-1 bg-surface-0 border-1 surface-border hover:border-primary transition-colors">
+                <span class="p-inputgroup-addon bg-transparent border-none">
+                  <i class="ph ph-text-t text-xl text-primary"></i>
+                </span>
+                <input
+                  pInputText
+                  formControlName="title"
+                  class="w-full border-none text-lg font-medium outline-none shadow-none bg-transparent"
+                  placeholder="Ej: Crear endpoint para tareas"
+                  [ngClass]="{'border-1 border-red-500': taskForm.get('title')?.invalid && taskForm.get('title')?.touched}">
               </div>
-              <div class="col-12 md:col-4">
-                <div class="flex align-items-center gap-2">
-                  <i class="pi pi-tag text-primary"></i>
-                  <span class="text-color-secondary">Estado:</span>
-                  <p-tag [value]="stateName" [severity]="'info'" styleClass="ml-2"></p-tag>
-                </div>
+              <small *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched" class="p-error block mt-2 font-medium">
+                <i class="ph ph-warning-circle mr-1"></i> El título es obligatorio (mínimo 3 caracteres)
+              </small>
+            </div>
+
+            <!-- Descripción -->
+            <div>
+              <label class="block text-color font-bold mb-2 text-lg">
+                Descripción <span class="text-red-500">*</span>
+              </label>
+              <div class="shadow-1 border-round-xl overflow-hidden bg-white border-1 surface-border hover:border-primary transition-colors" [ngClass]="{'border-red-500': taskForm.get('description')?.invalid && taskForm.get('description')?.touched}">
+                <textarea
+                  pInputTextarea
+                  rows="10"
+                  formControlName="description"
+                  class="w-full border-none p-3 text-base outline-none shadow-none bg-transparent resize-none line-height-3"
+                  placeholder="Describe detalladamente el objetivo de la tarea...">
+                </textarea>
               </div>
-              <div class="col-12 md:col-4">
-                <div class="flex align-items-center gap-2">
-                  <i class="pi pi-sitemap text-primary"></i>
-                  <span class="text-color-secondary">Subtareas:</span>
-                  <span class="font-bold" [ngClass]="{'text-orange-500': hasChildren}">
-                    {{ childrenCount }}
-                  </span>
+              <small *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched" class="p-error block mt-2 font-medium">
+                <i class="ph ph-warning-circle mr-1"></i> La descripción es obligatoria
+              </small>
+            </div>
+
+            <!-- Selector de Padre (condicional) -->
+            <div *ngIf="showParentSelector" class="surface-ground p-4 border-round-2xl border-1 surface-border shadow-1 mt-2">
+              <label class="block text-color font-bold mb-2 text-lg">
+                <i class="ph-fill ph-link text-primary mr-1"></i> {{ parentLabel }} <span class="text-red-500">*</span>
+              </label>
+              <p-dropdown
+                formControlName="parent_id"
+                [options]="parentOptions"
+                optionLabel="label"
+                optionValue="value"
+                [placeholder]="'Seleccionar ' + parentLabel"
+                class="w-full"
+                styleClass="w-full shadow-1 border-round-xl border-none p-2"
+                [showClear]="true"
+                [filter]="true"
+                [ngClass]="{'p-invalid': taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched}">
+              </p-dropdown>
+              <small *ngIf="taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched" class="p-error block mt-2 font-medium">
+                <i class="ph ph-warning-circle mr-1"></i> Debes seleccionar un {{ parentLabel.toLowerCase() }}
+              </small>
+            </div>
+
+            <!-- Tiempos y Planificación -->
+            <div>
+                <h3 class="font-bold text-lg text-color border-bottom-1 surface-border pb-2 mb-3"><i class="ph ph-calendar-blank mr-2 text-primary"></i>Planificación y Tiempos</h3>
+                <div class="grid">
+                  <div class="col-12 md:col-6">
+                    <label class="block text-color font-bold text-sm mb-2 text-color-secondary uppercase tracking-wider">
+                      Inicio
+                    </label>
+                    <div class="p-inputgroup shadow-1 border-round-xl overflow-hidden border-1 surface-border">
+                       <span class="p-inputgroup-addon bg-surface-50 border-none"><i class="ph ph-calendar-plus text-primary"></i></span>
+                       <p-calendar
+                         formControlName="start_date"
+                         [showButtonBar]="true"
+                         dateFormat="yy-mm-dd"
+                         placeholder="yyyy-mm-dd"
+                         class="w-full"
+                         inputStyleClass="w-full border-none shadow-none font-medium">
+                       </p-calendar>
+                     </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <label class="block text-color font-bold text-sm mb-2 text-color-secondary uppercase tracking-wider">
+                      Vencimiento
+                    </label>
+                    <div class="p-inputgroup shadow-1 border-round-xl overflow-hidden border-1 surface-border">
+                       <span class="p-inputgroup-addon bg-surface-50 border-none"><i class="ph ph-calendar-check text-red-500"></i></span>
+                       <p-calendar
+                         formControlName="due_date"
+                         [showButtonBar]="true"
+                         dateFormat="yy-mm-dd"
+                         placeholder="yyyy-mm-dd"
+                         class="w-full"
+                         inputStyleClass="w-full border-none shadow-none font-medium">
+                       </p-calendar>
+                    </div>
+                  </div>
                 </div>
+            </div>
+
+          </div>
+
+          <!-- Columna Derecha (Metadatos) -->
+          <div class="col-12 lg:col-4 lg:border-left-1 surface-border lg:pl-5 mt-4 lg:mt-0 flex flex-column gap-4">
+
+            <h3 class="font-bold text-lg text-color border-bottom-1 surface-border pb-2 mt-0 mb-1"><i class="ph ph-sliders mr-2 text-primary"></i>Estado y Detalles</h3>
+
+            <!-- Tipo (no editable) -->
+            <div class="surface-card p-3 border-round-xl shadow-1 border-1 surface-border">
+              <label class="block text-color-secondary font-bold text-xs uppercase tracking-wider mb-2">
+                Tipo Actual
+              </label>
+              <div class="flex align-items-center gap-3">
+                <i class="text-3xl" [ngClass]="{
+                  'ph-fill ph-star text-yellow-500': task.type?.id === 1,
+                  'ph ph-books text-blue-500': task.type?.id === 2,
+                  'ph ph-check-square text-green-500': task.type?.id === 3,
+                  'ph ph-bug text-red-500': task.type?.id === 4,
+                  'ph ph-tree-structure text-purple-500': task.type?.id === 5
+                }"></i>
+                <span class="font-bold text-xl">{{ task.type?.type }}</span>
               </div>
             </div>
-          </div>
 
-          <!-- Título -->
-          <div>
-            <label class="block text-color font-medium mb-2">
-              Título <span class="text-red-500">*</span>
-            </label>
-            <input
-              pInputText
-              formControlName="title"
-              class="w-full"
-              placeholder="Ej: Crear endpoint para tareas"
-              [ngClass]="{'p-invalid': taskForm.get('title')?.invalid && taskForm.get('title')?.touched}">
-            <small *ngIf="taskForm.get('title')?.invalid && taskForm.get('title')?.touched"
-                   class="p-error block mt-2">
-              El título es obligatorio (mínimo 3 caracteres)
-            </small>
-          </div>
+            <!-- Estado -->
+            <div class="surface-card p-3 border-round-xl shadow-1 border-1 surface-border">
+                <label class="block text-color-secondary font-bold text-xs uppercase tracking-wider mb-2">Estado</label>
+                <p-tag [value]="stateName" [severity]="'info'" styleClass="font-bold text-sm px-3 py-2 shadow-1"></p-tag>
+            </div>
 
-          <!-- Descripción -->
-          <div>
-            <label class="block text-color font-medium mb-2">
-              Descripción <span class="text-red-500">*</span>
-            </label>
-            <textarea
-              pInputTextarea
-              rows="4"
-              formControlName="description"
-              class="w-full"
-              placeholder="Describe el objetivo de la tarea"
-              [ngClass]="{'p-invalid': taskForm.get('description')?.invalid && taskForm.get('description')?.touched}">
-            </textarea>
-            <small *ngIf="taskForm.get('description')?.invalid && taskForm.get('description')?.touched"
-                   class="p-error block mt-2">
-              La descripción es obligatoria
-            </small>
-          </div>
+            <!-- Asignado a -->
+            <div>
+              <label class="block text-color font-bold mb-2">
+                Asignado A
+                <span *ngIf="taskType === EPIC_TYPE || taskType === HISTORY_USER_TYPE" class="text-red-500">*</span>
+              </label>
+              <p-dropdown
+                formControlName="assigned_user_id"
+                [options]="memberOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar..."
+                class="w-full"
+                styleClass="w-full shadow-1 border-round-xl border-1 surface-border p-1"
+                [showClear]="true"
+                [filter]="true"
+                [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
+                <ng-template pTemplate="selectedItem">
+                  <div *ngIf="taskForm.get('assigned_user_id')?.value" class="flex align-items-center gap-2">
+                    <i class="ph-fill ph-user-circle text-primary text-2xl"></i>
+                    <span class="font-bold">{{ getSelectedMemberLabel() }}</span>
+                  </div>
+                </ng-template>
+                <ng-template let-member pTemplate="item">
+                  <div class="flex align-items-center gap-2 py-1">
+                    <i class="ph-fill ph-user-circle text-color-secondary text-2xl"></i>
+                    <span class="font-medium">{{ member.label }}</span>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+              <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched" class="p-error block mt-2 font-medium">
+                <i class="ph ph-warning-circle mr-1"></i> Asignación obligatoria
+              </small>
+            </div>
 
-          <!-- Grid de 2 columnas -->
-          <div class="grid">
             <!-- Prioridad -->
-            <div class="col-12 md:col-6">
-              <label class="block text-color font-medium mb-2">
+            <div>
+              <label class="block text-color font-bold mb-2">
                 Prioridad <span class="text-red-500">*</span>
               </label>
               <p-dropdown
@@ -131,248 +264,111 @@
                 [options]="priorities"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Seleccionar prioridad"
+                placeholder="Seleccionar..."
                 class="w-full"
+                styleClass="w-full shadow-1 border-round-xl border-1 surface-border p-1"
                 [ngClass]="{'p-invalid': taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched}">
               </p-dropdown>
-              <small *ngIf="taskForm.get('priority')?.invalid && taskForm.get('priority')?.touched"
-                     class="p-error block mt-2">
-                La prioridad es obligatoria
-              </small>
             </div>
 
-            <!-- Tipo (no editable) -->
-            <div class="col-12 md:col-6">
-              <label class="block text-color font-medium mb-2">
-                Tipo <span class="text-red-500">*</span>
-              </label>
-              <div class="flex align-items-center gap-2 p-2 surface-ground border-round">
-                <i class="pi" [ngClass]="{
-                  'pi-star-fill text-yellow-500': task.type?.id === 1,
-                  'pi-list text-blue-500': task.type?.id === 2,
-                  'pi-check-square text-green-500': task.type?.id === 3,
-                  'pi-exclamation-triangle text-red-500': task.type?.id === 4,
-                  'pi-sitemap text-purple-500': task.type?.id === 5
-                }"></i>
-                <span class="font-medium">{{ task.type?.type }}</span>
-              </div>
-              <small class="block mt-2 text-color-secondary">
-                El tipo de tarea no se puede modificar
-              </small>
-            </div>
-          </div>
-
-          <div class="grid">
-            <!-- Prioridad -->
-            <div class="col-12 md:col-6">
-              <label class="block text-color font-medium mb-2">
-                Asignar a
-                <span *ngIf="taskType === EPIC_TYPE || taskType === HISTORY_USER_TYPE"
-                      class="text-red-500">*</span>
-              </label>
-              <p-dropdown
-                formControlName="assigned_user_id"
-                [options]="memberOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Seleccionar usuario"
-                class="w-full"
-                [showClear]="true"
-                [filter]="true"
-                [ngClass]="{'p-invalid': taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched}">
-                <ng-template pTemplate="selectedItem">
-                  <div *ngIf="taskForm.get('assigned_user_id')?.value" class="flex align-items-center gap-2">
-                    <i class="pi pi-user text-primary"></i>
-                    <span>{{ getSelectedMemberLabel() }}</span>
-                  </div>
-                </ng-template>
-                <ng-template let-member pTemplate="item">
-                  <div class="flex align-items-center gap-2">
-                    <i class="pi pi-user text-primary"></i>
-                    <span class="font-medium">{{ member.label }}</span>
-                  </div>
-                </ng-template>
-              </p-dropdown>
-              <small *ngIf="taskForm.get('assigned_user_id')?.invalid && taskForm.get('assigned_user_id')?.touched"
-                     class="p-error block mt-2">
-                Debes seleccionar un usuario asignado
-              </small>
-            </div>
-
-            <!-- Tipo (no editable) -->
-            <div class="col-12 md:col-6">
-              <label class="block text-color font-medium mb-2">
-                Categoria <span class="text-red-500">*</span>
+            <!-- Categoría -->
+            <div>
+              <label class="block text-color font-bold mb-2">
+                Categoría <span class="text-red-500">*</span>
               </label>
               <p-dropdown
                 formControlName="category"
                 [options]="categories"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Seleccionar prioridad"
+                placeholder="Seleccionar..."
                 class="w-full"
+                styleClass="w-full shadow-1 border-round-xl border-1 surface-border p-1"
                 [ngClass]="{'p-invalid': taskForm.get('category')?.invalid && taskForm.get('category')?.touched}">
               </p-dropdown>
-              <small *ngIf="taskForm.get('category')?.invalid && taskForm.get('category')?.touched"
-                     class="p-error block mt-2">
-                La prioridad es obligatoria
-              </small>
-            </div>
-          </div>
-
-          <!-- Fechas -->
-          <div class="grid">
-            <div class="col-12 md:col-6">
-              <label class="block text-color font-medium mb-2">
-                Fecha de inicio
-              </label>
-              <p-calendar
-                formControlName="start_date"
-                [showIcon]="true"
-                [showButtonBar]="true"
-                dateFormat="yy-mm-dd"
-                placeholder="yyyy-mm-dd"
-                class="w-full"
-                inputStyleClass="w-full">
-              </p-calendar>
             </div>
 
-            <div class="col-12 md:col-6">
-              <label class="block text-color font-medium mb-2">
-                Fecha de vencimiento
-              </label>
-              <p-calendar
-                formControlName="due_date"
-                [showIcon]="true"
-                [showButtonBar]="true"
-                dateFormat="yy-mm-dd"
-                placeholder="yyyy-mm-dd"
-                class="w-full"
-                inputStyleClass="w-full">
-              </p-calendar>
+            <!-- Información técnica (Accordion) -->
+            <div class="mt-2">
+              <p-accordion styleClass="shadow-1 border-round-xl">
+                <p-accordionTab header="Detalles del Registro">
+                  <div class="flex flex-column gap-3 py-2">
+                    <div class="flex align-items-center gap-3">
+                      <div class="w-2rem h-2rem border-circle bg-blue-50 flex align-items-center justify-content-center text-blue-600"><i class="ph-fill ph-user-plus"></i></div>
+                      <div class="flex flex-column">
+                         <span class="text-xs text-color-secondary font-medium uppercase">Creador</span>
+                         <span class="font-bold text-sm">{{ task.created_by?.name }}</span>
+                      </div>
+                    </div>
+                    <div class="flex align-items-center gap-3" *ngIf="task.parent">
+                      <div class="w-2rem h-2rem border-circle bg-purple-50 flex align-items-center justify-content-center text-purple-600"><i class="ph-fill ph-arrow-up-left"></i></div>
+                      <div class="flex flex-column">
+                         <span class="text-xs text-color-secondary font-medium uppercase">Padre</span>
+                         <span class="font-bold text-sm text-primary cursor-pointer hover:underline" (click)="navigateToParent()">{{ task.parent.title }}</span>
+                      </div>
+                    </div>
+                    <div class="flex gap-2 w-full mt-2 border-top-1 surface-border pt-3">
+                      <div class="flex flex-column surface-ground p-2 border-round flex-1">
+                         <span class="text-xs text-color-secondary font-medium uppercase text-center"><i class="ph ph-calendar-plus mr-1"></i>Creada</span>
+                         <span class="font-bold text-xs text-center mt-1">{{ task.created_at | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                      <div class="flex flex-column surface-ground p-2 border-round flex-1">
+                         <span class="text-xs text-color-secondary font-medium uppercase text-center"><i class="ph ph-clock mr-1"></i>Actualizada</span>
+                         <span class="font-bold text-xs text-center mt-1">{{ task.updated_at | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </p-accordionTab>
+              </p-accordion>
             </div>
+
           </div>
+        </div>
 
-          <!-- Selector de Padre (condicional) -->
-          <div *ngIf="showParentSelector" class="surface-ground p-3 border-round-lg">
-            <label class="block text-color font-medium mb-2">
-              {{ parentLabel }} <span class="text-red-500">*</span>
-            </label>
-            <p-dropdown
-              formControlName="parent_id"
-              [options]="parentOptions"
-              optionLabel="label"
-              optionValue="value"
-              [placeholder]="'Seleccionar ' + parentLabel"
-              class="w-full"
-              [showClear]="true"
-              [filter]="true"
-              [ngClass]="{'p-invalid': taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched}">
-            </p-dropdown>
-            <small *ngIf="taskForm.get('parent_id')?.invalid && taskForm.get('parent_id')?.touched"
-                   class="p-error block mt-2">
-              Debes seleccionar un {{ parentLabel.toLowerCase() }}
-            </small>
-          </div>
+        <!-- Botones de Acción (Full Width en el fondo) -->
+        <div class="flex flex-column sm:flex-row justify-content-between align-items-center gap-4 mt-2 pt-4 border-top-1 surface-border">
 
-          <!-- Información adicional de la tarea actual -->
-          <p-accordion>
-            <p-accordionTab header="Información adicional">
-              <div class="grid">
-                <div class="col-12 md:col-6">
-                  <div class="flex align-items-center gap-2 mb-2">
-                    <i class="pi pi-user text-primary"></i>
-                    <span class="font-medium">Creado por:</span>
-                    <span>{{ task.created_by?.name }}</span>
-                  </div>
-                  <div class="flex align-items-center gap-2">
-                    <i class="pi pi-calendar text-primary"></i>
-                    <span class="font-medium">Creado el:</span>
-                    <span>{{ task.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
-                  </div>
-                </div>
-                <div class="col-12 md:col-6">
-                  <div class="flex align-items-center gap-2 mb-2" *ngIf="task.parent">
-                    <i class="pi pi-level-up-alt text-primary"></i>
-                    <span class="font-medium">Tarea padre:</span>
-                    <span class="cursor-pointer hover:text-primary" (click)="navigateToParent()">
-                      {{ task.parent.title }}
-                    </span>
-                  </div>
-                  <div class="flex align-items-center gap-2">
-                    <i class="pi pi-clock text-primary"></i>
-                    <span class="font-medium">Última actualización:</span>
-                    <span>{{ task.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
-                  </div>
-                </div>
-              </div>
-            </p-accordionTab>
-          </p-accordion>
+          <button
+            pButton
+            type="button"
+            label="Eliminar Tarea"
+            icon="ph ph-trash"
+            class="p-button-danger p-button-outlined border-round-xl font-bold w-full sm:w-auto"
+            (click)="confirmDelete()"
+            [disabled]="saving || deleting"
+            [loading]="deleting">
+          </button>
 
-          <!-- Botones -->
-          <div class="flex justify-content-between align-items-center gap-3 mt-3">
-            <!-- Botón eliminar a la izquierda -->
+          <div class="flex flex-column sm:flex-row gap-3 w-full sm:w-auto">
             <button
               pButton
               type="button"
-              label="Eliminar Tarea"
-              icon="pi pi-trash"
-              class="p-button-danger p-button-outlined"
-              (click)="confirmDelete()"
-              [disabled]="saving || deleting"
-              [loading]="deleting">
+              label="Cancelar"
+              icon="ph ph-x"
+              class="p-button-text p-button-secondary border-round-xl font-bold w-full sm:w-auto"
+              (click)="onCancel()"
+              [disabled]="saving || deleting">
             </button>
 
-            <!-- Botones de acción a la derecha -->
-            <div class="flex gap-2">
-              <button
-                pButton
-                type="button"
-                label="Cancelar"
-                class="p-button-text"
-                (click)="onCancel()"
-                [disabled]="saving || deleting">
-              </button>
-
-              <button
-                pButton
-                type="submit"
-                label="Actualizar Tarea"
-                icon="pi pi-save"
-                class="p-button-raised p-button-primary"
-                [disabled]="saving || deleting"
-                [loading]="saving">
-              </button>
-            </div>
-          </div>
-
-        </form>
-      </div>
-
-      <!-- Columna derecha - Imagen (30%) -->
-      <div class="col-12 lg:col-5 flex align-items-center justify-content-center">
-        <div class="w-full surface-ground border-round-3xl p-4 text-center">
-          <img
-            src="assets/General/Cartoon_task_edit.png"
-            alt="Editar Tarea"
-            class="w-full h-auto max-w-30rem object-fit-cover">
-
-          <!-- Texto motivacional debajo de la imagen -->
-          <div class="mt-4 text-color-secondary">
-            <i class="pi pi-pencil text-primary text-xl block mb-2"></i>
-            <p class="text-sm">Actualiza los detalles de tu tarea</p>
-            <p class="text-xs opacity-70">Los cambios se guardarán automáticamente</p>
+            <button
+              pButton
+              type="submit"
+              label="Guardar Cambios"
+              icon="ph ph-floppy-disk"
+              class="p-button-raised p-button-primary border-round-xl font-bold px-5 w-full sm:w-auto"
+              [disabled]="saving || deleting"
+              [loading]="saving">
+            </button>
           </div>
         </div>
-      </div>
 
+      </form>
     </div>
 
   </div>
-
 </div>
 
-<!-- Diálogos de confirmación (se mantienen igual) -->
+<!-- Diálogos de confirmación -->
 <p-dialog
   header="Confirmar Eliminación"
   [(visible)]="showDeleteDialog"
@@ -380,9 +376,20 @@
   [style]="{width: '450px'}"
   [draggable]="false"
   [resizable]="false"
+  styleClass="border-round-2xl shadow-6"
   class="p-fluid">
-  <!-- Contenido del diálogo... -->
+  <div class="flex align-items-center gap-3 py-4">
+    <i class="ph ph-warning-circle text-5xl text-red-500"></i>
+    <p class="m-0 text-lg font-medium text-color">¿Estás seguro de que deseas eliminar esta tarea?</p>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2 pt-3">
+      <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary border-round-xl" (click)="showDeleteDialog = false"></button>
+      <button pButton label="Eliminar" icon="ph ph-trash" class="p-button-danger border-round-xl" (click)="deleteTask()"></button>
+    </div>
+  </ng-template>
 </p-dialog>
+
 <p-dialog
   header="Confirmar Eliminación Masiva"
   [(visible)]="showDeleteWithChildrenDialog"
@@ -390,21 +397,22 @@
   [style]="{width: '500px'}"
   [draggable]="false"
   [resizable]="false"
+  styleClass="border-round-2xl shadow-6"
   class="p-fluid">
 
   <div class="flex flex-column gap-4 p-3">
-    <div class="flex align-items-center gap-3 text-red-500 bg-red-50 p-3 border-round-lg">
-      <i class="pi pi-exclamation-triangle text-3xl"></i>
+    <div class="flex align-items-center gap-3 text-red-600 bg-red-50 p-4 border-round-xl shadow-1 border-1 border-red-200">
+      <i class="ph ph-warning text-4xl"></i>
       <div>
-        <span class="font-bold text-lg">¡Esta tarea tiene {{ childrenCount }} subtarea(s)!</span>
-        <p class="text-sm text-color-secondary mt-1">
-          Al eliminar esta tarea, también se eliminarán TODAS sus subtareas.
+        <span class="font-bold text-lg block mb-1">¡Tarea con {{ childrenCount }} subtareas!</span>
+        <p class="text-sm m-0">
+          Al eliminar esta tarea, también se eliminarán TODAS sus dependencias vinculadas de forma permanente.
         </p>
       </div>
     </div>
 
-    <div class="surface-ground p-3 border-round-lg">
-      <p class="font-medium mb-2">Para confirmar, escribe el nombre de la tarea:</p>
+    <div class="surface-ground p-4 border-round-xl border-1 surface-border shadow-1">
+      <p class="font-bold text-color mb-3 mt-0">Para confirmar, escribe el nombre de la tarea:</p>
       <div class="flex flex-column gap-2">
         <input
           type="text"
@@ -412,29 +420,29 @@
           [(ngModel)]="deleteConfirmationName"
           (input)="checkDeleteConfirmation()"
           [placeholder]="'Escribe: ' + task?.title"
-          class="w-full">
+          class="w-full border-round-lg shadow-1">
 
-        <small class="text-color-secondary">
-          El nombre debe coincidir exactamente con <span class="font-bold">"{{ task?.title }}"</span>
+        <small class="text-color-secondary mt-1 font-medium">
+          Debe coincidir exactamente con <span class="font-bold text-color">"{{ task?.title }}"</span>
         </small>
       </div>
     </div>
   </div>
 
   <ng-template pTemplate="footer">
-    <div class="flex justify-content-end gap-2">
+    <div class="flex justify-content-end gap-3 pt-3">
       <button
         pButton
         label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-text"
+        icon="ph ph-x"
+        class="p-button-text p-button-secondary font-bold border-round-xl"
         (click)="showDeleteWithChildrenDialog = false; deleteConfirmationName = ''">
       </button>
       <button
         pButton
         label="Eliminar Todo"
-        icon="pi pi-trash"
-        class="p-button-danger"
+        icon="ph ph-trash"
+        class="p-button-danger font-bold border-round-xl shadow-2"
         [disabled]="!deleteNameValid || deleting"
         [loading]="deleting"
         (click)="deleteTask()">
@@ -446,12 +454,8 @@
 <!-- Diálogo de confirmación de PrimeNG (para actualización y cancelación) -->
 <p-confirmDialog
   [baseZIndex]="10000"
-  rejectButtonStyleClass="p-button-text p-button-secondary"
-  acceptButtonStyleClass="p-button-success p-button-raised"
+  styleClass="border-round-2xl shadow-6"
+  rejectButtonStyleClass="p-button-text p-button-secondary font-bold border-round-xl"
+  acceptButtonStyleClass="p-button-success p-button-raised shadow-2 font-bold border-round-xl"
 >
-  <ng-template pTemplate="header">
-    <div class="flex align-items-center gap-2">
-      <i class="pi pi-question-circle text-primary" style="font-size: 1.5rem"></i>
-    </div>
-  </ng-template>
 </p-confirmDialog>
