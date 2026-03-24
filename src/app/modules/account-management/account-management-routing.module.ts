@@ -25,6 +25,12 @@ import { RouterModule } from "@angular/router";
         loadChildren: () =>
           import("./roles/role.module").then((m) => m.RoleModule),
       },
+      {
+        path: "client",
+        data: { breadcrumb: "Clients" },
+        loadComponent: () =>
+          import("./client/client.component").then((m) => m.ClientComponent),
+      },
       { path: "**", redirectTo: "/notfound" },
     ]),
   ],

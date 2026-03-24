@@ -1,11 +1,13 @@
 export interface CreateTeamRequest {
   name: string;
   type?: string;
+  client_id?: number | null;
 }
 
 export interface UpdateTeamRequest {
   name?: string;
   type?: string;
+  client_id?: number | null;
 }
 
 export interface TeamMemberRequest {

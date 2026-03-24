@@ -1,12 +1,16 @@
 <div class="px-4 py-6 flex flex-column gap-4 w-full mx-auto" style="max-width: 1400px;">
   <!-- Encabezado con Imagen Decorativa -->
-  <div class="surface-card p-4 md:p-6 border-round-2xl shadow-1 flex flex-column md:flex-row justify-content-between align-items-center gap-4 relative overflow-hidden">
+  <div
+    class="surface-card p-4 md:p-6 border-round-2xl shadow-1 flex flex-column md:flex-row justify-content-between align-items-center gap-4 relative overflow-hidden">
     <!-- Círculos de fondo decorativos -->
-    <div class="absolute top-0 left-0 w-15rem h-15rem bg-indigo-50 border-circle opacity-50" style="transform: translate(-50%, -50%);"></div>
-    <div class="absolute bottom-0 right-0 w-20rem h-20rem bg-blue-50 border-circle opacity-50" style="transform: translate(30%, 30%);"></div>
+    <div class="absolute top-0 left-0 w-15rem h-15rem bg-indigo-50 border-circle opacity-50"
+      style="transform: translate(-50%, -50%);"></div>
+    <div class="absolute bottom-0 right-0 w-20rem h-20rem bg-blue-50 border-circle opacity-50"
+      style="transform: translate(30%, 30%);"></div>
 
     <div class="flex align-items-center gap-4 z-1">
-      <div class="w-4rem h-4rem border-circle bg-white flex align-items-center justify-content-center text-indigo-600 shadow-2 flex-shrink-0">
+      <div
+        class="w-4rem h-4rem border-circle bg-white flex align-items-center justify-content-center text-indigo-600 shadow-2 flex-shrink-0">
         <i class="ph ph-gear text-3xl"></i>
       </div>
       <div>
@@ -16,7 +20,8 @@
     </div>
 
     <div class="hidden md:block z-1">
-      <img src="assets/General/Cartoon_project-settings.png" alt="Configuración" class="h-8rem w-auto object-fit-contain drop-shadow-2">
+      <img src="assets/General/Cartoon_project-settings.png" alt="Configuración"
+        class="h-8rem w-auto object-fit-contain drop-shadow-2">
     </div>
   </div>
 
@@ -26,13 +31,15 @@
   </div>
 
   <!-- Error Message -->
-  <div *ngIf="errorMessage" class="surface-card border-round-xl px-4 py-3 flex align-items-center gap-3 mb-2 shadow-1 border-left-3 border-red-500">
+  <div *ngIf="errorMessage"
+    class="surface-card border-round-xl px-4 py-3 flex align-items-center gap-3 mb-2 shadow-1 border-left-3 border-red-500">
     <i class="ph ph-warning-circle text-red-500 text-2xl"></i>
     <span class="text-red-700 font-medium">{{ errorMessage }}</span>
   </div>
 
   <!-- Success Message -->
-  <div *ngIf="successMessage" class="surface-card border-round-xl px-4 py-3 flex align-items-center gap-3 mb-2 shadow-1 border-left-3 border-green-500">
+  <div *ngIf="successMessage"
+    class="surface-card border-round-xl px-4 py-3 flex align-items-center gap-3 mb-2 shadow-1 border-left-3 border-green-500">
     <i class="ph ph-check-circle text-green-500 text-2xl"></i>
     <span class="text-green-700 font-medium">{{ successMessage }}</span>
   </div>
@@ -97,7 +104,8 @@
             <!-- Descripción -->
             <div class="col-12">
               <label class="block text-color-secondary font-medium mb-2 text-sm">Objeto del Contrato</label>
-              <textarea pInputTextarea rows="4" formControlName="objectContract" class="w-full border-round-xl" placeholder="Descripción del contrato"></textarea>
+              <textarea pInputTextarea rows="4" formControlName="objectContract" class="w-full border-round-xl"
+                placeholder="Descripción del contrato"></textarea>
             </div>
           </div>
         </div>
@@ -139,7 +147,9 @@
             </div>
             <div class="col-12 md:col-6 pl-0 md:pl-2">
               <label class="block text-color-secondary font-medium mb-2 text-sm">Estado del Proyecto</label>
-              <p-dropdown [options]="state_options" optionLabel="name" optionValue="id" formControlName="project_state_id" placeholder="Selecciona un estado" styleClass="w-full border-round-lg"></p-dropdown>
+              <p-dropdown [options]="state_options" optionLabel="name" optionValue="id"
+                formControlName="project_state_id" placeholder="Selecciona un estado"
+                styleClass="w-full border-round-lg"></p-dropdown>
             </div>
             <div class="col-12">
               <label class="block text-color-secondary font-medium mb-2 text-sm">Fase Actual</label>
@@ -149,13 +159,21 @@
         </div>
 
         <!-- Acciones Inferiores -->
-        <div class="surface-card p-4 border-round-2xl shadow-1 flex flex-wrap align-items-center justify-content-between gap-3 mt-2">
+        <div
+          class="surface-card p-4 border-round-2xl shadow-1 flex flex-wrap align-items-center justify-content-between gap-3 mt-2">
           <div class="flex flex-wrap gap-3 w-full sm:w-auto">
-            <button pButton type="submit" label="Guardar Cambios" icon="ph ph-floppy-disk" class="p-button-primary p-button-raised border-round-xl px-4 py-2 w-full sm:w-auto" [disabled]="projectForm.invalid || !projectForm.dirty || updateLoading" [loading]="updateLoading"></button>
-            <button pButton type="button" label="Cancelar" icon="ph ph-x" class="p-button-secondary p-button-text border-round-xl w-full sm:w-auto" (click)="resetForm()" [disabled]="!projectForm.dirty"></button>
+            <button pButton type="submit" label="Guardar Cambios" icon="ph ph-floppy-disk"
+              class="p-button-primary p-button-raised border-round-xl px-4 py-2 w-full sm:w-auto"
+              [disabled]="projectForm.invalid || !projectForm.dirty || updateLoading"
+              [loading]="updateLoading"></button>
+            <button pButton type="button" label="Cancelar" icon="ph ph-x"
+              class="p-button-secondary p-button-text border-round-xl w-full sm:w-auto" (click)="resetForm()"
+              [disabled]="!projectForm.dirty"></button>
           </div>
           <div class="w-full sm:w-auto mt-3 sm:mt-0">
-            <button pButton type="button" label="Eliminar Proyecto" icon="ph ph-trash" class="p-button-danger p-button-outlined border-round-xl w-full sm:w-auto" (click)="confirmDelete()"></button>
+            <button pButton type="button" label="Eliminar Proyecto" icon="ph ph-trash"
+              class="p-button-danger p-button-outlined border-round-xl w-full sm:w-auto"
+              (click)="confirmDelete()"></button>
           </div>
         </div>
       </form>
@@ -171,33 +189,42 @@
             <h3 class="m-0 text-xl font-semibold text-color">Equipo del Proyecto</h3>
           </div>
           <div class="flex gap-2">
-            <button pButton icon="ph ph-user-plus" class="p-button-rounded p-button-success p-button-text surface-hover" (click)="openAddMemberDialog()" pTooltip="Añadir miembro"></button>
-            <button pButton icon="ph ph-user-minus" class="p-button-rounded p-button-danger p-button-text surface-hover" (click)="openRemoveMemberDialog()" pTooltip="Remover miembro"></button>
+            <button pButton icon="ph ph-user-plus" class="p-button-rounded p-button-success p-button-text surface-hover"
+              (click)="openAddMemberDialog()" pTooltip="Añadir miembro"></button>
+            <button pButton icon="ph ph-user-minus" class="p-button-rounded p-button-danger p-button-text surface-hover"
+              (click)="openRemoveMemberDialog()" pTooltip="Remover miembro"></button>
           </div>
         </div>
 
         <!-- Lista de Miembros -->
         <div class="flex-1 overflow-auto bg-surface-50 border-round-xl p-3" style="min-height: 300px;">
-          <div *ngIf="member.length === 0" class="p-4 text-center text-color-secondary flex flex-column align-items-center justify-content-center h-full">
+          <div *ngIf="member.length === 0"
+            class="p-4 text-center text-color-secondary flex flex-column align-items-center justify-content-center h-full">
             <i class="ph ph-users text-4xl mb-3 text-400"></i>
             <span>No hay miembros asignados</span>
           </div>
 
-          <div *ngFor="let memberItem of member" class="surface-card p-3 mb-3 border-round-lg shadow-none border-1 surface-border hover:border-indigo-200 transition-colors flex align-items-center justify-content-between cursor-default">
+          <div *ngFor="let memberItem of member"
+            class="surface-card p-3 mb-3 border-round-lg shadow-none border-1 surface-border hover:border-indigo-200 transition-colors flex align-items-center justify-content-between cursor-default">
 
             <div class="flex align-items-center gap-3 overflow-hidden">
-              <div class="w-3rem h-3rem border-circle bg-indigo-100 flex align-items-center justify-content-center text-indigo-700 font-bold text-lg flex-shrink-0">
+              <div
+                class="w-3rem h-3rem border-circle bg-indigo-100 flex align-items-center justify-content-center text-indigo-700 font-bold text-lg flex-shrink-0">
                 {{ getInitials(memberItem.user.name) }}
               </div>
               <div class="flex flex-column overflow-hidden">
-                <span class="font-medium text-color text-overflow-ellipsis white-space-nowrap">{{ memberItem.user.name }}</span>
-                <span class="text-xs text-indigo-600 font-medium px-2 py-1 bg-indigo-50 border-round mt-1 flex-shrink-0 w-fit">
+                <span class="font-medium text-color text-overflow-ellipsis white-space-nowrap">{{ memberItem.user.name
+                  }}</span>
+                <span
+                  class="text-xs text-indigo-600 font-medium px-2 py-1 bg-indigo-50 border-round mt-1 flex-shrink-0 w-fit">
                   {{ getRoleName(memberItem.role.type) }}
                 </span>
               </div>
             </div>
 
-            <button pButton icon="ph ph-pencil-simple" class="p-button-rounded p-button-text p-button-sm text-color-secondary hover:text-indigo-600 flex-shrink-0 ml-2" (click)="openEditRoleDialog(memberItem)" pTooltip="Editar rol" tooltipPosition="left"></button>
+            <button pButton icon="ph ph-pencil-simple"
+              class="p-button-rounded p-button-text p-button-sm text-color-secondary hover:text-indigo-600 flex-shrink-0 ml-2"
+              (click)="openEditRoleDialog(memberItem)" pTooltip="Editar rol" tooltipPosition="left"></button>
           </div>
         </div>
       </div>
@@ -206,55 +233,74 @@
 </div>
 
 <!-- Diálogo para añadir miembro -->
-<p-dialog header="Añadir Miembro al Proyecto" [(visible)]="showAddMemberDialog" [modal]="true" [style]="{ width: '95vw', maxWidth: '500px' }" [draggable]="false" [resizable]="false" styleClass="p-fluid">
+<p-dialog header="Añadir Miembro al Proyecto" [(visible)]="showAddMemberDialog" [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '500px' }" [draggable]="false" [resizable]="false" styleClass="p-fluid">
   <form [formGroup]="addMemberForm" (ngSubmit)="addMember()" class="flex flex-column gap-4 pt-3">
     <!-- Selector de Usuario -->
     <div>
       <label class="block text-color font-medium mb-2">Usuario <span class="text-red-500">*</span></label>
-      <p-dropdown formControlName="user_id" [options]="profileOptions" optionLabel="label" optionValue="value" placeholder="Seleccionar usuario" [filter]="true" [showClear]="true" appendTo="body" styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
-      <small *ngIf="addMemberForm.get('user_id')?.invalid && addMemberForm.get('user_id')?.touched" class="p-error block mt-2">Debes seleccionar un usuario</small>
+      <p-dropdown formControlName="user_id" [options]="profileOptions" optionLabel="label" optionValue="value"
+        placeholder="Seleccionar usuario" [filter]="true" [showClear]="true" appendTo="body"
+        styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
+      <small *ngIf="addMemberForm.get('user_id')?.invalid && addMemberForm.get('user_id')?.touched"
+        class="p-error block mt-2">Debes seleccionar un usuario</small>
     </div>
 
     <!-- Selector de Rol -->
     <div>
       <label class="block text-color font-medium mb-2">Rol <span class="text-red-500">*</span></label>
-      <p-dropdown formControlName="role_type" [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Seleccionar rol" [showClear]="true" appendTo="body" styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
-      <small *ngIf="addMemberForm.get('role_type')?.invalid && addMemberForm.get('role_type')?.touched" class="p-error block mt-2">Debes seleccionar un rol</small>
+      <p-dropdown formControlName="role_type" [options]="roleOptions" optionLabel="label" optionValue="value"
+        placeholder="Seleccionar rol" [showClear]="true" appendTo="body"
+        styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
+      <small *ngIf="addMemberForm.get('role_type')?.invalid && addMemberForm.get('role_type')?.touched"
+        class="p-error block mt-2">Debes seleccionar un rol</small>
     </div>
   </form>
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2 mt-4">
-      <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary border-round-xl" (click)="showAddMemberDialog = false"></button>
-      <button pButton label="Añadir" icon="ph ph-check" class="p-button-raised p-button-success border-round-xl" [disabled]="addMemberForm.invalid || addMemberLoading" [loading]="addMemberLoading" (click)="addMember()"></button>
+      <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary border-round-xl"
+        (click)="showAddMemberDialog = false"></button>
+      <button pButton label="Añadir" icon="ph ph-check" class="p-button-raised p-button-success border-round-xl"
+        [disabled]="addMemberForm.invalid || addMemberLoading" [loading]="addMemberLoading"
+        (click)="addMember()"></button>
     </div>
   </ng-template>
 </p-dialog>
 
 <!-- Diálogo para eliminar miembro -->
-<p-dialog header="Eliminar Miembro del Proyecto" [(visible)]="showRemoveMemberDialog" [modal]="true" [style]="{ width: '95vw', maxWidth: '500px' }" [draggable]="false" [resizable]="false" styleClass="p-fluid">
+<p-dialog header="Eliminar Miembro del Proyecto" [(visible)]="showRemoveMemberDialog" [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '500px' }" [draggable]="false" [resizable]="false" styleClass="p-fluid">
   <form [formGroup]="deleteMemberForm" (ngSubmit)="RemoveMember()" class="flex flex-column gap-4 pt-3">
     <div>
       <label class="block text-color font-medium mb-2">Miembro <span class="text-red-500">*</span></label>
-      <p-dropdown formControlName="user_id" [options]="memberOptions" optionLabel="label" optionValue="value" placeholder="Seleccionar Miembro" [filter]="true" [showClear]="true" appendTo="body" styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
-      <small *ngIf="deleteMemberForm.get('user_id')?.invalid && deleteMemberForm.get('user_id')?.touched" class="p-error block mt-2">Debes seleccionar un miembro</small>
+      <p-dropdown formControlName="user_id" [options]="memberOptions" optionLabel="label" optionValue="value"
+        placeholder="Seleccionar Miembro" [filter]="true" [showClear]="true" appendTo="body"
+        styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
+      <small *ngIf="deleteMemberForm.get('user_id')?.invalid && deleteMemberForm.get('user_id')?.touched"
+        class="p-error block mt-2">Debes seleccionar un miembro</small>
     </div>
   </form>
 
   <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2 mt-4">
-      <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary border-round-xl" (click)="showRemoveMemberDialog = false"></button>
-      <button pButton label="Remover" icon="ph ph-trash" class="p-button-raised p-button-danger border-round-xl" [disabled]="deleteMemberForm.invalid || deleteMemberLoading" [loading]="deleteMemberLoading" (click)="RemoveMember()"></button>
+      <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary border-round-xl"
+        (click)="showRemoveMemberDialog = false"></button>
+      <button pButton label="Remover" icon="ph ph-trash" class="p-button-raised p-button-danger border-round-xl"
+        [disabled]="deleteMemberForm.invalid || deleteMemberLoading" [loading]="deleteMemberLoading"
+        (click)="RemoveMember()"></button>
     </div>
   </ng-template>
 </p-dialog>
 
 <!-- Diálogo para editar rol -->
-<p-dialog header="Editar Rol del Miembro" [(visible)]="showEditRoleDialog" [modal]="true" [style]="{ width: '95vw', maxWidth: '500px' }" [draggable]="false" [resizable]="false" styleClass="p-fluid">
+<p-dialog header="Editar Rol del Miembro" [(visible)]="showEditRoleDialog" [modal]="true"
+  [style]="{ width: '95vw', maxWidth: '500px' }" [draggable]="false" [resizable]="false" styleClass="p-fluid">
   <div *ngIf="selectedMember" class="flex flex-column gap-4 pt-3">
     <!-- Info del miembro -->
     <div class="flex align-items-center gap-3 p-3 surface-ground border-round-lg">
-      <div class="w-3rem h-3rem border-circle bg-indigo-500 flex align-items-center justify-content-center text-white font-bold text-xl">
+      <div
+        class="w-3rem h-3rem border-circle bg-indigo-500 flex align-items-center justify-content-center text-white font-bold text-xl">
         {{ getInitials(selectedMember.user.name) }}
       </div>
       <div class="font-medium text-lg">{{ selectedMember.user.name }}</div>
@@ -263,13 +309,18 @@
     <form [formGroup]="editRoleForm" (ngSubmit)="updateMemberRole()" class="flex flex-column gap-4">
       <div>
         <label class="block text-color font-medium mb-2">Rol <span class="text-red-500">*</span></label>
-        <p-dropdown formControlName="role_type" [options]="roleOptions" optionLabel="label" optionValue="value" placeholder="Seleccionar rol" appendTo="body" styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
-        <small *ngIf="editRoleForm.get('role_type')?.invalid && editRoleForm.get('role_type')?.touched" class="p-error block mt-2">Debes seleccionar un rol</small>
+        <p-dropdown formControlName="role_type" [options]="roleOptions" optionLabel="label" optionValue="value"
+          placeholder="Seleccionar rol" appendTo="body" styleClass="border-round-lg p-inputtext-sm"></p-dropdown>
+        <small *ngIf="editRoleForm.get('role_type')?.invalid && editRoleForm.get('role_type')?.touched"
+          class="p-error block mt-2">Debes seleccionar un rol</small>
       </div>
 
       <div class="flex justify-content-end gap-2 mt-4">
-        <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary border-round-xl" (click)="showEditRoleDialog = false" type="button"></button>
-        <button pButton label="Guardar" icon="ph ph-floppy-disk" class="p-button-raised p-button-primary border-round-xl" [disabled]="editRoleForm.invalid || editRoleLoading" [loading]="editRoleLoading" type="submit"></button>
+        <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary border-round-xl"
+          (click)="showEditRoleDialog = false" type="button"></button>
+        <button pButton label="Guardar" icon="ph ph-floppy-disk"
+          class="p-button-raised p-button-primary border-round-xl" [disabled]="editRoleForm.invalid || editRoleLoading"
+          [loading]="editRoleLoading" type="submit"></button>
       </div>
     </form>
   </div>
@@ -281,16 +332,24 @@
 <!-- ConfirmDialog (Eliminación) -->
 <p-confirmDialog #cd [key]="'deleteDialog'">
   <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
-    <div *ngIf="message" class="flex flex-column align-items-center p-6 surface-card border-round-2xl shadow-8" style="min-width: 350px; max-width: 450px;">
-      <div class="border-circle bg-red-100 flex align-items-center justify-content-center h-6rem w-6rem -mt-8 border-4 border-white shadow-2">
+    <div *ngIf="message" class="flex flex-column align-items-center p-6 surface-card border-round-2xl shadow-8"
+      style="min-width: 350px; max-width: 450px;">
+      <div
+        class="border-circle bg-red-100 flex align-items-center justify-content-center h-6rem w-6rem -mt-8 border-4 border-white shadow-2">
         <i class="ph ph-warning text-5xl text-red-600"></i>
       </div>
-      <span class="font-bold text-2xl block mb-2 mt-4 text-red-800 text-center">{{ message.header || '¿Eliminar Proyecto?' }}</span>
+      <span class="font-bold text-2xl block mb-2 mt-4 text-red-800 text-center">{{ message.header || '¿Eliminar
+        Proyecto?' }}</span>
       <p class="mb-2 text-red-700 text-center">{{ message.message }}</p>
-      <p class="text-sm text-color-secondary mt-0 text-center mb-5">Se eliminarán todas las incidencias, comentarios y datos asociados.</p>
+      <p class="text-sm text-color-secondary mt-0 text-center mb-5">Se eliminarán todas las incidencias, comentarios y
+        datos asociados.</p>
       <div class="flex align-items-center justify-content-center gap-3 w-full">
-        <button pButton label="Eliminar" (click)="onAccept()" class="p-button-danger p-button-raised border-round-xl flex-1 justify-content-center" icon="ph ph-trash"></button>
-        <button pButton label="Cancelar" (click)="onReject()" class="p-button-secondary p-button-outlined border-round-xl flex-1 justify-content-center" icon="ph ph-x"></button>
+        <button pButton label="Eliminar" (click)="onAccept()"
+          class="p-button-danger p-button-raised border-round-xl flex-1 justify-content-center"
+          icon="ph ph-trash"></button>
+        <button pButton label="Cancelar" (click)="onReject()"
+          class="p-button-secondary p-button-outlined border-round-xl flex-1 justify-content-center"
+          icon="ph ph-x"></button>
       </div>
     </div>
   </ng-template>
@@ -299,14 +358,19 @@
 <!-- ConfirmDialog (Éxito) -->
 <p-confirmDialog [key]="'successDialog'" [rejectVisible]="false" [acceptVisible]="true" [closable]="false">
   <ng-template let-message let-onAccept="onAccept">
-    <div *ngIf="message" class="flex flex-column align-items-center p-6 surface-card border-round-2xl shadow-8" style="min-width: 350px; max-width: 450px;">
-      <div class="border-circle bg-green-100 flex align-items-center justify-content-center h-6rem w-6rem -mt-8 border-4 border-white shadow-2">
+    <div *ngIf="message" class="flex flex-column align-items-center p-6 surface-card border-round-2xl shadow-8"
+      style="min-width: 350px; max-width: 450px;">
+      <div
+        class="border-circle bg-green-100 flex align-items-center justify-content-center h-6rem w-6rem -mt-8 border-4 border-white shadow-2">
         <i class="ph ph-check-circle text-5xl text-green-600"></i>
       </div>
-      <span class="font-bold text-2xl block mb-2 mt-4 text-green-800 text-center">{{ message.header || '¡Actualizado!' }}</span>
+      <span class="font-bold text-2xl block mb-2 mt-4 text-green-800 text-center">{{ message.header || '¡Actualizado!'
+        }}</span>
       <p class="mb-4 text-green-700 text-center">{{ message.message }}</p>
       <div class="flex align-items-center justify-content-center w-full">
-        <button pButton label="Aceptar" (click)="onAccept()" class="p-button-success p-button-raised border-round-xl w-full justify-content-center" icon="ph ph-check"></button>
+        <button pButton label="Aceptar" (click)="onAccept()"
+          class="p-button-success p-button-raised border-round-xl w-full justify-content-center"
+          icon="ph ph-check"></button>
       </div>
     </div>
   </ng-template>

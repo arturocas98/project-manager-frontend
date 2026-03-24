@@ -1,4 +1,4 @@
-export interface ProjectMember{
+export interface ProjectMember {
   user: {
     id: number;
     name: string;
@@ -78,5 +78,5 @@ export interface AssignedTo {
   id: number;
   name: string;
   email: string;
-  role:string;
+  role: string;
 }

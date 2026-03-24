@@ -22,6 +22,7 @@ import { MessageModule } from 'primeng/message';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthService } from "../../../core/service/auth.service";
 import { Team } from "../../../shared/models/team-models/team.model";
+import { Client } from "../../../shared/models/client.model";
 import { Profile } from "../../../shared/models/auth";
 import { CreateTeamRequest, TeamFilters } from "../../../shared/models/team-models/team-request.model";
 import { TooltipModule } from "primeng/tooltip";
@@ -67,6 +68,7 @@ export class TeamComponent implements OnInit {
   teams: Team[] = [];
   profiles: Profile[] = [];
   filteredProfiles: Profile[] = [];
+  clients: Client[] = [];
   selectedTeam: Team | null = null;
 
   // Estados
@@ -81,7 +83,8 @@ export class TeamComponent implements OnInit {
   // Formularios
   teamFormData: CreateTeamRequest = {
     name: '',
-    type: 'DEV'
+    type: 'DEV',
+    client_id: null
   };
 
   // Filtros
@@ -134,6 +137,16 @@ export class TeamComponent implements OnInit {
 
   ngOnInit() {
     this.loadTeams();
+    this.loadClients();
+  }
+
+  loadClients() {
+    this.authService.getClients().subscribe({
+      next: (clients) => {
+        this.clients = clients;
+      },
+      error: () => console.error('Failed to load clients')
+    });
   }
 
   loadTeams() {
@@ -192,7 +205,7 @@ export class TeamComponent implements OnInit {
   // Diálogo de equipo
   showTeamDialog() {
     this.editingTeam = false;
-    this.teamFormData = { name: '', type: 'DEV' };
+    this.teamFormData = { name: '', type: 'DEV', client_id: null };
     this.teamDialogVisible = true;
   }
 
@@ -204,7 +217,8 @@ export class TeamComponent implements OnInit {
     this.editingTeam = true;
     this.teamFormData = {
       name: team.name,
-      type: team.type
+      type: team.type,
+      client_id: team.client?.id || null
     };
     this.selectedTeam = team;
     this.teamDialogVisible = true;

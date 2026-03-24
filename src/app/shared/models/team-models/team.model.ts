@@ -21,6 +21,11 @@ export interface Team {
   type: string;
   members: TeamMember[];
   created_by: User;
+  client?: {
+    id: number;
+    Ruc: string;
+    Nombre: string;
+  };
   created_at: string;
   updated_at: string;
 }

@@ -56,6 +56,8 @@
         <tr>
           <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Nombre
           </th>
+          <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Cliente
+          </th>
           <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Tipo
           </th>
           <th class="border-y-1 border-x-none border-border surface-50 text-color-secondary font-semibold py-3">Miembros
@@ -80,6 +82,12 @@
               </div>
               <span class="font-bold">{{ team.name }}</span>
             </div>
+          </td>
+          <td class="border-bottom-1 surface-border py-3">
+            <span class="text-sm font-medium text-color-secondary flex align-items-center gap-1">
+              <i class="ph ph-buildings" *ngIf="team.client"></i>
+              {{ team.client?.Nombre || 'Sin cliente' }}
+            </span>
           </td>
           <td class="border-bottom-1 surface-border py-3">
             <p-tag [value]="team.type | uppercase" [severity]="getTagSeverity(team.type)"
@@ -185,6 +193,13 @@
             class="text-pink-500">*</span></label>
         <p-dropdown id="type" [options]="typeOptions" [(ngModel)]="teamFormData.type"
           placeholder="Seleccionar tipo de equipo" optionLabel="label" optionValue="value" [required]="true"
+          styleClass="w-full border-round-lg" appendTo="body">
+        </p-dropdown>
+      </div>
+      <div class="field mb-4">
+        <label for="client_id" class="font-bold text-color-secondary block mb-2 text-sm">Cliente Vinculado <span class="text-color-secondary font-normal">(Opcional)</span></label>
+        <p-dropdown id="client_id" [options]="clients" [(ngModel)]="teamFormData.client_id"
+          placeholder="Seleccionar cliente vinculado" optionLabel="Nombre" optionValue="id" [showClear]="true" [filter]="true" filterBy="Nombre"
           styleClass="w-full border-round-lg" appendTo="body">
         </p-dropdown>
       </div>

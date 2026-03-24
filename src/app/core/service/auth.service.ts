@@ -15,6 +15,9 @@ import {
   UpdateTeamRequest
 } from "../../shared/models/team-models/team-request.model";
 import { Team, TeamManagement } from "../../shared/models/team-models/team.model";
+import { Client, ClientRequest } from '../../shared/models/client.model';
+import { LocateResponse } from '../../shared/models/locate.response';
+
 
 export interface LoginData {
   id_card: string;
@@ -187,5 +190,40 @@ export class AuthService {
 
   removeTeamMemberByQuery(teamId: number, userId: number): Observable<Team> {
     return this.apiService.delete<Team>(`${environment.apiUrl}/auth/team/${teamId}/members`, { user_id: userId });
+  }
+
+  // Client Methods
+  getClients(): Observable<Client[]> {
+    return this.apiService.get<any[]>('auth/clients').pipe(
+      map(response => response.map(item => item || item.data))
+    );
+  }
+
+  getClient(id: number): Observable<Client> {
+    return this.apiService.get<Client>(`auth/clients/${id}`);
+  }
+
+  createClient(data: ClientRequest): Observable<Client> {
+    return this.apiService.post<Client>('auth/clients', data);
+  }
+
+  updateClient(id: number, data: ClientRequest): Observable<Client> {
+    return this.apiService.put<Client>(`auth/clients/${id}`, data);
+  }
+
+  deleteClient(id: number): Observable<any> {
+    return this.apiService.delete<any>(`auth/clients/${id}`);
+  }
+
+  // Location Methods
+  getLocations(): Observable<LocateResponse[]> {
+    return this.apiService.get<any[]>('auth/locations').pipe(
+      map(response => {
+        // Handle standardized nested data if returned via ApiService
+        if (response && (response as any).data) return (response as any).data;
+        if (Array.isArray(response)) return response.map(item => item || item.data);
+        return response;
+      })
+    );
   }
 }
