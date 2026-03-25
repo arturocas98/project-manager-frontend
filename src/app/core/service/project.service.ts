@@ -19,6 +19,7 @@ import {
 import {unassignedUsersData} from "../../shared/models/auth";
 import {CommentResponse} from "../../shared/models/task-models/CommentResponse";
 import {Notification} from "../../shared/models/notification-models/Notification-model";
+import {MessageResource, MessageRequest, MessageUpdateRequest} from "../../shared/models/projects-models/message-models";
 
 @Injectable({
   providedIn: "root",
@@ -233,6 +234,38 @@ export class ProjectService {
     // DELETE /projects/{project}/incidences/{incidence}/comments/{commentId}
     return this.apiService
       .delete<void>(`projects/${projectId}/incidences/${taskId}/comments/${commentId}`);
+  }
+
+  // --- PROJECT MESSAGES (CHAT) ---
+
+  getProjectMessages(projectId: number): Observable<MessageResource[]> {
+    return this.apiService.get<any>(`projects/${projectId}/messages`)
+      .pipe(map(res => res.data || res));
+  }
+
+  createProjectMessage(projectId: number, payload: MessageRequest, file?: File): Observable<MessageResource> {
+    if (file) {
+      const formData = new FormData();
+      formData.append('project_id', payload.project_id.toString());
+      if (payload.text) formData.append('text', payload.text);
+      if (payload.message_id) formData.append('message_id', payload.message_id.toString());
+      formData.append('file', file);
+      
+      return this.apiService.postFull<any>(`projects/${projectId}/messages`, formData, { omitContentType: true })
+        .pipe(map(res => res.data || res));
+    }
+
+    return this.apiService.post<any>(`projects/${projectId}/messages`, payload)
+      .pipe(map(res => res.data || res));
+  }
+
+  updateProjectMessage(projectId: number, messageId: number, payload: MessageUpdateRequest): Observable<MessageResource> {
+    return this.apiService.put<any>(`projects/${projectId}/messages/${messageId}`, payload)
+      .pipe(map(res => res.data || res));
+  }
+
+  deleteProjectMessage(projectId: number, messageId: number): Observable<void> {
+    return this.apiService.delete<void>(`projects/${projectId}/messages/${messageId}`);
   }
 
 }

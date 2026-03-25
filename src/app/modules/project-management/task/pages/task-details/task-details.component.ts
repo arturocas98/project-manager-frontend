@@ -518,8 +518,8 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
   confirmStateWithComment() {
     if (this.stateCommentRequired && !this.stateComment.trim()) {
-       this.showError('Error', 'El comentario es obligatorio para esta acción.');
-       return;
+      this.showError('Error', 'El comentario es obligatorio para esta acción.');
+      return;
     }
     this.showStateCommentDialogVisible = false;
     if (this.pendingStateId) {
@@ -570,13 +570,13 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (comment && comment.trim() !== '') {
           this.projectService.createComment(this.projectId, this.taskId, comment).subscribe({
-             next: () => {
-                this.finishStateUpdate();
-             },
-             error: () => {
-                this.showError('Advertencia', 'El estado fue actualizado, pero no se pudo enviar el comentario');
-                this.finishStateUpdate();
-             }
+            next: () => {
+              this.finishStateUpdate();
+            },
+            error: () => {
+              this.showError('Advertencia', 'El estado fue actualizado, pero no se pudo enviar el comentario');
+              this.finishStateUpdate();
+            }
           });
         } else {
           this.finishStateUpdate();

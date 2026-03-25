@@ -77,6 +77,14 @@ const routes: Routes = [
           ),
       },
       {
+        path: "project-chat",
+        data: { breadcrumb: "chat" },
+        loadComponent: () =>
+          import("./pages/chat/chat.component").then(
+            (m) => m.ChatComponent,
+          ),
+      },
+      {
         path: "create-task/:stateId",
         canActivate: [RoleGuard],
         data: { breadcrumb: "create", roles: ['administrator', 'leader'] },

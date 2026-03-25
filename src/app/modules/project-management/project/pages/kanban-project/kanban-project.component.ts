@@ -2,9 +2,10 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { KanbanColumn, KanbanTask, ProjectMember } from '../../../../../shared/models/kanban.models';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { KanbanService } from '../../../../../core/service/kanban-service';
+import { ProjectService } from '../../../../../core/service/project.service';
 import { TotalTasksPipe } from '../../../../../shared/Pipes/total-tasks.pipe';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +20,9 @@ import { DragDropModule } from 'primeng/dragdrop';
 import { SidebarModule } from 'primeng/sidebar';
 import { CheckboxModule } from 'primeng/checkbox';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -73,6 +77,9 @@ interface TypeOption {
     CdkDragPlaceholder,
     NgStyle,
     TitleCasePipe,
+    ConfirmDialogModule,
+    DialogModule,
+    InputTextareaModule,
   ],
   templateUrl: './kanban-project.component.html',
 })
@@ -142,11 +149,23 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     },
   ];
 
+  // Dialog properties
+  showStateCommentDialogVisible: boolean = false;
+  stateCommentDialogHeader: string = '';
+  stateCommentDialogDescription: string = '';
+  stateComment: string = '';
+  stateCommentRequired: boolean = false;
+  pendingDropEvent: CdkDragDrop<KanbanTask[]> | null = null;
+  pendingColumnId: number | null = null;
+  updatingState: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private kanbanService: KanbanService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private projectService: ProjectService,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
@@ -183,7 +202,7 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: columns => {
-          this.originalColumns = columns.map(c => ({...c, tasks: [...c.tasks]}));
+          this.originalColumns = columns.map(c => ({ ...c, tasks: [...c.tasks] }));
           this.applyLocalAvatarFilter();
           this.loading = false;
         },
@@ -340,7 +359,7 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     if (!this.originalColumns || this.originalColumns.length === 0) return;
 
     if (!this.selectedAvatarMember) {
-      this.columns = this.originalColumns.map(c => ({...c, tasks: [...c.tasks]}));
+      this.columns = this.originalColumns.map(c => ({ ...c, tasks: [...c.tasks] }));
       return;
     }
 
@@ -360,7 +379,7 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
           const st = task.state?.state?.toLowerCase() || '';
           return st.includes('finalizada') || st.includes('aprobada');
         }
-        return true; 
+        return true;
       });
       return { ...c, tasks: filteredTasks };
     });
@@ -407,38 +426,177 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     } else {
       // Mover entre columnas
       const task = event.previousContainer.data[event.previousIndex];
+      const sourceColumn = this.columns.find(col => col.tasks === event.previousContainer.data);
+      const sourceColumnId = sourceColumn ? sourceColumn.id : 0;
 
+      // Restricciones por rol
+      const role = this.roleType;
+
+      let allowed = false;
+      let requiresDialog = false;
+      let isMandatoryComment = false;
+      let dialogHeader = '';
+      let dialogDesc = '';
+      let requiresConfirmation = false;
+
+      if (role === 'developer' || role === 'dev') {
+        if (sourceColumnId === 1 && columnId === 2) {
+          allowed = true; // Asignado -> Ejecutando
+        } else if (sourceColumnId === 2 && columnId === 4) {
+          allowed = true; // Ejecutando -> Terminada
+          requiresDialog = true;
+          isMandatoryComment = false;
+          dialogHeader = 'Terminar Tarea';
+          dialogDesc = 'Opcional: Añade un comentario sobre la finalización';
+        }
+      } else if (role === 'tester' || role === 'tst') {
+        if (sourceColumnId === 4 && columnId === 6) {
+          allowed = true; // Terminada -> En Revisión
+        } else if (sourceColumnId === 6 && columnId === 2) {
+          allowed = true; // En Revisión -> Ejecutando
+          requiresDialog = true;
+          isMandatoryComment = true;
+          dialogHeader = 'Devolver Tarea';
+          dialogDesc = 'Obligatorio: Añade un comentario explicando la devolución';
+        } else if (sourceColumnId === 6 && columnId === 7) {
+          allowed = true; // En Revisión -> Finalizada
+        }
+      } else if (role === 'administrator' || role === 'leader' || role === 'adm' || role === 'ldr') {
+        allowed = true; // Pueden mover libremente
+        if (columnId === 3) { // Si mueven a suspendido
+          requiresConfirmation = true;
+        }
+      }
+
+      if (!allowed) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Permiso denegado',
+          detail: 'Tu rol no tiene permisos para realizar este cambio de estado.'
+        });
+        return;
+      }
+
+      // Si es permitido, movemos temporalmente el item
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
 
-      // Actualizar en el backend - PASAMOS EL columnId COMO NUMBER
-      this.kanbanService.updateTaskStatus(this.projectId, task.id, columnId).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Movido',
-            detail: `Tarea movida a ${this.getColumnTitle(columnId)}`,
-            life: 2000,
-          });
-        },
-        error: error => {
-          console.error('Error updating task status:', error);
-
-          // Revertir el movimiento en caso de error
-          transferArrayItem(
-            event.container.data,
-            event.previousContainer.data,
-            event.currentIndex,
-            event.previousIndex
-          );
-
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudo actualizar el estado de la tarea',
-          });
-        },
-      });
+      if (requiresConfirmation) {
+        this.pendingDropEvent = event;
+        this.pendingColumnId = columnId;
+        this.confirmSuspendTask();
+      } else if (requiresDialog) {
+        this.pendingDropEvent = event;
+        this.pendingColumnId = columnId;
+        this.showStateCommentDialog(dialogHeader, dialogDesc, isMandatoryComment);
+      } else {
+        this.executeTaskMove(event, columnId, task);
+      }
     }
+  }
+
+  executeTaskMove(event: CdkDragDrop<KanbanTask[]>, columnId: number, task: KanbanTask, comment?: string): void {
+    this.updatingState = true;
+    this.kanbanService.updateTaskStatus(this.projectId, task.id, columnId).subscribe({
+      next: () => {
+        if (comment && comment.trim() !== '') {
+          this.projectService.createComment(this.projectId, task.id, comment).subscribe({
+            next: () => {
+              this.finishStateUpdate(columnId);
+            },
+            error: () => {
+              this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Estado actualizado, pero no se pudo enviar el comentario' });
+              this.finishStateUpdate(columnId);
+            }
+          });
+        } else {
+          this.finishStateUpdate(columnId);
+        }
+      },
+      error: error => {
+        console.error('Error updating task status:', error);
+        this.revertDragDrop(event);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo actualizar el estado de la tarea',
+        });
+        this.updatingState = false;
+      },
+    });
+  }
+
+  private finishStateUpdate(columnId: number) {
+    this.updatingState = false;
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Movido',
+      detail: `Tarea movida a ${this.getColumnTitle(columnId)}`,
+      life: 2000,
+    });
+    this.pendingDropEvent = null;
+    this.pendingColumnId = null;
+    // this.loadBoard(); // Opcional: recargar si quisieramos
+  }
+
+  private revertDragDrop(event: CdkDragDrop<KanbanTask[]>) {
+    transferArrayItem(
+      event.container.data,
+      event.previousContainer.data,
+      event.currentIndex,
+      event.previousIndex
+    );
+    this.pendingDropEvent = null;
+    this.pendingColumnId = null;
+  }
+
+  showStateCommentDialog(header: string, desc: string, required: boolean) {
+    this.stateCommentDialogHeader = header;
+    this.stateCommentDialogDescription = desc;
+    this.stateCommentRequired = required;
+    this.stateComment = '';
+    this.showStateCommentDialogVisible = true;
+  }
+
+  confirmStateWithComment() {
+    if (this.stateCommentRequired && !this.stateComment.trim()) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El comentario es obligatorio para esta acción.' });
+      return;
+    }
+    this.showStateCommentDialogVisible = false;
+    if (this.pendingDropEvent && this.pendingColumnId !== null) {
+      const task = this.pendingDropEvent.container.data[this.pendingDropEvent.currentIndex];
+      this.executeTaskMove(this.pendingDropEvent, this.pendingColumnId, task, this.stateComment);
+    }
+  }
+
+  cancelStateChange() {
+    this.showStateCommentDialogVisible = false;
+    if (this.pendingDropEvent) {
+      this.revertDragDrop(this.pendingDropEvent);
+    }
+  }
+
+  confirmSuspendTask() {
+    this.confirmationService.confirm({
+      message: '¿Está seguro de que desea suspender esta tarea? La tarea quedará inactiva temporalmente.',
+      header: 'Confirmar Suspensión',
+      icon: 'ph ph-warning-circle text-orange-500 text-3xl',
+      acceptLabel: 'Sí, suspender',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-warning',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        if (this.pendingDropEvent && this.pendingColumnId !== null) {
+          const task = this.pendingDropEvent.container.data[this.pendingDropEvent.currentIndex];
+          this.executeTaskMove(this.pendingDropEvent, this.pendingColumnId, task);
+        }
+      },
+      reject: () => {
+        if (this.pendingDropEvent) {
+          this.revertDragDrop(this.pendingDropEvent);
+        }
+      }
+    });
   }
 
   /**

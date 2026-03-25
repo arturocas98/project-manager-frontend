@@ -333,3 +333,17 @@
     </div>
   </ng-template>
 </p-sidebar>
+
+<!-- Dialog for State Change Comment -->
+<p-dialog [(visible)]="showStateCommentDialogVisible" [header]="stateCommentDialogHeader" [modal]="true" [style]="{width: '450px'}" (onHide)="cancelStateChange()">
+  <div class="flex flex-column gap-3 mt-2">
+    <p class="m-0 text-color-secondary">{{ stateCommentDialogDescription }}</p>
+    <textarea pInputTextarea [(ngModel)]="stateComment" rows="4" class="w-full text-lg p-3 border-round-lg" placeholder="Escribe tu comentario aquí..."></textarea>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancelar" icon="ph ph-x" class="p-button-text p-button-secondary" (click)="cancelStateChange()"></button>
+    <button pButton label="Confirmar" icon="ph ph-check" class="p-button-primary" (click)="confirmStateWithComment()" [disabled]="stateCommentRequired && !stateComment.trim()"></button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>

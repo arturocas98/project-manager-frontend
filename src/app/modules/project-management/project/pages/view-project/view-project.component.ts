@@ -68,6 +68,15 @@ export class ViewProjectComponent implements OnInit {
           this.projectId,
           'project-kanban'
         ])
+      },
+      {
+        label: 'Chat de Equipo',
+        icon: 'ph ph-chats',
+        command: () => this.router.navigate([
+          '/project-management/projects/kanban',
+          this.projectId,
+          'project-chat'
+        ])
       }
     ];
 
