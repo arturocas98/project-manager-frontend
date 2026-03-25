@@ -32,7 +32,7 @@
       </div>
 
       <ng-container *ngFor="let msg of messages">
-        <div class="flex w-full"
+        <div class="flex w-full" [id]="'msg-' + msg.id"
           [ngClass]="msg.user?.id === currentUserId ? 'justify-content-end' : 'justify-content-start'">
           <div class="flex gap-3 max-w-30rem md:max-w-40rem"
             [ngClass]="{'flex-row-reverse': msg.user?.id === currentUserId}">

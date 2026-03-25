@@ -105,7 +105,16 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.messages = msgs;
         this.buildMenuItems();
         this.loading = false;
-        this.shouldScrollToBottom = true;
+        
+        const messageId = this.route.snapshot.queryParams['messageId'];
+        if (messageId) {
+          setTimeout(() => {
+            const el = document.getElementById('msg-' + messageId);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300);
+        } else {
+          this.shouldScrollToBottom = true;
+        }
       },
       error: (error) => {
         console.error('Error loading messages', error);

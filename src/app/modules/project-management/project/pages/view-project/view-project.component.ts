@@ -77,6 +77,15 @@ export class ViewProjectComponent implements OnInit {
           this.projectId,
           'project-chat'
         ])
+      },
+      {
+        label: 'Archivos',
+        icon: 'ph ph-folder',
+        command: () => this.router.navigate([
+          '/project-management/projects/kanban',
+          this.projectId,
+          'project-files'
+        ])
       }
     ];
 

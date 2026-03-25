@@ -243,6 +243,10 @@ export class ProjectService {
       .pipe(map(res => res.data || res));
   }
 
+  getProjectFiles(projectId: number): Observable<any[]> {
+    return this.apiService.get<any>(`projects/${projectId}/files`);
+  }
+
   createProjectMessage(projectId: number, payload: MessageRequest, file?: File): Observable<MessageResource> {
     if (file) {
       const formData = new FormData();

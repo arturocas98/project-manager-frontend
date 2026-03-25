@@ -85,6 +85,14 @@ const routes: Routes = [
           ),
       },
       {
+        path: "project-files",
+        data: { breadcrumb: "files" },
+        loadComponent: () =>
+          import("./pages/files/files.component").then(
+            (m) => m.FilesComponent,
+          ),
+      },
+      {
         path: "create-task/:stateId",
         canActivate: [RoleGuard],
         data: { breadcrumb: "create", roles: ['administrator', 'leader'] },
