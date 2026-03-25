@@ -1,531 +1,380 @@
-<div class="surface-ground min-h-screen flex flex-column gap-5">
+<div class="surface-ground min-h-screen flex flex-column gap-3 p-3 md:p-4">
   <p-toast position="top-right"></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
   <!-- Loader -->
   <div *ngIf="loading" class="flex flex-column justify-content-center align-items-center min-h-screen">
-    <p-progressSpinner styleClass="w-6rem h-6rem" strokeWidth="4" fill="var(--surface-ground)"></p-progressSpinner>
-    <p class="mt-4 text-color-secondary font-bold text-2xl animate-pulse">Cargando información</p>
+    <p-progressSpinner styleClass="w-5rem h-5rem" strokeWidth="4" fill="var(--surface-ground)"></p-progressSpinner>
+    <p class="mt-3 text-color-secondary font-bold text-lg animate-pulse">Cargando información</p>
   </div>
 
   <!-- Error Message -->
   <div *ngIf="error && !loading" class="flex justify-content-center align-items-center min-h-screen">
-    <div class="surface-card p-6 border-round-2xl shadow-4 text-center max-w-40rem w-full">
-      <div class="bg-red-50 border-circle p-5 mb-5 inline-block">
-        <i class="ph ph-warning-circle text-7xl text-red-500"></i>
+    <div class="surface-card p-5 border-round-2xl shadow-4 text-center max-w-35rem w-full">
+      <div class="bg-red-50 border-circle p-4 mb-4 inline-block">
+        <i class="ph ph-warning-circle text-6xl text-red-500"></i>
       </div>
-      <h2 class="text-4xl font-extrabold text-color mb-3">Error al cargar</h2>
-      <p class="text-color-secondary mb-6 text-xl line-height-3">{{ error }}</p>
-      <div class="flex gap-4 justify-content-center">
+      <h2 class="text-2xl font-extrabold text-color mb-2">Error al cargar</h2>
+      <p class="text-color-secondary mb-5 text-lg">{{ error }}</p>
+      <div class="flex gap-3 justify-content-center">
         <button pButton label="Reintentar" icon="ph ph-arrows-clockwise"
-          class="p-button-primary border-round-xl p-button-lg shadow-2 font-bold px-5"
-          (click)="loadTaskDetails()"></button>
+                class="p-button-primary border-round-xl p-button-md shadow-2 font-bold px-4"
+                (click)="loadTaskDetails()"></button>
         <button pButton label="Volver al Kanban" icon="ph ph-arrow-left"
-          class="p-button-outlined p-button-secondary border-round-xl p-button-lg px-5 font-bold"
-          (click)="goBack()"></button>
+                class="p-button-outlined p-button-secondary border-round-xl p-button-md px-4 font-bold"
+                (click)="goBack()"></button>
       </div>
     </div>
   </div>
 
   <ng-container *ngIf="task && !loading">
-    <!-- Header -->
+    <!-- Header compacto -->
     <div
-      class="surface-card p-5 md:p-6 border-round-2xl shadow-3 flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-5 border-top-3 border-primary relative overflow-hidden">
-      <div
-        class="absolute top-0 right-0 w-15rem h-15rem bg-primary-100 border-circle translate-x-100 -translate-y-50 opacity-20 blur-xl">
-      </div>
+      class="surface-card p-3 md:p-4 border-round-2xl shadow-2 flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-3 border-top-3 border-primary relative overflow-hidden">
 
-      <div class="flex align-items-center gap-4 w-full md:w-auto z-1">
+      <div class="flex align-items-center gap-3 w-full md:w-auto z-1">
         <button pButton icon="ph ph-arrow-left"
-          class="p-button-rounded p-button-text p-button-lg text-color-secondary hover:surface-hover transition-colors shadow-1"
-          style="width: 3.5rem; height: 3.5rem" (click)="goBack()" pTooltip="Volver al Kanban"
-          tooltipPosition="bottom"></button>
+                class="p-button-rounded p-button-text p-button-md text-color-secondary hover:surface-hover transition-colors"
+                style="width: 2.5rem; height: 2.5rem" (click)="goBack()" pTooltip="Volver al Kanban"
+                tooltipPosition="bottom"></button>
         <div>
-          <div class="flex align-items-center gap-2 text-md text-color-secondary mb-2 font-medium">
-            <i class="ph ph-tree-structure text-primary text-lg"></i>
-            <span *ngFor="let ancestor of taskAncestors; let last = last" class="flex align-items-center gap-2">
-              <span class="cursor-pointer hover:text-primary transition-colors font-bold"
-                (click)="navigateToTask(ancestor.id)">
-                {{ ancestor.title | truncate:30 }}
+          <div class="flex align-items-center gap-1 text-sm text-color-secondary mb-1 font-medium flex-wrap">
+            <i class="ph ph-tree-structure text-primary text-base"></i>
+            <span *ngFor="let ancestor of taskAncestors; let last = last" class="flex align-items-center gap-1">
+              <span class="cursor-pointer hover:text-primary transition-colors font-semibold text-sm"
+                    (click)="navigateToTask(ancestor.id)">
+                {{ ancestor.title | truncate:25 }}
               </span>
-              <i class="ph ph-caret-right text-sm" *ngIf="!last"></i>
+              <i class="ph ph-caret-right text-xs" *ngIf="!last"></i>
             </span>
-            <span *ngIf="taskAncestors.length === 0" class="font-bold">Elemento Raíz</span>
+            <span *ngIf="taskAncestors.length === 0" class="font-semibold text-sm">Elemento Raíz</span>
           </div>
-          <h1 class="text-3xl md:text-5xl font-extrabold m-0 text-color flex align-items-center gap-3 tracking-tight">
+          <h1 class="text-xl md:text-2xl font-extrabold m-0 text-color tracking-tight">
             {{ task.title }}
           </h1>
         </div>
       </div>
-      <div class="flex align-items-center gap-3 flex-wrap w-full md:w-auto z-1 justify-content-end">
+
+      <div class="flex align-items-center gap-2 flex-wrap w-full md:w-auto z-1 justify-content-end">
         <p-tag [value]="task.state?.state || 'N/A'" [severity]="getStateSeverity(task.state?.state)"
-          styleClass="font-black text-lg px-4 py-3 border-round-xl shadow-2 uppercase tracking-wide"></p-tag>
+               styleClass="font-bold text-sm px-3 py-1 border-round-xl shadow-1 uppercase tracking-wide"></p-tag>
 
         <!-- Acciones Developer -->
         <ng-container *ngIf="roleType === 'developer'">
           <button *ngIf="task.state?.state?.toLowerCase() === 'asignado'" pButton label="Ejecutar"
-            icon="ph-bold ph-play"
-            class="p-button-success border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-            (click)="updateTaskState(2)" [loading]="updatingState"></button>
+                  icon="ph-bold ph-play"
+                  class="p-button-success border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                  (click)="updateTaskState(2)" [loading]="updatingState"></button>
           <button *ngIf="task.state?.state?.toLowerCase() === 'ejecutando'" pButton label="Terminar"
-            icon="ph-bold ph-check"
-            class="p-button-success border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-            (click)="showStateCommentDialog('Terminar Tarea', 'Opcional: Añade un comentario sobre la finalización', 4, false)"
-            [loading]="updatingState"></button>
+                  icon="ph-bold ph-check"
+                  class="p-button-success border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                  (click)="showStateCommentDialog('Terminar Tarea', 'Opcional: Añade un comentario sobre la finalización', 4, false)"
+                  [loading]="updatingState"></button>
         </ng-container>
 
         <!-- Acciones Tester -->
         <ng-container *ngIf="roleType === 'tester'">
-          <ng-container
-            *ngIf="task.state?.state?.toLowerCase() === 'terminado' || task.state?.state?.toLowerCase() === 'terminada'">
+          <ng-container *ngIf="task.state?.state?.toLowerCase() === 'terminado' || task.state?.state?.toLowerCase() === 'terminada'">
             <button pButton label="Revisar" icon="ph-bold ph-magnifying-glass"
-              class="p-button-warning border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-              (click)="updateTaskState(6)" [loading]="updatingState"></button>
+                    class="p-button-warning border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                    (click)="updateTaskState(6)" [loading]="updatingState"></button>
           </ng-container>
-          <ng-container
-            *ngIf="task.state?.state?.toLowerCase() === 'en revisión' || task.state?.state?.toLowerCase() === 'en revision'">
+          <ng-container *ngIf="task.state?.state?.toLowerCase() === 'en revisión' || task.state?.state?.toLowerCase() === 'en revision'">
             <button pButton label="Devolver" icon="ph-bold ph-arrow-u-down-left"
-              class="p-button-danger border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-              (click)="showStateCommentDialog('Devolver Tarea', 'Obligatorio: Añade un comentario explicando la devolución', 2, true)"
-              [loading]="updatingState"></button>
+                    class="p-button-danger border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                    (click)="showStateCommentDialog('Devolver Tarea', 'Obligatorio: Añade un comentario explicando la devolución', 2, true)"
+                    [loading]="updatingState"></button>
             <button pButton label="Finalizar" icon="ph-bold ph-check-circle"
-              class="p-button-success border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-              (click)="updateTaskState(7)" [loading]="updatingState"></button>
+                    class="p-button-success border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                    (click)="updateTaskState(7)" [loading]="updatingState"></button>
           </ng-container>
         </ng-container>
 
         <!-- Acciones Administrator/Leader -->
         <ng-container *ngIf="roleType === 'administrator' || roleType === 'leader'">
           <button *ngIf="task.state?.state?.toLowerCase() === 'suspendido'" pButton label="Ejecutar"
-            icon="ph-bold ph-play"
-            class="p-button-success border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-            (click)="updateTaskState(2)" [loading]="updatingState"></button>
+                  icon="ph-bold ph-play"
+                  class="p-button-success border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                  (click)="updateTaskState(2)" [loading]="updatingState"></button>
           <button *ngIf="task.state?.state?.toLowerCase() !== 'suspendido'" pButton label="Suspender"
-            icon="ph-bold ph-pause"
-            class="p-button-warning border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-            (click)="confirmSuspendTask()" [loading]="updatingState"></button>
+                  icon="ph-bold ph-pause"
+                  class="p-button-warning border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                  (click)="confirmSuspendTask()" [loading]="updatingState"></button>
         </ng-container>
 
-        <button *ngIf="canManageTasks" pButton label="Editar Tarea" icon="ph-bold ph-pencil-simple"
-          class="p-button-primary border-round-xl shadow-3 p-button-lg font-bold px-5 transition-transform hover:scale-105"
-          (click)="editTask(task?.id)" [disabled]="!task || loading"></button>
+        <button *ngIf="canManageTasks" pButton label="Editar" icon="ph-bold ph-pencil-simple"
+                class="p-button-primary border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
+                (click)="editTask(task?.id)" [disabled]="!task || loading"></button>
       </div>
     </div>
 
-    <!-- Quick Info Cards Row -->
-    <div class="flex flex-column lg:flex-row gap-5 w-full">
+    <!-- Quick Info Cards Row - usando FLEX en lugar de grid -->
+    <div class="flex flex-wrap gap-3">
       <!-- Involucrados -->
-      <div
-        class="surface-card p-5 border-round-2xl shadow-2 flex-1 flex flex-column gap-4 border-1 surface-border hover:shadow-4 transition-all w-full">
-        <h3 class="text-sm font-black text-color-secondary uppercase tracking-widest m-0 flex align-items-center gap-2">
-          <i class="ph-bold ph-users text-xl text-primary"></i> Equipo Involucrado
-        </h3>
-
-        <div class="flex flex-column gap-3">
-          <div
-            class="flex flex-column md:flex-row justify-content-between md:align-items-center surface-ground p-4 border-round-xl border-1 surface-border gap-3">
-            <span class="text-color-secondary font-bold text-lg flex align-items-center"><i
-                class="ph-bold ph-user-circle mr-2 text-xl"></i>Responsable</span>
-            <div *ngIf="task.assigned_to" class="flex align-items-center gap-3 text-right">
-              <div class="flex flex-column align-items-end">
-                <span class="font-bold text-color text-xl">{{ task.assigned_to.name }}</span>
-                <span *ngIf="task.assigned_to?.role_name"
-                  class="text-sm bg-indigo-50 text-indigo-700 px-3 py-1 border-round-md font-bold mt-1 shadow-1">
-                  {{ getRoleNameInSpanish(task.assigned_to.role_name) }}
-                </span>
+      <div class="flex-1 min-w-[200px]">
+        <div class="surface-card p-3 border-round-2xl shadow-2 h-full border-1 surface-border">
+          <h3 class="text-xs font-bold text-color-secondary uppercase tracking-wider flex align-items-center gap-1 m-0 mb-2">
+            <i class="ph-bold ph-users text-primary text-sm"></i> Equipo
+          </h3>
+          <div class="flex flex-column gap-2">
+            <div class="flex justify-content-between align-items-center surface-ground p-2 border-round-xl border-1 surface-border">
+              <span class="text-color-secondary font-semibold text-sm flex align-items-center gap-1">
+                <i class="ph-bold ph-user-circle text-sm"></i>Responsable
+              </span>
+              <div *ngIf="task.assigned_to" class="flex align-items-center gap-2">
+                <span class="font-semibold text-color text-sm">{{ task.assigned_to.name }}</span>
+                <p-avatar [label]="getUserInitials(task.assigned_to.name)" size="normal" shape="circle"
+                          [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'width':'32px', 'height':'32px', 'font-size':'0.9rem'}"></p-avatar>
               </div>
-              <p-avatar [label]="getUserInitials(task.assigned_to.name)" size="large" shape="circle"
-                [style]="{'background': 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', 'color': '#ffffff', 'font-weight':'bold', 'box-shadow': '0 4px 6px -1px rgba(0, 0, 0, 0.1)', 'width':'50px', 'height':'50px', 'font-size':'1.2rem'}"></p-avatar>
+              <div *ngIf="!task.assigned_to" class="flex align-items-center gap-1 text-sm text-400">
+                <i class="ph ph-user-minus"></i> Sin asignar
+              </div>
             </div>
-            <div *ngIf="!task.assigned_to"
-              class="flex align-items-center gap-2 text-400 font-bold bg-gray-50 px-4 py-3 border-round-lg text-lg">
-              <i class="ph ph-user-minus text-2xl"></i> Sin asignar
-            </div>
-          </div>
-
-          <div
-            class="flex flex-column md:flex-row justify-content-between md:align-items-center p-4 border-round-xl surface-ground border-1 surface-border gap-3">
-            <span class="text-color-secondary font-bold text-lg flex align-items-center"><i
-                class="ph-bold ph-pen-nib mr-2 text-xl"></i>Creador</span>
-            <div *ngIf="task.created_by" class="flex align-items-center gap-3">
-              <span class="font-bold text-color text-xl">{{ task.created_by.name }}</span>
-              <p-avatar [label]="getUserInitials(task.created_by.name)" shape="circle"
-                [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'font-weight':'bold', 'box-shadow': '0 4px 6px -1px rgba(0, 0, 0, 0.1)', 'width':'40px', 'height':'40px', 'font-size':'1rem'}"></p-avatar>
+            <div class="flex justify-content-between align-items-center surface-ground p-2 border-round-xl border-1 surface-border">
+              <span class="text-color-secondary font-semibold text-sm flex align-items-center gap-1">
+                <i class="ph-bold ph-pen-nib text-sm"></i>Creador
+              </span>
+              <div *ngIf="task.created_by" class="flex align-items-center gap-2">
+                <span class="font-semibold text-color text-sm">{{ task.created_by.name }}</span>
+                <p-avatar [label]="getUserInitials(task.created_by.name)" shape="circle"
+                          [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 'color': '#ffffff', 'width':'28px', 'height':'28px', 'font-size':'0.8rem'}"></p-avatar>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Tiempos -->
-      <div
-        class="surface-card p-5 border-round-2xl shadow-2 flex-1 flex flex-column gap-4 border-1 surface-border hover:shadow-4 transition-all w-full">
-        <h3 class="text-sm font-black text-color-secondary uppercase tracking-widest m-0 flex align-items-center gap-2">
-          <i class="ph-bold ph-calendar-blank text-xl text-primary"></i> Cronograma
-        </h3>
-
-        <div class="flex flex-column gap-3">
-          <div
-            class="flex justify-content-between align-items-center surface-ground p-4 border-round-xl border-1 surface-border">
-            <span class="text-color-secondary font-bold text-lg flex align-items-center"><i
-                class="ph-bold ph-play-circle mr-2 text-xl"></i>Inicio</span>
-            <span class="font-bold text-color text-xl bg-surface-0 px-4 py-2 border-round-lg shadow-1">
-              {{ task.start_date ? (task.start_date | date:'mediumDate') : 'No definida' }}
-            </span>
-          </div>
-          <div
-            class="flex justify-content-between align-items-center surface-ground p-4 border-round-xl border-1 surface-border flex-wrap gap-2"
-            [ngClass]="{'border-red-500 bg-red-50': isOverdue(task.due_date)}">
-            <span class="text-color-secondary font-bold text-lg flex align-items-center"><i
-                class="ph-bold ph-flag-checkered mr-2 text-xl"
-                [ngClass]="{'text-red-500': isOverdue(task.due_date)}"></i>Vencimiento</span>
-            <div class="flex align-items-center gap-3">
-              <span class="font-bold text-xl px-4 py-2 border-round-lg shadow-1"
-                [ngClass]="isOverdue(task.due_date) ? 'text-red-600 surface-card' : 'text-color bg-surface-0'">
-                {{ task.due_date ? (task.due_date | date:'mediumDate') : 'No definida' }}
-              </span>
-              <p-tag *ngIf="isOverdue(task.due_date)" value="Vencida" severity="danger"
-                styleClass="font-bold text-lg px-3 py-2 shadow-1"></p-tag>
+      <div class="flex-1 min-w-[200px]">
+        <div class="surface-card p-3 border-round-2xl shadow-2 h-full border-1 surface-border">
+          <h3 class="text-xs font-bold text-color-secondary uppercase tracking-wider flex align-items-center gap-1 m-0 mb-2">
+            <i class="ph-bold ph-calendar-blank text-primary text-sm"></i> Cronograma
+          </h3>
+          <div class="flex flex-column gap-2">
+            <div class="flex justify-content-between align-items-center surface-ground p-2 border-round-xl border-1 surface-border">
+              <span class="text-color-secondary font-semibold text-sm"><i class="ph-bold ph-play-circle text-sm mr-1"></i>Inicio</span>
+              <span class="font-semibold text-color text-sm">{{ task.start_date ? (task.start_date | date:'shortDate') : 'No definida' }}</span>
+            </div>
+            <div class="flex justify-content-between align-items-center surface-ground p-2 border-round-xl border-1 surface-border"
+                 [ngClass]="{'border-red-500 bg-red-50': isOverdue(task.due_date)}">
+              <span class="text-color-secondary font-semibold text-sm"><i class="ph-bold ph-flag-checkered text-sm mr-1"></i>Vencimiento</span>
+              <div class="flex align-items-center gap-2">
+                <span class="font-semibold text-sm" [ngClass]="isOverdue(task.due_date) ? 'text-red-600' : 'text-color'">
+                  {{ task.due_date ? (task.due_date | date:'shortDate') : 'No definida' }}
+                </span>
+                <p-tag *ngIf="isOverdue(task.due_date)" value="Vencida" severity="danger" styleClass="text-xs px-2 py-0"></p-tag>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Especificaciones -->
-      <div
-        class="surface-card p-5 border-round-2xl shadow-2 flex-1 flex flex-column gap-4 border-1 surface-border hover:shadow-4 transition-all w-full">
-        <h3 class="text-sm font-black text-color-secondary uppercase tracking-widest m-0 flex align-items-center gap-2">
-          <i class="ph-bold ph-info text-xl text-primary"></i> Especificaciones
-        </h3>
-
-        <div class="flex flex-column gap-3">
-          <div
-            class="flex justify-content-between align-items-center surface-ground p-4 border-round-xl border-1 surface-border">
-            <span class="text-color-secondary font-bold text-lg flex align-items-center"><i
-                class="ph-bold ph-hash mr-2 text-xl"></i>Proyecto ID</span>
-            <span class="font-black text-white bg-indigo-600 px-4 py-2 border-round-lg shadow-2 text-xl">#{{
-              task.project_id }}</span>
-          </div>
-          <div
-            class="flex justify-content-between align-items-center surface-ground p-4 border-round-xl border-1 surface-border">
-            <span class="text-color-secondary font-bold text-lg flex align-items-center"><i
-                class="ph-bold ph-tag mr-2 text-xl"></i>Prioridad</span>
-            <p-tag [value]="getPriorityInfo(task.priority).label" [severity]="getPriorityInfo(task.priority).severity"
-              styleClass="font-bold text-xl px-5 py-2 border-round-lg shadow-1 uppercase tracking-wide"></p-tag>
+      <div class="flex-1 min-w-[200px]">
+        <div class="surface-card p-3 border-round-2xl shadow-2 h-full border-1 surface-border">
+          <h3 class="text-xs font-bold text-color-secondary uppercase tracking-wider flex align-items-center gap-1 m-0 mb-2">
+            <i class="ph-bold ph-info text-primary text-sm"></i> Especificaciones
+          </h3>
+          <div class="flex flex-column gap-2">
+            <div class="flex justify-content-between align-items-center surface-ground p-2 border-round-xl border-1 surface-border">
+              <span class="text-color-secondary font-semibold text-sm"><i class="ph-bold ph-hash text-sm mr-1"></i>Proyecto</span>
+              <span class="font-bold text-white bg-indigo-600 px-2 py-1 border-round-lg text-sm">#{{ task.project_id }}</span>
+            </div>
+            <div class="flex justify-content-between align-items-center surface-ground p-2 border-round-xl border-1 surface-border">
+              <span class="text-color-secondary font-semibold text-sm"><i class="ph-bold ph-tag text-sm mr-1"></i>Prioridad</span>
+              <p-tag [value]="getPriorityInfo(task.priority).label" [severity]="getPriorityInfo(task.priority).severity"
+                     styleClass="font-bold text-sm px-3 py-1 border-round-lg uppercase"></p-tag>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- MAIN CONTENT COLUMN -->
-    <div class="flex flex-column gap-5 w-full">
+    <!-- MAIN CONTENT - compacto -->
+    <div class="flex flex-column gap-3">
       <!-- Origen y Descripción -->
-      <div class="surface-card p-5 md:p-6 border-round-2xl shadow-2 border-1 surface-border relative overflow-hidden">
-        <div
-          class="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-4 mb-5">
-          <div class="flex align-items-center gap-4">
-            <div
-              class="w-5rem h-5rem flex align-items-center justify-content-center border-circle bg-indigo-50 border-1 border-indigo-100 shadow-1 flex-shrink-0">
-              <i class="ph-bold ph-folder-open text-indigo-600 text-4xl"></i>
+      <div class="surface-card p-3 md:p-4 border-round-2xl shadow-2 border-1 surface-border">
+        <div class="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3 mb-3">
+          <div class="flex align-items-center gap-3">
+            <div class="w-8 h-8 flex align-items-center justify-content-center border-circle shadow-sm">
+              <i class="ph-bold ph-folder-open text-indigo-600 text-lg"></i>
             </div>
             <div>
-              <h3 class="text-sm font-black text-color-secondary uppercase tracking-widest mb-1 m-0">Categoría</h3>
-              <h2 class="text-3xl font-extrabold text-indigo-700 m-0">{{ task.category?.name || 'General' }}</h2>
+              <h3 class="text-xs font-bold text-color-secondary uppercase mb-0">Categoría</h3>
+              <h2 class="text-base font-extrabold text-indigo-700 m-0">{{ task.category?.name || 'General' }}</h2>
             </div>
           </div>
 
-          <div *ngIf="task.parent"
-            class="bg-indigo-50 border-round-xl p-3 border-1 border-indigo-200 cursor-pointer hover:bg-indigo-100 transition-colors shadow-1 flex align-items-center gap-3 w-full md:w-auto"
-            (click)="navigateToTask(task.parent!.id)">
-            <div
-              class="surface-card border-circle w-3rem h-3rem flex align-items-center justify-content-center shadow-1 flex-shrink-0">
-              <i class="ph-bold ph-arrow-u-up-left text-indigo-600 text-xl"></i>
-            </div>
-            <div class="flex flex-column flex-1 min-w-0">
-              <span class="text-xs font-bold text-indigo-500 uppercase">Tarea Padre</span>
-              <span
-                class="font-bold text-indigo-900 text-lg text-overflow-ellipsis white-space-nowrap overflow-hidden pr-3">{{
-                task.parent.title }}</span>
-            </div>
-          </div>
-          <div *ngIf="!task.parent"
-            class="bg-surface-50 border-round-xl p-3 border-1 surface-border flex align-items-center gap-3">
-            <div
-              class="surface-card border-circle w-3rem h-3rem flex align-items-center justify-content-center shadow-1 flex-shrink-0">
-              <i class="ph-bold ph-crown text-400 text-xl"></i>
-            </div>
-            <div class="flex flex-column">
-              <span class="text-xs font-bold text-500 uppercase">Jerarquía</span>
-              <span class="font-bold text-700 text-lg">Tarea Raíz</span>
+          <div *ngIf="task.parent" class=" border-round-xl p-2 border-1 border-indigo-200 cursor-pointer hover:bg-indigo-100 transition-colors flex align-items-center gap-2"
+               (click)="navigateToTask(task.parent!.id)">
+            <i class="ph-bold ph-arrow-u-up-left text-indigo-600 text-sm"></i>
+            <div>
+              <span class="text-xs font-bold text-indigo-500 uppercase">Padre</span>
+              <p class="font-bold text-indigo-900 text-sm m-0">{{ task.parent.title | truncate:25 }}</p>
             </div>
           </div>
         </div>
 
-        <p-divider styleClass="my-5"></p-divider>
-
-        <h3
-          class="text-xl font-black text-color-secondary uppercase tracking-widest mb-4 flex align-items-center gap-2">
-          <i class="ph-bold ph-text-align-left text-3xl text-primary"></i> Descripción Detallada
+        <h3 class="text-sm font-bold text-color-secondary uppercase tracking-wide mb-2 flex align-items-center gap-1">
+          <i class="ph-bold ph-text-align-left text-primary text-base"></i> Descripción
         </h3>
-        <div class="surface-ground p-5 md:p-6 border-round-2xl border-1 surface-border shadow-1">
-          <p class="text-color line-height-4 white-space-pre-wrap m-0 font-medium text-xl w-full"
-            style="overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; overflow-x: auto;">
+        <div class="surface-ground p-3 border-round-2xl border-1 surface-border">
+          <p class="text-color line-height-3 whitespace-pre-wrap m-0 text-sm">
             {{ task.description || 'Sin descripción provista.' }}
           </p>
         </div>
       </div>
 
-      <!-- SUBTAREAS -->
-      <div class="surface-card p-5 md:p-6 border-round-2xl shadow-2 border-1 surface-border relative">
-        <div
-          class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between mb-5 pb-4 border-bottom-1 surface-border gap-4">
-          <div class="flex align-items-center gap-4">
-            <div
-              class="w-5rem h-5rem flex align-items-center justify-content-center border-circle bg-primary-50 border-1 border-primary-100 shadow-1 flex-shrink-0">
-              <i class="ph-bold ph-tree-structure text-primary text-4xl"></i>
+      <!-- SUBTAREAS - compactas -->
+      <div class="surface-card p-3 md:p-4 border-round-2xl shadow-2 border-1 surface-border">
+        <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom-1 surface-border">
+          <div class="flex align-items-center gap-3">
+            <div class="w-8 h-8 flex align-items-center justify-content-center border-circle shadow-sm">
+              <i class="ph-bold ph-tree-structure text-primary text-lg"></i>
             </div>
             <div>
-              <h2 class="text-4xl font-extrabold text-color m-0">Desglose de Subtareas</h2>
-              <p class="text-color-secondary font-medium m-0 mt-2 text-xl">Estructura jerárquica de elementos de trabajo
-              </p>
+              <h2 class="text-lg font-extrabold text-color m-0">Subtareas</h2>
+              <p class="text-color-secondary text-xs m-0">{{ getTotalChildrenCount(task) }} elementos</p>
             </div>
           </div>
-          <div
-            class="flex align-items-center gap-4 bg-surface-50 p-3 border-round-xl border-1 surface-border w-full md:w-auto mt-4 md:mt-0">
-            <span class="font-bold text-color-secondary text-xl px-2"><span class="text-primary font-black">{{
-                getTotalChildrenCount(task) }}</span> elementos</span>
-            <button *ngIf="canManageTasks" pButton label="Nueva Subtarea" icon="ph-bold ph-plus"
-              class="p-button-primary border-round-xl shadow-2 p-button-lg px-4 font-bold"
-              (click)="createTask(1)"></button>
-          </div>
+          <button *ngIf="canManageTasks" pButton label="Agregar" icon="ph-bold ph-plus"
+                  class="p-button-primary border-round-xl p-button-sm font-bold text-sm px-3"
+                  (click)="createTask(1)"></button>
         </div>
 
-        <div *ngIf="task.children && task.children.length > 0" class="border-round-2xl">
+        <div *ngIf="task.children && task.children.length > 0" class="border-round-xl">
           <p-tree [value]="treeData" [loading]="loading" class="w-full bg-transparent border-none p-0"
-            styleClass="border-none w-full p-0">
+                  styleClass="border-none w-full p-0">
             <ng-template let-node pTemplate="default">
-              <div
-                class="flex flex-column xl:flex-row xl:align-items-center justify-content-between w-full p-4 md:p-5 surface-ground border-round-2xl mb-4 hover:shadow-4 transition-all cursor-pointer border-2 surface-border hover:border-primary"
-                (click)="navigateToTask(node.data.id)">
-
-                <div class="flex align-items-center gap-4 mb-4 xl:mb-0 w-full xl:w-auto overflow-hidden">
-                  <div
-                    class="w-4rem h-4rem flex align-items-center justify-content-center border-circle surface-card shadow-2 flex-shrink-0">
-                    <i class="ph-bold text-3xl"
-                      [ngClass]="node.children?.length ? 'ph-folder-open text-indigo-500' : 'ph-file-text text-blue-500'"></i>
+              <div class="flex flex-col xl:flex-row xl:items-center justify-between w-full p-2 surface-ground border-round-xl mb-2 hover:shadow-md transition-all cursor-pointer border surface-border hover:border-primary"
+                   (click)="navigateToTask(node.data.id)">
+                <div class="flex items-center gap-2 mb-2 xl:mb-0 flex-1 min-w-0">
+                  <div class="w-7 h-7 flex items-center justify-content-center border-circle surface-card shadow-sm flex-shrink-0">
+                    <i class="ph-bold text-sm" [ngClass]="node.children?.length ? 'ph-folder-open text-indigo-500' : 'ph-file-text text-blue-500'"></i>
                   </div>
-                  <div class="flex flex-column flex-1 min-w-0 pr-3">
-                    <span
-                      class="font-extrabold text-color text-2xl mb-2 text-overflow-ellipsis white-space-nowrap overflow-hidden">{{
-                      node.label }}</span>
-                    <div class="flex align-items-center gap-3 flex-wrap">
-                      <span
-                        class="text-md surface-card text-color-secondary font-bold px-3 py-1 border-round-md shadow-1 border-1 surface-border flex align-items-center gap-1">
-                        <i class="ph-bold ph-tag"></i> {{ node.data.type?.type || 'Sin tipo' }}
+                  <div class="flex-1 min-w-0">
+                    <span class="font-bold text-color text-sm block truncate">{{ node.label }}</span>
+                    <div class="flex gap-2 mt-1">
+                      <span class="text-xs surface-card text-color-secondary px-2 py-0 border-round-md border-1 surface-border">
+                        {{ node.data.type?.type || 'Sin tipo' }}
                       </span>
                       <p-tag [value]="node.data.state?.state" [severity]="getStateSeverity(node.data.state?.state)"
-                        styleClass="text-md font-bold px-3 py-1 shadow-1 border-round-md tracking-wide uppercase"></p-tag>
+                             styleClass="text-xs px-2 py-0"></p-tag>
                     </div>
                   </div>
                 </div>
-
-                <div
-                  class="flex align-items-center gap-4 flex-wrap w-full xl:w-auto xl:justify-content-end bg-surface-50 xl:bg-transparent p-4 xl:p-0 border-round-xl xl:border-none border-1 surface-border xl:border-transparent">
-                  <span
-                    class="flex align-items-center gap-2 text-lg font-bold surface-card px-4 py-2 border-round-lg shadow-1 border-1 surface-border"
-                    [ngClass]="getPriorityColor(node.data.priority)">
-                    <i [class]="getPriorityIcon(node.data.priority) + ' text-xl'"></i>
+                <div class="flex items-center gap-2 justify-end">
+                  <span class="flex items-center gap-1 text-xs font-semibold surface-card px-2 py-1 border-round-lg shadow-sm">
+                    <i [class]="getPriorityIcon(node.data.priority) + ' text-xs'"></i>
                     {{ getPriorityInfo(node.data.priority).label }}
                   </span>
-
-                  <div
-                    class="flex align-items-center gap-2 text-lg text-color-secondary surface-card px-4 py-2 border-round-lg shadow-1 font-bold border-1 surface-border">
-                    <i class="ph-bold ph-calendar-blank text-xl"></i>
-                    <span>{{ getDisplayDate(node.data) | date:'mediumDate' }}</span>
+                  <div class="flex items-center gap-1 text-xs text-color-secondary">
+                    <i class="ph-bold ph-calendar-blank text-xs"></i>
+                    <span>{{ getDisplayDate(node.data) | date:'shortDate' }}</span>
                   </div>
-
                   <p-avatar *ngIf="node.data.assigned_to" [label]="getUserInitials(node.data.assigned_to.name)"
-                    shape="circle" pTooltip="{{node.data.assigned_to.name}}" tooltipPosition="top"
-                    [style]="{'background': 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', 'color': '#fff', 'font-size': '1.1rem', 'font-weight': 'bold', 'width':'45px','height':'45px', 'box-shadow': '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}"></p-avatar>
+                            shape="circle" [style]="{'width':'28px','height':'28px', 'font-size':'0.8rem', 'background': '#6366f1'}" pTooltip="{{node.data.assigned_to.name}}"></p-avatar>
                 </div>
               </div>
             </ng-template>
           </p-tree>
         </div>
 
-        <div *ngIf="!task.children || task.children.length === 0"
-          class="flex flex-column align-items-center justify-content-center py-8 md:py-10 surface-ground border-round-2xl border-dashed border-3 border-400 mt-4">
-          <div class="surface-card p-5 border-circle shadow-2 mb-5">
-            <i class="ph-bold ph-tree-structure text-7xl text-400 block"></i>
-          </div>
-          <h4 class="text-4xl font-extrabold text-color mb-3">No hay subtareas</h4>
-          <p class="text-color-secondary mb-0 text-2xl font-medium">Esta tarea se encuentra en el nivel más bajo de la
-            jerarquía.</p>
+        <div *ngIf="!task.children || task.children.length === 0" class="text-center py-4 surface-ground border-round-2xl border-dashed border-2 border-300">
+          <i class="ph-bold ph-tree-structure text-3xl text-400 block mb-2"></i>
+          <p class="text-color-secondary text-sm mb-0">No hay subtareas</p>
         </div>
       </div>
 
-      <!-- COMENTARIOS -->
-      <div class="surface-card p-5 md:p-6 border-round-2xl shadow-2 border-1 surface-border mt-3">
-        <div
-          class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between mb-6 pb-5 border-bottom-1 surface-border gap-4">
-          <div class="flex align-items-center gap-4">
-            <div
-              class="w-5rem h-5rem flex align-items-center justify-content-center border-circle bg-blue-50 border-1 border-blue-100 shadow-1 flex-shrink-0">
-              <i class="ph-bold ph-chats text-blue-500 text-4xl"></i>
+      <!-- COMENTARIOS - compactos -->
+      <div class="surface-card p-3 md:p-4 border-round-2xl shadow-2 border-1 surface-border">
+        <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-3 mb-4 pb-2 border-bottom-1 surface-border">
+          <div class="flex align-items-center gap-3">
+            <div class="w-8 h-8 flex align-items-center justify-content-center border-circle shadow-sm">
+              <i class="ph-bold ph-chats text-blue-500 text-lg"></i>
             </div>
             <div>
-              <h3 class="text-4xl font-extrabold text-color m-0">Conversación y Anotaciones</h3>
-              <p class="text-color-secondary font-medium m-0 mt-2 text-xl">Colaboración del equipo de trabajo</p>
+              <h3 class="text-lg font-extrabold text-color m-0">Comentarios</h3>
+              <p class="text-color-secondary text-xs m-0">{{ comments.length }} aportes</p>
             </div>
-          </div>
-          <div
-            class="bg-blue-50 border-1 border-blue-200 text-blue-800 font-black px-5 py-3 border-round-xl text-2xl shadow-1">
-            {{ comments.length }} aportes
           </div>
         </div>
 
-        <!-- Caja de nuevo comentario -->
-        <div
-          class="flex flex-column md:flex-row gap-5 mb-7 p-5 md:p-6 surface-ground border-round-2xl border-2 surface-border shadow-1">
-          <div class="hidden md:block">
-            <p-avatar [label]="getUserInitials('Usuario')" size="xlarge" shape="circle"
-              [style]="{'background': 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', 'color': '#ffffff', 'font-weight': 'bold', 'box-shadow': '0 4px 6px -1px rgba(0, 0, 0, 0.1)', 'width':'60px', 'height':'60px', 'font-size':'1.3rem'}"></p-avatar>
-          </div>
-          <div class="flex-1 w-full">
+        <!-- Caja de nuevo comentario compacta -->
+        <div class="flex gap-3 mb-4 p-3 surface-ground border-round-2xl border surface-border">
+          <p-avatar [label]="getUserInitials('Usuario')" size="normal" shape="circle"
+                    [style]="{'background': '#3b82f6', 'width':'36px', 'height':'36px', 'font-size':'0.9rem'}" class="flex-shrink-0 hidden md:block"></p-avatar>
+          <div class="flex-1">
             <textarea pInputTextarea [(ngModel)]="newComment"
-              placeholder="Escribe una actualización, nota técnica o comentario importante..." rows="4"
-              class="w-full p-4 md:p-5 border-round-xl surface-white border-2 surface-border hover:border-primary focus:border-primary focus:shadow-3 transition-all text-2xl font-medium resize-y"
-              [disabled]="submittingComment" style="min-height: 140px;"></textarea>
+                      placeholder="Escribe un comentario..." rows="2"
+                      class="w-full p-2 border-round-xl border surface-border focus:border-primary text-sm resize-none"
+                      [disabled]="submittingComment"></textarea>
 
-            <!-- Archivo seleccionado (Previa) -->
-            <div *ngIf="selectedFile"
-              class="mt-4 p-4 surface-card border-round-xl shadow-2 flex align-items-center justify-content-between border-1 border-blue-200 bg-blue-50">
-              <div class="flex align-items-center gap-4">
-                <div
-                  class="w-4rem h-4rem flex align-items-center justify-content-center border-circle surface-card shadow-1 inline-flex">
-                  <i class="ph-bold ph-file text-blue-500 text-3xl"></i>
-                </div>
-                <div class="flex flex-column">
-                  <span class="font-bold text-color text-xl">{{ selectedFile.name }}</span>
-                  <span
-                    class="text-md font-bold text-color-secondary mt-2 surface-card px-3 py-1 border-round-lg w-max shadow-1 border-1 surface-border">
-                    {{ (selectedFile.size / 1048576) | number:'1.1-2' }} MB
+            <div *ngIf="selectedFile" class="mt-2 p-2 surface-card border-round-xl flex align-items-center justify-content-between border border-blue-200 bg-blue-50 text-sm">
+              <div class="flex items-center gap-2">
+                <i class="ph-bold ph-file text-blue-500"></i>
+                <span class="font-semibold text-sm">{{ selectedFile.name }}</span>
+                <span class="text-xs text-color-secondary">{{ (selectedFile.size / 1048576) | number:'1.1-2' }} MB</span>
+              </div>
+              <button pButton icon="ph-bold ph-x" class="p-button-rounded p-button-text p-button-sm p-button-danger" (click)="removeSelectedFile()"></button>
+            </div>
+
+            <div class="flex justify-content-between align-items-center mt-2 gap-2">
+              <div>
+                <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none">
+                <button pButton icon="ph-bold ph-paperclip" label="Adjuntar"
+                        class="p-button-outlined p-button-secondary p-button-sm font-bold text-sm"
+                        (click)="fileInput.click()" [disabled]="submittingComment"></button>
+              </div>
+              <button pButton label="Publicar" icon="ph-bold ph-paper-plane-right"
+                      [disabled]="(!newComment.trim() && !selectedFile) || submittingComment" [loading]="submittingComment"
+                      (click)="submitComment()"
+                      class="p-button-primary p-button-sm font-bold text-sm"></button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="loadingComments" class="flex justify-content-center py-4">
+          <p-progressSpinner styleClass="w-8 h-8" strokeWidth="4"></p-progressSpinner>
+        </div>
+
+        <div *ngIf="!loadingComments && comments.length === 0" class="text-center py-4 bg-surface-50 border-round-2xl border-dashed border surface-border">
+          <i class="ph-bold ph-chat-teardrop text-3xl text-400 block mb-2"></i>
+          <p class="text-color-secondary text-sm mb-0">Sin comentarios</p>
+        </div>
+
+        <div *ngIf="!loadingComments && comments.length > 0" class="flex flex-column gap-3">
+          <div *ngFor="let comment of comments" class="flex gap-3 p-3 surface-ground border-round-2xl border surface-border">
+            <p-avatar [label]="getUserInitials(comment.createdBy?.name || 'Usuario')" size="normal" shape="circle"
+                      [style]="{'background': '#10b981', 'width':'32px', 'height':'32px', 'font-size':'0.8rem'}" class="flex-shrink-0"></p-avatar>
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap justify-content-between align-items-start gap-2 mb-1">
+                <div>
+                  <span class="font-bold text-color text-sm">{{ comment.createdBy?.name || 'Usuario' }}</span>
+                  <span *ngIf="comment.createdBy?.user_role?.type" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0 border-round-lg ml-2">
+                    {{ getRoleNameInSpanish(comment.createdBy?.user_role?.type) }}
                   </span>
                 </div>
+                <span class="text-xs text-color-secondary flex items-center gap-1">
+                  <i class="ph-bold ph-clock text-xs"></i> {{ comment.created_at ? (comment.created_at | date:'short') : '' }}
+                </span>
               </div>
-              <button pButton icon="ph-bold ph-x"
-                class="p-button-rounded p-button-danger p-button-text hover:bg-red-100 transition-colors p-button-lg"
-                (click)="removeSelectedFile()" pTooltip="Quitar archivo" tooltipPosition="left"></button>
-            </div>
+              <p class="text-color text-sm line-height-3 mb-2">{{ comment.description }}</p>
 
-            <div class="flex flex-column lg:flex-row justify-content-between align-items-center mt-5 gap-4">
-              <div class="w-full lg:w-auto">
-                <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none">
-                <button pButton icon="ph-bold ph-paperclip" label="Adjuntar Archivo"
-                  class="p-button-outlined text-blue-500 p-button-secondary font-bold border-round-xl p-button-lg w-full md:auto px-5 shadow-1 surface-card hover:bg-gray-50 transition-colors"
-                  (click)="fileInput.click()" [disabled]="submittingComment"></button>
-              </div>
-              <button pButton label="Publicar Nota" icon="ph-bold ph-paper-plane-right"
-                [disabled]="(!newComment.trim() && !selectedFile) || submittingComment" [loading]="submittingComment"
-                (click)="submitComment()"
-                class="p-button-primary border-round-xl p-button-lg px-7 font-black text-xl shadow-3 w-full lg:w-auto transition-transform hover:scale-105"
-                style="height: 3.5rem"></button>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="loadingComments" class="flex justify-content-center py-7">
-          <p-progressSpinner styleClass="w-6rem h-6rem" strokeWidth="4"></p-progressSpinner>
-        </div>
-
-        <div *ngIf="!loadingComments && comments.length === 0"
-          class="text-center py-8 bg-surface-50 border-round-2xl border-1 border-dashed surface-border">
-          <div class="inline-block surface-card border-circle p-6 mb-5 shadow-2 border-1 surface-border">
-            <i class="ph-bold ph-chat-teardrop text-7xl text-400 block"></i>
-          </div>
-          <h4 class="text-4xl font-extrabold text-color mb-3">Sin actividad reciente</h4>
-          <p class="text-color-secondary text-2xl font-medium">Sé el primero en aportar un comentario a esta tarea
-            colaborativa.</p>
-        </div>
-
-        <div *ngIf="!loadingComments && comments.length > 0" class="flex flex-column gap-6">
-          <div *ngFor="let comment of comments"
-            class="flex flex-column md:flex-row gap-5 p-5 md:p-6 surface-ground border-2 surface-border border-round-2xl hover:shadow-4 hover:border-primary-300 transition-all relative">
-
-            <div class="flex md:block align-items-center gap-4 mb-3 md:mb-0">
-              <p-avatar [label]="getUserInitials(comment.createdBy?.name || 'Usuario')" size="xlarge" shape="circle"
-                [style]="{'background': 'linear-gradient(135deg, #10b981 0%, #059669 100%)', 'color': '#ffffff', 'font-weight': 'bold', 'box-shadow': '0 4px 6px -1px rgba(0, 0, 0, 0.1)', 'width':'60px', 'height':'60px', 'font-size':'1.3rem'}"
-                class="flex-shrink-0 mt-1"></p-avatar>
-              <div class="md:hidden flex flex-column">
-                <span class="font-extrabold text-color text-2xl">{{ comment.createdBy?.name || 'Usuario' }}</span>
-                <span class="text-lg font-bold text-color-secondary">{{ comment.created_at ? (comment.created_at |
-                  date:'medium') : '' }}</span>
-              </div>
-            </div>
-
-            <div class="flex-1 w-full min-w-0">
-              <div class="flex flex-column md:flex-row md:align-items-center justify-content-between mb-4 gap-4">
-                <div class="flex flex-column md:flex-row md:align-items-center gap-4">
-                  <span class="font-extrabold text-color text-3xl hidden md:block">{{ comment.createdBy?.name ||
-                    'Usuario' }}</span>
-                  <div class="flex align-items-center gap-3 flex-wrap">
-                    <span *ngIf="comment.createdBy?.user_role?.type"
-                      class="text-md bg-indigo-100 text-indigo-800 px-4 py-2 border-round-lg font-bold shadow-1 border-1 border-indigo-200">
-                      {{ getRoleNameInSpanish(comment.createdBy?.user_role?.type) }}
-                    </span>
-                    <span
-                      class="text-lg font-bold text-color-secondary flex align-items-center gap-2 surface-card px-4 py-2 border-round-lg shadow-1 border-1 surface-border hidden md:flex">
-                      <i class="ph-bold ph-clock"></i> {{ comment.created_at ? (comment.created_at | date:'medium') : ''
-                      }}
-                    </span>
-                  </div>
-                </div>
-
-                <ng-container *ngIf="comment.createdBy?.id == currentUserId">
-                  <div class="absolute top-0 right-0 p-4 md:static md:p-0">
-                    <button pButton icon="ph-bold ph-dots-three-outline-vertical"
-                      class="p-button-rounded p-button-text p-button-lg text-color-secondary hover:surface-card hover:shadow-1 transition-all"
-                      (click)="menu.toggle($event)"></button>
-                    <p-menu #menu [model]="commentMenuItems[comment.id]" [popup]="true" appendTo="body"
-                      styleClass="w-15rem border-round-xl shadow-4 font-bold text-lg"></p-menu>
-                  </div>
-                </ng-container>
-              </div>
-
-              <div
-                class="text-color line-height-4 text-2xl white-space-pre-wrap surface-card p-5 md:p-6 border-round-2xl shadow-1 border-1 surface-border font-medium">
-                {{ comment.description }}
-              </div>
-
-              <!-- Archivos adjuntos -->
-              <div *ngIf="comment.meta?.attachments?.length" class="mt-5 flex flex-wrap gap-4">
-                <div *ngFor="let m of comment.meta?.attachments"
-                  class="surface-card p-4 border-round-xl shadow-1 flex align-items-center gap-4 border-1 surface-border hover:border-primary-300 transition-colors hover:shadow-3 w-full sm:w-auto">
-                  <div
-                    class="w-4rem h-4rem flex align-items-center justify-content-center border-circle bg-blue-50 border-1 border-blue-100 flex-shrink-0">
-                    <i class="ph-bold ph-file-text text-blue-600 text-3xl"></i>
-                  </div>
-                  <div class="flex flex-column mr-4 min-w-0">
-                    <span
-                      class="font-bold text-color text-xl text-overflow-ellipsis white-space-nowrap overflow-hidden max-w-15rem"
-                      [title]="m.name">{{ m.name }}</span>
-                    <span class="text-md font-bold text-color-secondary mt-1">{{ (m.size / 1048576) | number:'1.1-2' }}
-                      MB</span>
-                  </div>
-                  <a [href]="m.url" target="_blank"
-                    class="p-button p-button-rounded p-button-outlined p-button-primary ml-auto p-0 w-4rem h-4rem flex align-items-center justify-content-center flex-shrink-0 bg-primary-50 hover:bg-primary transition-colors hover:text-white text-decoration-none shadow-1"
-                    title="Descargar">
-                    <i class="ph-bold ph-download-simple text-2xl"></i>
+              <div *ngIf="comment.meta?.attachments?.length" class="flex flex-wrap gap-2 mt-2">
+                <div *ngFor="let m of comment.meta?.attachments" class="surface-card p-2 border-round-xl flex items-center gap-2 border surface-border text-sm">
+                  <i class="ph-bold ph-file-text text-blue-500"></i>
+                  <span class="font-semibold text-sm truncate max-w-32">{{ m.name }}</span>
+                  <a [href]="m.url" target="_blank" class="text-primary hover:text-primary-600">
+                    <i class="ph-bold ph-download-simple"></i>
                   </a>
                 </div>
               </div>
 
-              <div *ngIf="comment.incidence" class="mt-5 flex align-items-center">
-                <div
-                  class="flex align-items-center gap-3 px-5 py-3 bg-indigo-50 border-1 border-indigo-200 text-indigo-800 font-bold border-round-xl cursor-pointer hover:bg-indigo-100 shadow-1 transition-colors text-xl"
-                  (click)="navigateToTask(comment.incidence.id)">
-                  <i class="ph-bold ph-tag text-2xl"></i>
-                  <span>Referencia: {{ comment.incidence.name }}</span>
-                </div>
+              <div *ngIf="comment.incidence" class="mt-2 inline-flex align-items-center gap-2 px-3 py-1 border-round-xl cursor-pointer hover:bg-indigo-100 text-sm"
+                   (click)="navigateToTask(comment.incidence.id)">
+                <i class="ph-bold ph-tag text-indigo-600 text-xs"></i>
+                <span class="font-semibold text-indigo-700 text-xs">{{ comment.incidence.name }}</span>
               </div>
             </div>
           </div>
@@ -536,24 +385,24 @@
 
   <!-- Dialog for State Change Comment -->
   <p-dialog [(visible)]="showStateCommentDialogVisible" [header]="stateCommentDialogHeader" [modal]="true"
-    [style]="{width: '600px'}" styleClass="border-round-2xl overflow-hidden shadow-6">
-    <div class="flex flex-column gap-4 mt-4">
-      <div class="bg-blue-50 border-round-xl p-4 border-1 border-blue-100 flex gap-3 align-items-start shadow-1">
-        <i class="ph-bold ph-info text-blue-600 text-2xl mt-1 flex-shrink-0"></i>
-        <p class="m-0 text-blue-900 font-medium text-xl line-height-3">{{ stateCommentDialogDescription }}</p>
+            [style]="{width: '500px'}" styleClass="border-round-2xl">
+    <div class="flex flex-column gap-3">
+      <div class="bg-blue-50 border-round-xl p-3 border-1 border-blue-100 flex gap-2">
+        <i class="ph-bold ph-info text-blue-600 text-lg mt-0.5"></i>
+        <p class="m-0 text-blue-900 font-medium text-sm">{{ stateCommentDialogDescription }}</p>
       </div>
-      <textarea pInputTextarea [(ngModel)]="stateComment" rows="5"
-        class="w-full text-2xl p-4 border-round-xl border-2 surface-border focus:border-primary focus:shadow-3 transition-all"
-        placeholder="Escribe tu comentario detallado aquí..."></textarea>
+      <textarea pInputTextarea [(ngModel)]="stateComment" rows="4"
+                class="w-full p-3 border-round-xl border surface-border focus:border-primary text-sm"
+                placeholder="Escribe tu comentario..."></textarea>
     </div>
     <ng-template pTemplate="footer">
-      <div class="flex justify-content-end gap-4 pt-4 mt-2">
+      <div class="flex justify-content-end gap-2 pt-2">
         <button pButton label="Cancelar" icon="ph-bold ph-x"
-          class="p-button-text p-button-secondary font-bold p-button-lg px-5 text-xl"
-          (click)="showStateCommentDialogVisible = false"></button>
-        <button pButton label="Confirmar Acción" icon="ph-bold ph-check"
-          class="p-button-primary font-bold p-button-lg px-6 border-round-xl shadow-2 text-xl"
-          (click)="confirmStateWithComment()" [disabled]="stateCommentRequired && !stateComment.trim()"></button>
+                class="p-button-text p-button-secondary p-button-sm font-bold text-sm"
+                (click)="showStateCommentDialogVisible = false"></button>
+        <button pButton label="Confirmar" icon="ph-bold ph-check"
+                class="p-button-primary p-button-sm font-bold text-sm"
+                (click)="confirmStateWithComment()" [disabled]="stateCommentRequired && !stateComment.trim()"></button>
       </div>
     </ng-template>
   </p-dialog>
