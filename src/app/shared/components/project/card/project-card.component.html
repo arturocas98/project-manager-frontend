@@ -7,7 +7,7 @@
     <div class="flex align-items-start justify-content-between mb-3 gap-3">
       <div class="flex align-items-center gap-3 overflow-hidden">
         <p-avatar
-          [label]="(project.project_type?.charAt(0) || '?') | uppercase"
+          [label]="(project.project_type.charAt(0) || '?') | uppercase"
           shape="circle"
           size="xlarge"
           [styleClass]="'font-bold shadow-1 flex-shrink-0 ' + getProjectColor(project.id).iconBg + ' ' + getProjectColor(project.id).icon">
@@ -35,7 +35,7 @@
     <div class="flex flex-column gap-2 mb-4 mt-auto">
       <div class="flex align-items-center gap-2 text-sm overflow-hidden" [pTooltip]="getClientTooltip(project)" tooltipPosition="top">
         <i class="ph ph-buildings text-color-secondary text-lg flex-shrink-0"></i>
-        <span class="text-color font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ project.client?.Nombre || 'Sin cliente' }}</span>
+        <span class="text-color font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ project.client.Nombre || 'Sin cliente' }}</span>
       </div>
       <div class="flex align-items-center gap-2 text-sm overflow-hidden" *ngIf="project.administrator" pTooltip="Administrador" tooltipPosition="top">
         <i class="ph ph-user-circle text-color-secondary text-lg flex-shrink-0"></i>

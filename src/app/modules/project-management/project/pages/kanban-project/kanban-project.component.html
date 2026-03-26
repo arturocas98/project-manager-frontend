@@ -157,7 +157,7 @@
           <!-- Tarea: Metadatos Top -->
           <div class="flex align-items-center justify-content-between mb-2">
             <div class="flex align-items-center gap-1 text-xs font-bold text-gray-700">
-              <i [class]="getTypeIcon(task.type?.type || 'task')" class="text-sm"></i>
+              <i [class]="getTypeIcon(task.type.type || 'task')" class="text-sm"></i>
               <span>#{{ task.id }}</span>
               <span *ngIf="task.type?.type"
                     class="ml-1 text-xs px-2 py-1 border-round-lg bg-white-alpha-60 text-gray-800 border-1 border-black-alpha-20">
@@ -168,7 +168,7 @@
       <span
         class="text-xs px-2 py-1 font-bold border-round-3xl bg-black-alpha-20 text-gray-800 flex align-items-center gap-1"
         *ngIf="task.state?.state">
-        {{ task.state?.state | slice:0:15 }}<span *ngIf="(task.state?.state?.length || 0) > 15">...</span>
+        {{ task.state.state | slice:0:15 }}<span *ngIf="(task.state.state.length || 0) > 15">...</span>
       </span>
               <p-tag [value]="getPriorityDisplay(task.priority)" [severity]="getPrioritySeverity(task.priority)"
                      styleClass="text-sm px-2 py-1 border-round-3xl font-medium shadow-none bg-white-alpha-600 text-gray-800"></p-tag>
