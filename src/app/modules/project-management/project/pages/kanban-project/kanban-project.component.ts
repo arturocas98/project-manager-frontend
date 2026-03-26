@@ -23,6 +23,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ToastModule } from 'primeng/toast';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -80,6 +81,7 @@ interface TypeOption {
     ConfirmDialogModule,
     DialogModule,
     InputTextareaModule,
+    ToastModule,
   ],
   templateUrl: './kanban-project.component.html',
 })
@@ -94,6 +96,7 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
   columns: KanbanColumn[] = [];
   members: ProjectMember[] = [];
   loading = true;
+  error: string | null = null;
 
   // Privilegios
   roleType: string | null = null;
@@ -194,8 +197,9 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
   /**
    * Carga el tablero Kanban
    */
-  private loadBoard(): void {
+  public loadBoard(): void {
     this.loading = true;
+    this.error = null;
 
     this.kanbanService
       .getKanbanBoard(this.projectId)
@@ -208,6 +212,7 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
         },
         error: error => {
           console.error('Error loading kanban board:', error);
+          this.error = 'No se pudo cargar la información del tablero Kanban';
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -231,6 +236,12 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
         },
         error: error => {
           console.error('Error loading members:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al cargar los miembros del equipo',
+            life: 5000,
+          });
         },
       });
   }
@@ -461,21 +472,14 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
         } else if (sourceColumnId === 6 && columnId === 7) {
           allowed = true; // En Revisión -> Finalizada
         }
-      } else if (role === 'administrator' || role === 'leader' || role === 'adm' || role === 'ldr') {
+      } else if (role === 'administrator' || role === 'leader' || role === 'adm' || role === 'LDR') {
         allowed = true; // Pueden mover libremente
         if (columnId === 3) { // Si mueven a suspendido
           requiresConfirmation = true;
         }
       }
 
-      if (!allowed) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Permiso denegado',
-          detail: 'Tu rol no tiene permisos para realizar este cambio de estado.'
-        });
-        return;
-      }
+
 
       // Si es permitido, movemos temporalmente el item
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
@@ -489,7 +493,29 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
         this.pendingColumnId = columnId;
         this.showStateCommentDialog(dialogHeader, dialogDesc, isMandatoryComment);
       } else {
-        this.executeTaskMove(event, columnId, task);
+        this.pendingDropEvent = event;
+        this.pendingColumnId = columnId;
+
+        this.confirmationService.confirm({
+          message: `¿Estás seguro de mover la tarea a la columna "${this.getColumnTitle(columnId)}"?`,
+          header: 'Confirmar movimiento',
+          icon: 'ph ph-question text-blue-500 text-3xl',
+          acceptLabel: 'Sí, mover',
+          rejectLabel: 'Cancelar',
+          acceptButtonStyleClass: 'p-button-primary',
+          rejectButtonStyleClass: 'p-button-text p-button-secondary',
+          accept: () => {
+            if (this.pendingDropEvent && this.pendingColumnId !== null) {
+              const task = this.pendingDropEvent.container.data[this.pendingDropEvent.currentIndex];
+              this.executeTaskMove(this.pendingDropEvent, this.pendingColumnId, task);
+            }
+          },
+          reject: () => {
+            if (this.pendingDropEvent) {
+              this.revertDragDrop(this.pendingDropEvent);
+            }
+          }
+        });
       }
     }
   }
@@ -501,15 +527,15 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
         if (comment && comment.trim() !== '') {
           this.projectService.createComment(this.projectId, task.id, comment).subscribe({
             next: () => {
-              this.finishStateUpdate(columnId);
+              this.finishStateUpdate(columnId, task);
             },
             error: () => {
               this.messageService.add({ severity: 'warn', summary: 'Advertencia', detail: 'Estado actualizado, pero no se pudo enviar el comentario' });
-              this.finishStateUpdate(columnId);
+              this.finishStateUpdate(columnId, task);
             }
           });
         } else {
-          this.finishStateUpdate(columnId);
+          this.finishStateUpdate(columnId, task);
         }
       },
       error: error => {
@@ -517,16 +543,25 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
         this.revertDragDrop(event);
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo actualizar el estado de la tarea',
+          summary: 'Permiso Denegado',
+          detail: error.error?.message || error.message || 'No se pudo actualizar el estado de la tarea',
+          life: 5000
         });
         this.updatingState = false;
       },
     });
   }
 
-  private finishStateUpdate(columnId: number) {
+  private finishStateUpdate(columnId: number, task: KanbanTask) {
     this.updatingState = false;
+
+    if (task && task.state) {
+      task.state.id = columnId;
+      task.state.state = this.getColumnTitle(columnId);
+    } else if (task) {
+      task.state = { id: columnId, state: this.getColumnTitle(columnId) } as any;
+    }
+
     this.messageService.add({
       severity: 'success',
       summary: 'Movido',
@@ -535,7 +570,9 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     });
     this.pendingDropEvent = null;
     this.pendingColumnId = null;
-    // this.loadBoard(); // Opcional: recargar si quisieramos
+
+    // Actualiza el cache silenciosamente sin recargar la tabla entera
+    this.kanbanService.getProjectTasks(this.projectId).pipe(takeUntil(this.destroy$)).subscribe();
   }
 
   private revertDragDrop(event: CdkDragDrop<KanbanTask[]>) {

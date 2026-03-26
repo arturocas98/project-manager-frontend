@@ -95,14 +95,30 @@
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading"
+  <div *ngIf="loading && !error"
     class="flex flex-column align-items-center justify-content-center flex-1 min-h-20rem border-round-3xl surface-card shadow-1 border-1 surface-border">
     <i class="ph ph-spinner-gap ph-spin text-indigo-500 text-5xl mb-3"></i>
     <span class="text-color-secondary font-medium text-lg">Cargando tablero...</span>
   </div>
 
+  <!-- Error State (New) -->
+  <div *ngIf="error && !loading" class="flex flex-column align-items-center justify-content-center flex-1 min-h-20rem border-round-3xl surface-card shadow-1 border-1 surface-border mt-4">
+    <div class="surface-card p-5 text-center max-w-35rem w-full">
+      <div class="bg-red-50 border-circle p-4 mb-4 inline-block">
+        <i class="ph ph-warning-circle text-6xl text-red-500"></i>
+      </div>
+      <h2 class="text-2xl font-extrabold text-color mb-2">Error al cargar</h2>
+      <p class="text-color-secondary mb-5 text-lg">{{ error }}</p>
+      <div class="flex gap-3 justify-content-center">
+        <button pButton label="Reintentar" icon="ph ph-arrows-clockwise"
+                class="p-button-primary border-round-xl p-button-md shadow-2 font-bold px-4"
+                (click)="loadBoard()"></button>
+      </div>
+    </div>
+  </div>
+
   <!-- Board Principal (Scrolling Header + Content) -->
-  <div *ngIf="!loading" cdkDropListGroup class="flex overflow-x-auto gap-4 pb-4 px-1 flex-1 align-items-start"
+  <div *ngIf="!loading && !error" cdkDropListGroup class="flex overflow-x-auto gap-4 pb-4 px-1 flex-1 align-items-start"
     style="min-height: 500px;">
 
     <!-- Iteración de Columnas -->
@@ -347,3 +363,4 @@
 </p-dialog>
 
 <p-confirmDialog></p-confirmDialog>
+<p-toast position="top-right"></p-toast>
