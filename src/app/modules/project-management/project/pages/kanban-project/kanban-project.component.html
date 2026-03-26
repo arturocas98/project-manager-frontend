@@ -65,7 +65,7 @@
               [ngStyle]="selectedAvatarMember?.user?.id === member.user.id ? {'transform': 'scale(1.1)', 'z-index': 10} : {}"
               styleClass="bg-indigo-100 text-indigo-800 text-sm font-bold shadow-1 hover:z-5 transition-transform hover:scale-110"
               (click)="toggleAvatarFilter(member)"
-              [pTooltip]="member.user.name + ' (' + member.role.type + ')'" tooltipPosition="bottom"></p-avatar>
+                      [pTooltip]="member.user.name + ' (' + translateRole(member.role.type) + ')'" tooltipPosition="bottom"></p-avatar>
             <p-avatar *ngIf="members.length > 3" label="+{{ members.length - 3 }}" shape="circle"
               styleClass="border-circle border-2 border-white bg-surface-200 text-color-secondary text-sm font-bold shadow-1 cursor-pointer hover:bg-surface-300 transition-colors"
               (click)="op.toggle($event)"

@@ -120,6 +120,18 @@ export class KanbanProjectComponent implements OnInit, OnDestroy {
     { label: 'Medium', value: 'medium', icon: 'ph ph-minus' },
     { label: 'Low', value: 'low', icon: 'ph ph-arrow-down-right' },
   ];
+  // En tu componente TypeScript
+  translateRole(roleType: string): string {
+    const roleMap: { [key: string]: string } = {
+      'administrator': 'Administrador',
+      'leader': 'Líder',
+      'developer': 'Desarrollador',
+      'tester': 'Tester',
+      'documenter': 'Documentador'
+    };
+
+    return roleMap[roleType?.toLowerCase()] || roleType || 'Sin rol';
+  }
 
   typeOptions: TypeOption[] = [
     { label: 'Tarea', value: 'task', icon: 'ph ph-check-square' },
