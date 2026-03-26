@@ -1,4 +1,4 @@
-<div class="surface-card border-round-2xl shadow-1 hover:shadow-4 border-1 surface-border transition-all transition-duration-300 cursor-pointer flex flex-column h-full relative overflow-hidden group w-full" style="min-width: 20rem; max-width: 24rem;" [style.border-top]="'4px solid var(--' + getProjectColor(project.id).name + '-500)'">
+<div class="surface-card border-round-2xl shadow-1 hover:shadow-4 border-1 surface-border transition-all transition-duration-300 cursor-pointer flex flex-column relative overflow-hidden group w-full" [style.border-top]="'4px solid var(--' + getProjectColor(project.id).name + '-500)'">
   
   <!-- Content -->
   <div class="p-4 flex flex-column flex-1">
@@ -33,9 +33,9 @@
 
     <!-- Meta Grid -->
     <div class="flex flex-column gap-2 mb-4 mt-auto">
-      <div class="flex align-items-center gap-2 text-sm overflow-hidden" pTooltip="Cliente" tooltipPosition="top">
+      <div class="flex align-items-center gap-2 text-sm overflow-hidden" [pTooltip]="getClientTooltip(project)" tooltipPosition="top">
         <i class="ph ph-buildings text-color-secondary text-lg flex-shrink-0"></i>
-        <span class="text-color font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ project.client || 'Sin cliente' }}</span>
+        <span class="text-color font-medium white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ project.client?.Nombre || 'Sin cliente' }}</span>
       </div>
       <div class="flex align-items-center gap-2 text-sm overflow-hidden" *ngIf="project.administrator" pTooltip="Administrador" tooltipPosition="top">
         <i class="ph ph-user-circle text-color-secondary text-lg flex-shrink-0"></i>

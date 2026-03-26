@@ -1,6 +1,6 @@
 export interface ProjectRequest {
   ContractNo: string;
-  client: string;
+  client_id: number;
   project_type: string;
 
   start_date: string;

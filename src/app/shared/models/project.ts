@@ -1,8 +1,10 @@
+import { Client } from './client.model';
+
 export interface Project {
   id: number;
 
   ContractNo: string;
-  client: string;
+  client: Client;
   project_type: string;
   objectContract: string;
 

@@ -1,3 +1,5 @@
+import { Client } from '../client.model';
+
 export interface ProjectResponse {
   id: number;
   name: string;
@@ -5,7 +7,7 @@ export interface ProjectResponse {
   objectContract?: string;
   ContractNo?: string;
   start_date: string;
-  client: string;
+  client: Client;
   contracted_company: string;
   project_type: string;
   last_phase: string;

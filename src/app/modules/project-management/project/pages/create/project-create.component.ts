@@ -21,6 +21,7 @@ import { Profile } from '../../../../../shared/models/auth';
 import { InputTextModule } from 'primeng/inputtext';
 import { Router } from '@angular/router';
 import { Team } from '../../../../../shared/models/team-models/team.model';
+import { Client } from '../../../../../shared/models/client.model';
 
 interface SelectedMember {
   user_id: number;
@@ -62,7 +63,7 @@ export class ProjectCreateComponent implements OnInit {
 
   projectForm = this.fb.group({
     ContractNo: ['', Validators.required],
-    client: ['', Validators.required],
+    client_id: [null, Validators.required],
     project_type: ['', Validators.required],
     objectContract: [''],
 
@@ -93,10 +94,12 @@ export class ProjectCreateComponent implements OnInit {
   teamOptions: { label: string; value: number }[] = [];
   selectedTeamIds: number[] = [];
   previousTeamIds: number[] = [];
-
   // Variables para selectores de miembros
   selectedUserId: number | null = null;
   selectedRoleType: string | null = null;
+
+  // Clientes
+  clients: Client[] = [];
 
   // Opciones de roles
   roleOptions = [
@@ -152,6 +155,16 @@ export class ProjectCreateComponent implements OnInit {
   ngOnInit(): void {
     this.loadAllUsers();
     this.loadAllTeams();
+    this.loadClients();
+  }
+
+  loadClients(): void {
+    this.authService.getClients().subscribe({
+      next: (clients) => {
+        this.clients = clients;
+      },
+      error: error => console.error('Error cargando clientes:', error)
+    });
   }
 
   loadAllTeams(): void {
@@ -431,7 +444,7 @@ export class ProjectCreateComponent implements OnInit {
 
       const projectData: ProjectRequest = {
         ContractNo: formValue.ContractNo!,
-        client: formValue.client!,
+        client_id: formValue.client_id!,
         project_type: formValue.project_type!,
         start_date: formValue.start_date!,
         duration_days: formValue.duration_days || undefined,
@@ -535,7 +548,8 @@ export class ProjectCreateComponent implements OnInit {
     this.previousTeamIds = [];
     this.updateAvailableUsers();
 
-    this.successProjectName = project.client || project.ContractNo;
+    // project.client es un objeto Client, intentamos extraer Nombre u otro campo descriptivo, o caemos a ContractNo
+    this.successProjectName = project.client?.Nombre || project.client?.name || project.ContractNo;
     this.showSuccessDialog = true;
   }
 

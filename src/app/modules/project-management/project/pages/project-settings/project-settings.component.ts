@@ -23,6 +23,8 @@ import { KanbanService } from "../../../../../core/service/kanban-service";
 import { TooltipModule } from "primeng/tooltip";
 import { Option } from "../../../../../shared/models/general";
 import { TranslateModule } from "@ngx-translate/core";
+import { Client } from "../../../../../shared/models/client.model";
+import { AuthService } from "../../../../../core/service/auth.service";
 
 @Component({
   selector: 'app-project-settings',
@@ -85,6 +87,13 @@ export class ProjectSettingsComponent implements OnInit {
   profileOptions: { label: string, value: number }[] = [];
   memberOptions: { label: string, value: number }[] = [];
   member: ProjectMember[] = [];
+  clients: Client[] = [];
+
+  get selectedClient(): Client | null {
+    const clientId = this.projectForm.get('client_id')?.value;
+    if (!clientId) return null;
+    return this.clients.find(c => c.id === clientId) || null;
+  }
 
   // Miembro seleccionado para editar
   selectedMember: ProjectMember | null = null;
@@ -111,11 +120,12 @@ export class ProjectSettingsComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private http: HttpClient,
-    private kanbanService: KanbanService
+    private kanbanService: KanbanService,
+    private authService: AuthService
   ) {
     this.projectForm = this.fb.group({
       ContractNo: ['', Validators.required],
-      client: ['', Validators.required],
+      client_id: [null, Validators.required],
       project_type: ['', Validators.required],
 
       start_date: ['', Validators.required],
@@ -153,6 +163,14 @@ export class ProjectSettingsComponent implements OnInit {
     this.loadProjectData();
     this.loadUnassignedUsers();
     this.loadMembers();
+    this.loadClients();
+  }
+
+  loadClients() {
+    this.authService.getClients().subscribe({
+      next: (clients) => this.clients = clients,
+      error: () => console.error('Error loading clients')
+    });
   }
 
   /**
@@ -165,7 +183,7 @@ export class ProjectSettingsComponent implements OnInit {
         console.log(project);
         this.projectForm.patchValue({
           ContractNo: project.ContractNo ?? '',
-          client: project.client ?? '',
+          client_id: project.client?.id ?? null,
           project_type: project.project_type ?? '',
 
           start_date: project.start_date ?? '',
@@ -428,7 +446,7 @@ export class ProjectSettingsComponent implements OnInit {
 
       const projectData: UpdateProjectRequest = {
         ContractNo: this.projectForm.value.ContractNo,
-        client: this.projectForm.value.client,
+        client_id: this.projectForm.value.client_id,
         project_type: this.projectForm.value.project_type,
 
         start_date: this.projectForm.value.start_date,

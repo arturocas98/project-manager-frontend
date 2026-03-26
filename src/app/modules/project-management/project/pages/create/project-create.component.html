@@ -55,15 +55,25 @@
                 <span class="p-inputgroup-addon">
                   <i class="pi pi-building"></i>
                 </span>
-                <input
-                  pInputText
-                  formControlName="client"
-                  class="w-full"
-                  placeholder="Ej: Empresa ABC"
-                  [ngClass]="{ 'p-invalid': projectForm.get('client')?.invalid && projectForm.get('client')?.touched }"
-                />
+
+                              <p-dropdown
+                                formControlName="client_id"
+                                [options]="clients"
+                                optionLabel="Nombre"
+                                optionValue="id"
+                                placeholder="Seleccionar cliente"
+                                [filter]="true"
+                                filterBy="Nombre"
+                                [showClear]="true"
+                                styleClass="w-full"
+                                appendTo="body"
+                                [ngClass]="{
+                    'ng-invalid ng-dirty':
+                    projectForm.get('client_id')?.invalid &&
+                    projectForm.get('client_id')?.touched
+                  }"></p-dropdown>
               </div>
-              <small *ngIf="projectForm.get('client')?.invalid && projectForm.get('client')?.touched" class="p-error block mt-2">
+              <small *ngIf="projectForm.get('client_id')?.invalid && projectForm.get('client_id')?.touched" class="p-error block mt-2">
                 El cliente es obligatorio
               </small>
             </div>

@@ -2,6 +2,8 @@
 // MODELO DE RESPUESTA PARA CREACIÓN DE PROYECTO
 // ============================================
 
+import { Client } from '../client.model';
+
 /**
  * Rol de usuario asignado al proyecto
  */
@@ -19,7 +21,7 @@ export interface CreatedProject {
   id: number;
 
   ContractNo: string;
-  client: string;
+  client: Client;
   project_type: string;
   objectContract?: string;
 

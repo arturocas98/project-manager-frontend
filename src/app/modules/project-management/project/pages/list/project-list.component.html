@@ -1,3 +1,23 @@
+<style>
+  .masonry-grid {
+    column-count: 1;
+    column-gap: 1.5rem;
+    width: 100%;
+  }
+  @media (min-width: 640px) { .masonry-grid { column-count: 2; } }
+  @media (min-width: 1024px) { .masonry-grid { column-count: 3; } }
+  @media (min-width: 1440px) { .masonry-grid { column-count: 4; } }
+  
+  .masonry-item {
+    break-inside: avoid;
+    break-inside: avoid-column;
+    page-break-inside: avoid;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    width: 100%;
+  }
+</style>
+
 <div class="flex flex-column gap-4">
 
   <!-- HEADER -->
@@ -12,7 +32,7 @@
 
     <!-- Buscador y Botón crear -->
     <div class="flex flex-column sm:flex-row align-items-center gap-3 w-full md:w-auto mt-3 md:mt-0">
-      
+
       <!-- Búsqueda -->
       <span class="p-input-icon-left w-full sm:w-auto">
         <i class="ph ph-magnifying-glass"></i>
@@ -29,7 +49,7 @@
         class="p-button-success w-full sm:w-auto border-round-xl shadow-2"
         [routerLink]="['/project-management/projects/create']">
       </button>
-      
+
     </div>
 
   </div>
@@ -43,48 +63,66 @@
 
   <!-- GRID DE PROYECTOS -->
   <div *ngIf="!loading">
-
+    <!-- LISTA DE PROYECTOS -->
     <div *ngIf="filteredProjects.length > 0"
-         class="flex flex-wrap gap-4">
+         class="masonry-grid">
 
-      <app-project-card
-        *ngFor="let project of filteredProjects"
-        [project]="project"
-        (click)="goToProject(project.id)">
-      </app-project-card>
+      <div *ngFor="let project of filteredProjects"
+           class="masonry-item">
 
+        <app-project-card
+          [project]="project"
+          (click)="goToProject(project.id)"
+          class="cursor-pointer block w-full">
+        </app-project-card>
+
+      </div>
     </div>
 
-
-    <!-- SIN PROYECTOS / RESULTADOS -->
+    <!-- SIN PROYECTOS -->
     <div *ngIf="filteredProjects.length === 0"
-         class="flex flex-column align-items-center justify-content-center py-8 text-center text-color-secondary">
+         class="flex flex-column align-items-center justify-content-center py-8 px-4 text-center">
 
-      <i class="ph ph-folder-open text-4xl mb-3"></i>
-      <p class="text-lg font-medium m-0">
-        No se encontraron proyectos
-      </p>
+      <div class="flex flex-column align-items-center gap-3">
+        <i class="ph ph-folder-open text-5xl text-color-secondary"></i>
 
-      <button
-        *ngIf="isAdmin && projects.length === 0"
-        pButton
-        icon="ph ph-plus"
-        label="Crear el primer proyecto"
-        class="p-button-outlined mt-3 border-round-xl"
-        [routerLink]="['/project-management/projects/create']">
-      </button>
+        <div>
+          <p class="text-lg font-medium m-0 text-color">
+            No se encontraron proyectos
+          </p>
+          <p class="text-sm text-color-secondary mt-1" *ngIf="searchQuery">
+            No hay proyectos que coincidan con "{{ searchQuery }}"
+          </p>
+        </div>
 
-      <button
-        *ngIf="projects.length > 0"
-        pButton
-        icon="ph ph-funnel-x"
-        label="Limpiar búsqueda"
-        class="p-button-text mt-3"
-        (click)="searchQuery = ''; filterProjects()">
-      </button>
+        <div class="flex flex-wrap justify-content-center gap-2 mt-2">
+          <button
+            *ngIf="isAdmin && projects.length === 0"
+            pButton
+            class="flex align-items-center gap-2 p-button-outlined border-round-xl"
+            [routerLink]="['/project-management/projects/create']">
+            <i class="ph ph-plus"></i>
+            <span>Crear el primer proyecto</span>
+          </button>
 
+          <button
+            *ngIf="projects.length > 0 && searchQuery"
+            pButton
+            class="flex align-items-center gap-2 p-button-text border-round-xl"
+            (click)="searchQuery = ''; filterProjects()">
+            <i class="ph ph-funnel-x"></i>
+            <span>Limpiar búsqueda</span>
+          </button>
+
+          <button
+            *ngIf="projects.length === 0 && !isAdmin"
+            pButton
+            class="p-button-text border-round-xl"
+            disabled>
+            <span>No hay proyectos disponibles</span>
+          </button>
+        </div>
+      </div>
     </div>
-
   </div>
-
 </div>

@@ -106,7 +106,7 @@ export class ProjectListComponent implements OnInit {
       this.filteredProjects = this.projects.filter(p => 
         p.objectContract?.toLowerCase().includes(query) ||
         p.ContractNo?.toLowerCase().includes(query) ||
-        p.client?.toLowerCase().includes(query) ||
+        p.client?.Nombre?.toLowerCase().includes(query) ||
         p.administrator?.name?.toLowerCase().includes(query) ||
         p.state?.name?.toLowerCase().includes(query) ||
         p.project_type?.toLowerCase().includes(query)

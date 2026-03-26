@@ -86,7 +86,9 @@
                 <span class="p-inputgroup-addon bg-surface-50 border-surface-200">
                   <i class="ph ph-buildings text-color-secondary"></i>
                 </span>
-                <input pInputText formControlName="client" class="w-full" placeholder="Ej: TECH2GO">
+                <p-dropdown formControlName="client_id" [options]="clients" optionLabel="Nombre" optionValue="id"
+                  placeholder="Seleccionar cliente" [filter]="true" filterBy="Nombre" [showClear]="true"
+                  styleClass="w-full border-round-right-lg h-full" [style]="{'border-top-left-radius': '0', 'border-bottom-left-radius': '0'}" appendTo="body"></p-dropdown>
               </div>
             </div>
 
@@ -106,6 +108,37 @@
               <label class="block text-color-secondary font-medium mb-2 text-sm">Objeto del Contrato</label>
               <textarea pInputTextarea rows="4" formControlName="objectContract" class="w-full border-round-xl"
                 placeholder="Descripción del contrato"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalles del Cliente (Solo Lectura) -->
+        <div class="surface-card p-5 border-round-2xl shadow-1" *ngIf="selectedClient">
+          <div class="flex align-items-center gap-2 mb-5 pb-3 border-bottom-1 surface-border">
+            <i class="ph ph-identification-card text-indigo-500 text-2xl"></i>
+            <h3 class="m-0 text-xl font-semibold text-color">Detalles del Cliente</h3>
+          </div>
+
+          <div class="grid grid-nogutter gap-4">
+            <div class="col-12 sm:col-6 md:col-4">
+              <span class="block text-color-secondary font-medium mb-1 text-sm">RUC</span>
+              <div class="text-color text-base">{{ selectedClient.Ruc || 'N/A' }}</div>
+            </div>
+            <div class="col-12 sm:col-6 md:col-4">
+              <span class="block text-color-secondary font-medium mb-1 text-sm">Correo Electrónico</span>
+              <div class="text-color text-base">{{ selectedClient.Correo || 'N/A' }}</div>
+            </div>
+            <div class="col-12 sm:col-6 md:col-4">
+              <span class="block text-color-secondary font-medium mb-1 text-sm">Teléfono</span>
+              <div class="text-color text-base">{{ selectedClient.Telefono || 'N/A' }}</div>
+            </div>
+            <div class="col-12 sm:col-6 md:col-4">
+              <span class="block text-color-secondary font-medium mb-1 text-sm">Provincia</span>
+              <div class="text-color text-base">{{ selectedClient.Provincia || 'N/A' }}</div>
+            </div>
+            <div class="col-12 sm:col-6 md:col-4">
+              <span class="block text-color-secondary font-medium mb-1 text-sm">Cantón</span>
+              <div class="text-color text-base">{{ selectedClient.Canton || 'N/A' }}</div>
             </div>
           </div>
         </div>
