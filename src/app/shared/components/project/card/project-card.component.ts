@@ -175,9 +175,9 @@ export class ProjectCardComponent {
     if (!project.client) return 'Sin cliente';
     const client = project.client as any;
     // Assuming the client object has Nombre, Correo, Telefono
-    const name = client.Nombre || client.name || 'Sin nombre';
-    const email = client.Correo || client.email || 'N/A';
-    const phone = client.Telefono || client.phone || 'N/A';
+    const name = client.name || 'Sin nombre';
+    const email = client.email || 'N/A';
+    const phone = client.phone || 'N/A';
     
     return `Cliente: ${name}\nEmail: ${email}\nTeléfono: ${phone}`;
   }

@@ -299,8 +299,13 @@ export class ProjectCreateComponent implements OnInit {
       DEV: 'info',
       TST: 'success',
       DOC: 'help',
+      leader: 'warning',
+      developer: 'info',
+      tester: 'success',
+      documenter: 'help',
+      administrator: 'danger',
     };
-    return severities[roleType] || 'secondary';
+    return severities[roleType] || severities[roleType.toLowerCase()] || 'secondary';
   }
 
   /**
@@ -549,7 +554,7 @@ export class ProjectCreateComponent implements OnInit {
     this.updateAvailableUsers();
 
     // project.client es un objeto Client, intentamos extraer Nombre u otro campo descriptivo, o caemos a ContractNo
-    this.successProjectName = project.client?.Nombre || project.client?.name || project.ContractNo;
+    this.successProjectName = project.client?.name || project.ContractNo;
     this.showSuccessDialog = true;
   }
 

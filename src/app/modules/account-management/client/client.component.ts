@@ -71,17 +71,17 @@ export class ClientComponent implements OnInit {
 
   onProvinceChange() {
     // Re-calculate cantons when province changes
-    if (!this.client.Provincia) {
+    if (!this.client.province) {
       this.cantons = [];
-      this.client.Canton = '';
+      this.client.canton = '';
       return;
     }
     
     // reset Canton if it doesn't belong to the new province
-    this.client.Canton = '';
+    this.client.canton = '';
     
     const filteredCantons = this.locations
-      .filter(loc => loc.name_provinces === this.client.Provincia)
+      .filter(loc => loc.name_provinces === this.client.province)
       .map(loc => loc.name_canton);
       
     this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
@@ -113,12 +113,12 @@ export class ClientComponent implements OnInit {
 
   getEmptyClient(): ClientRequest {
     return {
-      Ruc: '',
-      Nombre: '',
-      Correo: '',
-      Provincia: '',
-      Canton: '',
-      Telefono: ''
+      ruc: '',
+      name: '',
+      email: '',
+      province: '',
+      canton: '',
+      phone: ''
     };
   }
 
@@ -131,19 +131,19 @@ export class ClientComponent implements OnInit {
 
   editClient(clientVar: Client) {
     this.client = {
-      Ruc: clientVar.Ruc,
-      Nombre: clientVar.Nombre,
-      Correo: clientVar.Correo,
-      Provincia: clientVar.Provincia,
-      Canton: clientVar.Canton,
-      Telefono: clientVar.Telefono
+      ruc: clientVar.ruc,
+      name: clientVar.name,
+      email: clientVar.email,
+      province: clientVar.province,
+      canton: clientVar.canton,
+      phone: clientVar.phone
     };
     this.selectedClientId = clientVar.id;
     
     // Load cantons for the selected client's province
-    if (this.client.Provincia) {
+    if (this.client.province) {
        const filteredCantons = this.locations
-        .filter(loc => loc.name_provinces === this.client.Provincia)
+        .filter(loc => loc.name_provinces === this.client.province)
         .map(loc => loc.name_canton);
        this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
     } else {
@@ -155,7 +155,7 @@ export class ClientComponent implements OnInit {
 
   deleteClient(clientVar: Client) {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + clientVar.Nombre + '?',
+      message: 'Are you sure you want to delete ' + clientVar.name + '?',
       header: 'Confirm',
       icon: 'ph ph-warning',
       accept: () => {
@@ -180,12 +180,12 @@ export class ClientComponent implements OnInit {
   saveClient() {
     this.submitted.set(true);
 
-    const isValid = this.client.Nombre?.trim() && 
-                    this.client.Ruc?.trim() && 
-                    this.client.Correo?.trim() && 
-                    this.client.Telefono?.trim() && 
-                    this.client.Provincia?.trim() && 
-                    this.client.Canton?.trim();
+    const isValid = this.client.name?.trim() && 
+                    this.client.ruc?.trim() && 
+                    this.client.email?.trim() && 
+                    this.client.phone?.trim() && 
+                    this.client.province?.trim() && 
+                    this.client.canton?.trim();
 
     if (isValid) {
       if (this.selectedClientId) {

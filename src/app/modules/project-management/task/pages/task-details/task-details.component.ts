@@ -59,7 +59,7 @@ registerLocaleData(localeEs);
 export class TaskDetailsComponent implements OnInit, OnDestroy {
   readonly roleMap: Record<string, string> = {
     administrator: 'Administrador',
-    leader: 'Líder',
+    leader: 'Lider',
     developer: 'Desarrollador',
     tester: 'Tester',
     documenter: 'Documentador',
