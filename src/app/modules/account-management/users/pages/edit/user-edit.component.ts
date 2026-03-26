@@ -24,6 +24,7 @@ import { ToastModule } from 'primeng/toast';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { InputTextModule } from 'primeng/inputtext';
 import { Option } from 'src/app/shared/models/general';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   templateUrl: './user-edit.component.html',
@@ -42,6 +43,7 @@ import { Option } from 'src/app/shared/models/general';
     ToastModule,
     KeyFilterModule,
     InputTextModule,
+    CheckboxModule,
   ],
 })
 export class UserEditComponent implements OnInit {
@@ -80,6 +82,7 @@ export class UserEditComponent implements OnInit {
 
     this.userForm = this.fb.group({
       name: ['', [Validators.required]],
+      id_card: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: [''],
       expires_at: [''],
@@ -91,6 +94,17 @@ export class UserEditComponent implements OnInit {
       modality_id: [''],
       address: ['', [Validators.required]],
       telephone: ['', [Validators.required]],
+      birthdate: [''],
+      employee_type: [''],
+      title: [''],
+      senescyt_record: [''],
+      province: [''],
+      canton: [''],
+      has_electronic_signature: [false],
+      administrative_direction: [''],
+      administrative_unit: [''],
+      entity_ruc: [''],
+      entity_name: [''],
     });
   }
 
@@ -99,9 +113,11 @@ export class UserEditComponent implements OnInit {
     if (this.userId) {
       this.userService.getUser(this.userId).subscribe((response: UserResponse) => {
         const expires_at = response.data.expires_at ? moment(response.data.expires_at).toDate() : null;
+        const birthdate = response.data.birthdate ? moment(response.data.birthdate).toDate() : null;
         const data = {
           ...response.data,
           expires_at,
+          birthdate,
           rols: response.data.rols,
           password: null,
           status: !response.data.deleted_at,
@@ -138,6 +154,7 @@ export class UserEditComponent implements OnInit {
 
       const fieldNames: { [key: string]: string } = {
         name: 'Nombre',
+        id_card: 'Cédula',
         email: 'Correo Electrónico',
         address: 'Dirección',
         telephone: 'Teléfono',
@@ -176,10 +193,15 @@ export class UserEditComponent implements OnInit {
       ? moment(this.userForm.value.expires_at).format(this.shortFormatDate)
       : null;
 
+    const birthdate = this.userForm.value.birthdate
+      ? moment(this.userForm.value.birthdate).format(this.shortFormatDate)
+      : null;
+
     const body = {
       ...filteredFormValue,
       status: this.userForm.value.status,
       expires_at,
+      birthdate,
       reset_password: Constants.zero,
       rols: this.userForm.value.rols.map((rol: { name: string }) => ({ name: rol.name })),
     } as User;

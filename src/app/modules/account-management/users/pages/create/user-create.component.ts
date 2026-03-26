@@ -20,6 +20,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
 import { KeyFilterModule } from 'primeng/keyfilter';
+import {RippleModule} from "primeng/ripple";
+import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   templateUrl: './user-create.component.html',
@@ -36,6 +38,8 @@ import { KeyFilterModule } from 'primeng/keyfilter';
     CalendarModule,
     InputTextModule,
     KeyFilterModule,
+    RippleModule,
+    CheckboxModule,
   ],
 })
 export class UserCreateComponent {
@@ -87,6 +91,17 @@ export class UserCreateComponent {
       modality_id: [''],
       address: ['', [Validators.required]],
       telephone: ['', [Validators.required]],
+      birthdate: [''],
+      employee_type: [''],
+      title: [''],
+      senescyt_record: [''],
+      province: [''],
+      canton: [''],
+      has_electronic_signature: [false],
+      administrative_direction: [''],
+      administrative_unit: [''],
+      entity_ruc: [''],
+      entity_name: [''],
     });
   }
 
@@ -118,9 +133,13 @@ export class UserCreateComponent {
     const expires_at = this.userForm.value.expires_at
       ? moment(this.userForm.value.expires_at).format(this.shortFormatDate)
       : null;
+    const birthdate = this.userForm.value.birthdate
+      ? moment(this.userForm.value.birthdate).format(this.shortFormatDate)
+      : null;
     const body = {
       ...this.userForm.value,
       expires_at,
+      birthdate,
       rols: this.userForm.value.rols.map((rol: { name: string }) => ({ name: rol.name })),
     };
     this.userService.createUser(body).subscribe({
