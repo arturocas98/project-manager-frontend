@@ -12,6 +12,7 @@ import { ToastModule } from 'primeng/toast';
 import { Client, ClientRequest } from 'src/app/shared/models/client.model';
 import { LocateResponse } from 'src/app/shared/models/locate.response';
 import { AuthService } from 'src/app/core/service/auth.service';
+import {RippleModule} from "primeng/ripple";
 
 @Component({
   selector: 'app-client',
@@ -25,7 +26,8 @@ import { AuthService } from 'src/app/core/service/auth.service';
     InputTextModule,
     ConfirmDialogModule,
     DropdownModule,
-    ToastModule
+    ToastModule,
+    RippleModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './client.component.html',
@@ -35,7 +37,7 @@ export class ClientComponent implements OnInit {
   clients = signal<Client[]>([]);
   loading = signal<boolean>(false);
   clientDialog = signal<boolean>(false);
-  
+
   client: ClientRequest = this.getEmptyClient();
   selectedClientId: number | null = null;
   submitted = signal<boolean>(false);
@@ -60,7 +62,7 @@ export class ClientComponent implements OnInit {
       next: (res) => {
         // the API returns { "data": [...] } but ApiService & our map might unwrap it.
         this.locations = Array.isArray(res) ? res : (res as any).data || [];
-        
+
         // Extract unique provinces
         const uniqueProvinces = [...new Set(this.locations.map(loc => loc.name_provinces))];
         this.provinces = uniqueProvinces.map(p => ({ label: p, value: p }));
@@ -76,14 +78,14 @@ export class ClientComponent implements OnInit {
       this.client.canton = '';
       return;
     }
-    
+
     // reset Canton if it doesn't belong to the new province
     this.client.canton = '';
-    
+
     const filteredCantons = this.locations
       .filter(loc => loc.name_provinces === this.client.province)
       .map(loc => loc.name_canton);
-      
+
     this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
   }
 
@@ -139,17 +141,35 @@ export class ClientComponent implements OnInit {
       phone: clientVar.phone
     };
     this.selectedClientId = clientVar.id;
-    
-    // Load cantons for the selected client's province
-    if (this.client.province) {
-       const filteredCantons = this.locations
-        .filter(loc => loc.name_provinces === this.client.province)
-        .map(loc => loc.name_canton);
-       this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
-    } else {
-       this.cantons = [];
+
+    // Buscar la provincia que coincida (insensible a mayúsculas)
+    const matchingProvince = this.provinces.find(
+      p => p.value.toLowerCase() === clientVar.province?.toLowerCase()
+    );
+
+    if (matchingProvince) {
+      this.client.province = matchingProvince.value; // Usar el valor exacto de la lista
     }
-    
+
+    // Cargar cantones
+    if (this.client.province) {
+      const filteredCantons = this.locations
+        .filter(loc => loc.name_provinces?.toLowerCase() === this.client.province?.toLowerCase())
+        .map(loc => loc.name_canton);
+
+      const uniqueCantons = [...new Set(filteredCantons)];
+      this.cantons = uniqueCantons.map(c => ({ label: c, value: c }));
+
+      // Buscar el cantón que coincida
+      const matchingCanton = this.cantons.find(
+        c => c.value.toLowerCase() === clientVar.canton?.toLowerCase()
+      );
+
+      if (matchingCanton) {
+        this.client.canton = matchingCanton.value; // Usar el valor exacto de la lista
+      }
+    }
+
     this.clientDialog.set(true);
   }
 
@@ -180,11 +200,11 @@ export class ClientComponent implements OnInit {
   saveClient() {
     this.submitted.set(true);
 
-    const isValid = this.client.name?.trim() && 
-                    this.client.ruc?.trim() && 
-                    this.client.email?.trim() && 
-                    this.client.phone?.trim() && 
-                    this.client.province?.trim() && 
+    const isValid = this.client.name?.trim() &&
+                    this.client.ruc?.trim() &&
+                    this.client.email?.trim() &&
+                    this.client.phone?.trim() &&
+                    this.client.province?.trim() &&
                     this.client.canton?.trim();
 
     if (isValid) {
