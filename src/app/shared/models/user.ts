@@ -24,8 +24,12 @@ export interface User {
   employee_type?: string;
   title?: string;
   senescyt_record?: string;
-  province?: string;
-  canton?: string;
+  locate?: {
+    id: number;
+    name_provinces: string;
+    name_canton: string;
+  };
+  locate_id?: number | null;
   has_electronic_signature?: boolean;
   administrative_direction?: string;
   administrative_unit?: string;
@@ -49,8 +53,12 @@ export interface UserData {
   employee_type?: string;
   title?: string;
   senescyt_record?: string;
-  province?: string;
-  canton?: string;
+  locate?: {
+    id: number;
+    name_provinces: string;
+    name_canton: string;
+  };
+  locate_id?: number | null;
   has_electronic_signature?: boolean;
   administrative_direction?: string;
   administrative_unit?: string;

@@ -3,8 +3,12 @@ export interface Client {
   ruc: string;
   name: string;
   email: string;
-  province: string;
-  canton: string;
+  locate?: {
+    id: number;
+    name_provinces: string;
+    name_canton: string;
+  };
+  locate_id?: number | null;
   phone: string;
   created_at?: string;
   updated_at?: string;
@@ -14,7 +18,6 @@ export interface ClientRequest {
   ruc: string;
   name: string;
   email: string;
-  province: string;
-  canton: string;
+  locate_id: number | null;
   phone: string;
 }

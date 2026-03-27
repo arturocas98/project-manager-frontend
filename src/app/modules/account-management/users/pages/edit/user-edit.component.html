@@ -88,11 +88,11 @@
           </div>
           <div class="field mb-4 col-6">
             <label for="province" class="font-medium text-900">Provincia</label>
-            <input formControlName="province" id="province" type="text" pInputText />
+            <p-dropdown id="province" [options]="provinces" [(ngModel)]="selectedProvince" (onChange)="onProvinceChange()" [ngModelOptions]="{standalone: true}" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Selecciona una provincia" appendTo="body" styleClass="w-full"></p-dropdown>
           </div>
           <div class="field mb-4 col-6">
             <label for="canton" class="font-medium text-900">Cantón</label>
-            <input formControlName="canton" id="canton" type="text" pInputText />
+             <p-dropdown id="canton" [options]="cantons" [(ngModel)]="selectedCanton" (onChange)="onCantonChange()" [ngModelOptions]="{standalone: true}" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Selecciona un cantón" [disabled]="!selectedProvince" appendTo="body" styleClass="w-full"></p-dropdown>
           </div>
           <div class="field mb-4 col-6">
             <label for="administrative_direction" class="font-medium text-900">Dirección Administrativa</label>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Constants, NUMBERS, SEVERITY } from 'src/app/shared/constants/constants';
@@ -12,6 +12,8 @@ import * as moment from 'moment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from 'src/app/core/service/auth.service';
+import { LocateResponse } from 'src/app/shared/models/locate.response';
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
@@ -42,7 +44,7 @@ import { CheckboxModule } from 'primeng/checkbox';
     CheckboxModule,
   ],
 })
-export class UserCreateComponent {
+export class UserCreateComponent implements OnInit {
   userForm: FormGroup;
   roles: Option[] = [];
   rolPartner = 'Partner';
@@ -61,13 +63,21 @@ export class UserCreateComponent {
     },
   ];
 
+  locations: LocateResponse[] = [];
+  provinces: any[] = [];
+  cantons: any[] = [];
+  
+  selectedProvince: string = '';
+  selectedCanton: string = '';
+
   constructor(
     private userService: UserService,
     private roleService: RoleService,
     private fb: FormBuilder,
     private router: Router,
     private messageService: MessageService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private authService: AuthService
   ) {
     const params: ParamJson = {
       ...Constants.pageParams.all,
@@ -95,14 +105,57 @@ export class UserCreateComponent {
       employee_type: [''],
       title: [''],
       senescyt_record: [''],
-      province: [''],
-      canton: [''],
+      locate_id: [null],
       has_electronic_signature: [false],
       administrative_direction: [''],
       administrative_unit: [''],
       entity_ruc: [''],
       entity_name: [''],
     });
+  }
+
+  ngOnInit(): void {
+    this.loadLocations();
+  }
+
+  loadLocations() {
+    this.authService.getLocations().subscribe({
+      next: (res) => {
+        this.locations = Array.isArray(res) ? res : (res as any).data || [];
+        const uniqueProvinces = [...new Set(this.locations.map(loc => loc.name_provinces))];
+        this.provinces = uniqueProvinces.map(p => ({ label: p, value: p }));
+      },
+      error: () => console.error('Error loading locations')
+    });
+  }
+
+  onProvinceChange() {
+    if (!this.selectedProvince) {
+      this.cantons = [];
+      this.selectedCanton = '';
+      this.userForm.get('locate_id')?.setValue(null);
+      return;
+    }
+
+    this.selectedCanton = '';
+    this.userForm.get('locate_id')?.setValue(null);
+
+    const filteredCantons = this.locations
+      .filter(loc => loc.name_provinces === this.selectedProvince)
+      .map(loc => loc.name_canton);
+
+    this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
+  }
+
+  onCantonChange() {
+    if(this.selectedProvince && this.selectedCanton) {
+      const location = this.locations.find(
+        loc => loc.name_provinces === this.selectedProvince && loc.name_canton === this.selectedCanton
+      );
+      this.userForm.get('locate_id')?.setValue(location ? location.id : null);
+    } else {
+      this.userForm.get('locate_id')?.setValue(null);
+    }
   }
 
   changeRol(roles: Option[]): void {

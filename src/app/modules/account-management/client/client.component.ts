@@ -46,6 +46,9 @@ export class ClientComponent implements OnInit {
   provinces: any[] = [];
   cantons: any[] = [];
 
+  selectedProvince: string = '';
+  selectedCanton: string = '';
+
   constructor(
     private authService: AuthService,
     private confirmationService: ConfirmationService,
@@ -73,20 +76,33 @@ export class ClientComponent implements OnInit {
 
   onProvinceChange() {
     // Re-calculate cantons when province changes
-    if (!this.client.province) {
+    if (!this.selectedProvince) {
       this.cantons = [];
-      this.client.canton = '';
+      this.selectedCanton = '';
+      this.client.locate_id = null;
       return;
     }
 
     // reset Canton if it doesn't belong to the new province
-    this.client.canton = '';
+    this.selectedCanton = '';
+    this.client.locate_id = null;
 
     const filteredCantons = this.locations
-      .filter(loc => loc.name_provinces === this.client.province)
+      .filter(loc => loc.name_provinces === this.selectedProvince)
       .map(loc => loc.name_canton);
 
     this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
+  }
+
+  onCantonChange() {
+    if(this.selectedProvince && this.selectedCanton) {
+      const location = this.locations.find(
+        loc => loc.name_provinces === this.selectedProvince && loc.name_canton === this.selectedCanton
+      );
+      this.client.locate_id = location ? location.id : null;
+    } else {
+      this.client.locate_id = null;
+    }
   }
 
   loadClients() {
@@ -118,14 +134,15 @@ export class ClientComponent implements OnInit {
       ruc: '',
       name: '',
       email: '',
-      province: '',
-      canton: '',
+      locate_id: null,
       phone: ''
     };
   }
 
   openNew() {
     this.client = this.getEmptyClient();
+    this.selectedProvince = '';
+    this.selectedCanton = '';
     this.selectedClientId = null;
     this.submitted.set(false);
     this.clientDialog.set(true);
@@ -136,25 +153,29 @@ export class ClientComponent implements OnInit {
       ruc: clientVar.ruc,
       name: clientVar.name,
       email: clientVar.email,
-      province: clientVar.province,
-      canton: clientVar.canton,
+      locate_id: clientVar.locate_id || null,
       phone: clientVar.phone
     };
     this.selectedClientId = clientVar.id;
 
+    const clientProv = clientVar.locate?.name_provinces;
+    const clientCant = clientVar.locate?.name_canton;
+
     // Buscar la provincia que coincida (insensible a mayúsculas)
     const matchingProvince = this.provinces.find(
-      p => p.value.toLowerCase() === clientVar.province?.toLowerCase()
+      p => p.value.toLowerCase() === clientProv?.toLowerCase()
     );
 
     if (matchingProvince) {
-      this.client.province = matchingProvince.value; // Usar el valor exacto de la lista
+      this.selectedProvince = matchingProvince.value; // Usar el valor exacto de la lista
+    } else {
+      this.selectedProvince = '';
     }
 
     // Cargar cantones
-    if (this.client.province) {
+    if (this.selectedProvince) {
       const filteredCantons = this.locations
-        .filter(loc => loc.name_provinces?.toLowerCase() === this.client.province?.toLowerCase())
+        .filter(loc => loc.name_provinces?.toLowerCase() === this.selectedProvince?.toLowerCase())
         .map(loc => loc.name_canton);
 
       const uniqueCantons = [...new Set(filteredCantons)];
@@ -162,12 +183,21 @@ export class ClientComponent implements OnInit {
 
       // Buscar el cantón que coincida
       const matchingCanton = this.cantons.find(
-        c => c.value.toLowerCase() === clientVar.canton?.toLowerCase()
+        c => c.value.toLowerCase() === clientCant?.toLowerCase()
       );
 
       if (matchingCanton) {
-        this.client.canton = matchingCanton.value; // Usar el valor exacto de la lista
+        this.selectedCanton = matchingCanton.value; // Usar el valor exacto de la lista
+        const location = this.locations.find(
+          loc => loc.name_provinces === this.selectedProvince && loc.name_canton === this.selectedCanton
+        );
+        this.client.locate_id = location ? location.id : null;
+      } else {
+        this.selectedCanton = '';
       }
+    } else {
+      this.cantons = [];
+      this.selectedCanton = '';
     }
 
     this.clientDialog.set(true);
@@ -204,8 +234,9 @@ export class ClientComponent implements OnInit {
                     this.client.ruc?.trim() &&
                     this.client.email?.trim() &&
                     this.client.phone?.trim() &&
-                    this.client.province?.trim() &&
-                    this.client.canton?.trim();
+                    this.selectedProvince?.trim() &&
+                    this.selectedCanton?.trim() &&
+                    this.client.locate_id !== null;
 
     if (isValid) {
       if (this.selectedClientId) {
@@ -225,6 +256,7 @@ export class ClientComponent implements OnInit {
             this.clients.set([...this.clients()]); // trigger change detection if needed
             this.clientDialog.set(false);
             this.client = this.getEmptyClient();
+            this.loadClients();
           },
           error: () => {
              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not update client', life: 3000 });

@@ -24,6 +24,8 @@ import { ToastModule } from 'primeng/toast';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { InputTextModule } from 'primeng/inputtext';
 import { Option } from 'src/app/shared/models/general';
+import { AuthService } from 'src/app/core/service/auth.service';
+import { LocateResponse } from 'src/app/shared/models/locate.response';
 import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
@@ -66,6 +68,13 @@ export class UserEditComponent implements OnInit {
     },
   ];
 
+  locations: LocateResponse[] = [];
+  provinces: any[] = [];
+  cantons: any[] = [];
+  
+  selectedProvince: string = '';
+  selectedCanton: string = '';
+
   constructor(
     private userService: UserService,
     private roleService: RoleService,
@@ -73,7 +82,8 @@ export class UserEditComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private messageService: MessageService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private authService: AuthService
   ) {
     const userId = this.activatedRoute.snapshot.paramMap.get('id');
     if (userId) {
@@ -98,8 +108,7 @@ export class UserEditComponent implements OnInit {
       employee_type: [''],
       title: [''],
       senescyt_record: [''],
-      province: [''],
-      canton: [''],
+      locate_id: [null],
       has_electronic_signature: [false],
       administrative_direction: [''],
       administrative_unit: [''],
@@ -111,21 +120,87 @@ export class UserEditComponent implements OnInit {
   ngOnInit(): void {
     this.getRoles();
     if (this.userId) {
-      this.userService.getUser(this.userId).subscribe((response: UserResponse) => {
-        const expires_at = response.data.expires_at ? moment(response.data.expires_at).toDate() : null;
-        const birthdate = response.data.birthdate ? moment(response.data.birthdate).toDate() : null;
-        const data = {
-          ...response.data,
-          expires_at,
-          birthdate,
-          rols: response.data.rols,
-          password: null,
-          status: !response.data.deleted_at,
-        };
-        this.userForm.patchValue(data);
-        this.userForm.updateValueAndValidity();
-        this.changeRol();
+      this.authService.getLocations().subscribe({
+        next: (res) => {
+          this.locations = Array.isArray(res) ? res : (res as any).data || [];
+          const uniqueProvinces = [...new Set(this.locations.map(loc => loc.name_provinces))];
+          this.provinces = uniqueProvinces.map(p => ({ label: p, value: p }));
+          
+          this.loadUser();
+        },
+        error: () => {
+          console.error('Error loading locations');
+          this.loadUser(); // Intentar cargar el usuario de todas formas
+        }
       });
+    }
+  }
+
+  loadUser(): void {
+    if (!this.userId) return;
+    this.userService.getUser(this.userId).subscribe((response: UserResponse) => {
+      const expires_at = response.data.expires_at ? moment(response.data.expires_at).toDate() : null;
+      const birthdate = response.data.birthdate ? moment(response.data.birthdate).toDate() : null;
+      
+      const locationProv = response.data.locate?.name_provinces || '';
+      const locationCant = response.data.locate?.name_canton || '';
+
+      const matchingProvince = this.provinces.find(p => p.value.toLowerCase() === locationProv.toLowerCase());
+      if (matchingProvince) {
+        this.selectedProvince = matchingProvince.value;
+        const filteredCantons = this.locations
+          .filter(loc => loc.name_provinces?.toLowerCase() === this.selectedProvince.toLowerCase())
+          .map(loc => loc.name_canton);
+        this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
+        
+        const matchingCanton = this.cantons.find(c => c.value.toLowerCase() === locationCant.toLowerCase());
+        if (matchingCanton) {
+          this.selectedCanton = matchingCanton.value;
+        }
+      }
+
+      const data = {
+        ...response.data,
+        locate_id: response.data.locate_id || null,
+        expires_at,
+        birthdate,
+        rols: response.data.rols,
+        password: null,
+        status: !response.data.deleted_at,
+      };
+      
+      this.userForm.patchValue(data);
+      this.userForm.updateValueAndValidity();
+      this.changeRol();
+    });
+  }
+
+  onProvinceChange() {
+    if (!this.selectedProvince) {
+      this.cantons = [];
+      this.selectedCanton = '';
+      this.userForm.get('locate_id')?.setValue(null);
+      return;
+    }
+
+    this.selectedCanton = '';
+    this.userForm.get('locate_id')?.setValue(null);
+
+    const filteredCantons = this.locations
+      .filter(loc => loc.name_provinces === this.selectedProvince)
+      .map(loc => loc.name_canton);
+
+    this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
+  }
+
+  onCantonChange() {
+    if(this.selectedProvince && this.selectedCanton) {
+      const location = this.locations.find(
+        loc => loc.name_provinces === this.selectedProvince && loc.name_canton === this.selectedCanton
+      );
+      this.userForm.get('locate_id')?.setValue(location ? location.id : null);
+    } else {
+      this.userForm.get('locate_id')?.setValue(null);
     }
   }
 

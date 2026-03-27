@@ -19,7 +19,7 @@
   </div>
 
   <p-table #dt [value]="clients()" [rows]="10" [paginator]="true" [loading]="loading()"
-    [globalFilterFields]="['name','ruc','email','province','canton']" [rowHover]="true" dataKey="id"
+    [globalFilterFields]="['name','ruc','email','locate.name_provinces','locate.name_canton']" [rowHover]="true" dataKey="id"
     currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas" [showCurrentPageReport]="true"
     styleClass="p-datatable-sm md:p-datatable-lg" [tableStyle]="{ 'min-width': '50rem' }">
 
@@ -61,8 +61,8 @@
             {{clientVar.email}}
           </div>
         </td>
-        <td class="text-sm text-color">{{clientVar.province}}</td>
-        <td class="text-sm text-color">{{clientVar.canton}}</td>
+        <td class="text-sm text-color">{{clientVar.locate?.name_provinces}}</td>
+        <td class="text-sm text-color">{{clientVar.locate?.name_canton}}</td>
         <td class="text-sm text-color-secondary">
           <div class="flex align-items-center gap-1">
             <i class="ph-fill ph-phone cursor-pointer text-color-secondary"></i>
@@ -150,12 +150,12 @@
           <label for="provincia" class="block text-sm font-semibold text-color flex items-center gap-1">
             <i class="ph ph-map-pin text-color"></i> Provincia <span class="text-red-500">*</span>
           </label>
-          <p-dropdown id="provincia" [options]="provinces" [(ngModel)]="client.province"
+          <p-dropdown id="provincia" [options]="provinces" [(ngModel)]="selectedProvince"
             (onChange)="onProvinceChange()" optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
             placeholder="Selecciona una provincia"
             styleClass="w-full p-inputtext-sm rounded-lg border-gray-300 shadow-sm" appendTo="body"
-            [ngClass]="{'ng-invalid ng-dirty': submitted() && !client.province}"></p-dropdown>
-          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !client.province">La
+            [ngClass]="{'ng-invalid ng-dirty': submitted() && !selectedProvince}"></p-dropdown>
+          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !selectedProvince">La
             provincia es requerida.</small>
         </div>
 
@@ -164,11 +164,11 @@
           <label for="canton" class="block text-sm font-semibold text-color flex items-center gap-1">
             <i class="ph ph-map-pin-line text-color"></i> Cantón <span class="text-red-500">*</span>
           </label>
-          <p-dropdown id="canton" [options]="cantons" [(ngModel)]="client.canton" optionLabel="label"
+          <p-dropdown id="canton" [options]="cantons" [(ngModel)]="selectedCanton" (onChange)="onCantonChange()" optionLabel="label"
             optionValue="value" [filter]="true" filterBy="label" placeholder="Selecciona un cantón"
-            [disabled]="!client.province" styleClass="w-full p-inputtext-sm rounded-lg border-gray-300 shadow-sm"
-            appendTo="body" [ngClass]="{'ng-invalid ng-dirty': submitted() && !client.canton}"></p-dropdown>
-          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !client.canton">El cantón
+            [disabled]="!selectedProvince" styleClass="w-full p-inputtext-sm rounded-lg border-gray-300 shadow-sm"
+            appendTo="body" [ngClass]="{'ng-invalid ng-dirty': submitted() && !selectedCanton}"></p-dropdown>
+          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !selectedCanton">El cantón
             es requerido.</small>
         </div>
       </div>
