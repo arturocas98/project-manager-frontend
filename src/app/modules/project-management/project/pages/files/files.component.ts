@@ -7,6 +7,10 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
 import { SkeletonModule } from 'primeng/skeleton';
+import { MediaService } from '../../../../../core/service/media.service';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { FileUploadModule } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-project-files',
@@ -16,22 +20,27 @@ import { SkeletonModule } from 'primeng/skeleton';
     CardModule,
     ButtonModule,
     ToastModule,
-    SkeletonModule
+    SkeletonModule,
+    ConfirmDialogModule,
+    FileUploadModule
   ],
   templateUrl: './files.component.html',
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class FilesComponent implements OnInit {
   projectId!: number;
   files: any[] = [];
   loading: boolean = true;
+  viewMode: 'grid' | 'list' = 'grid';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private projectService: ProjectService,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private mediaService: MediaService,
+    private confirmationService: ConfirmationService
+  ) { }
 
   ngOnInit(): void {
     // Obtenemos el ID del proyecto de la ruta padre
@@ -63,11 +72,17 @@ export class FilesComponent implements OnInit {
   }
 
   goToOrigin(file: any): void {
-    if (file.model_type === 'messages') {
+    console.log(file);
+
+    const isMessage = file.model_type === 'message';
+    const isTaskOrComment = file.model_type === 'task_comment';
+
+    if (isMessage) {
       this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-chat'], {
         queryParams: { messageId: file.model_id }
       });
-    } else if (file.model_type === 'task_coments' || file.model_type === 'incidences') { // incidences is added just in case task attachment uses incidences
+    } else if (isTaskOrComment) {
+      // incidences is added just in case task attachment uses incidences
       this.router.navigate(['/project-management/projects/kanban', this.projectId, 'task-details', file.model_id]);
     }
   }
@@ -83,9 +98,10 @@ export class FilesComponent implements OnInit {
   }
 
   getOriginName(modelType: string): string {
-    if (modelType === 'messages') return 'Chat Grupal';
-    if (modelType === 'task_coments') return 'Comentario de tarea';
-    if (modelType === 'incidences') return 'Tarea';
+    if (!modelType) return 'Proyecto';
+    if (modelType === 'message' || String(modelType).includes('Message')) return 'Chat Grupal';
+    if (modelType === 'task_coment' || String(modelType).includes('TaskComment')) return 'Comentario de tarea';
+    if (modelType === 'incidence' || String(modelType).includes('Incidence')) return 'Tarea';
     return 'Proyecto';
   }
 
@@ -96,5 +112,49 @@ export class FilesComponent implements OnInit {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  uploading = false;
+  onUpload(event: any, fileUploadCtrl: any) {
+    const file = event.files[0];
+    if (file) {
+      this.uploading = true;
+      this.mediaService.uploadMedia(file, 'project', this.projectId).subscribe({
+        next: (uploadedFile) => {
+          this.uploading = false;
+          fileUploadCtrl.clear();
+          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Archivo subido correctamente' });
+          this.files.unshift(uploadedFile);
+        },
+        error: (err) => {
+          this.uploading = false;
+          fileUploadCtrl.clear();
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Error al subir archivo' });
+        }
+      });
+    }
+  }
+
+  deleteFile(fileItem: any, event: Event) {
+    if (event) event.stopPropagation();
+    this.confirmationService.confirm({
+      message: '¿Estás seguro que deseas eliminar permanentemente este archivo?',
+      header: 'Confirmar eliminación',
+      icon: 'ph ph-warning text-red-500',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.mediaService.deleteMedia(fileItem.id).subscribe({
+          next: () => {
+            this.files = this.files.filter(f => f.id !== fileItem.id);
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Archivo eliminado' });
+          },
+          error: (err) => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Error al eliminar el archivo' });
+          }
+        });
+      }
+    });
   }
 }

@@ -244,7 +244,8 @@ export class ProjectService {
   }
 
   getProjectFiles(projectId: number): Observable<any[]> {
-    return this.apiService.get<any>(`projects/${projectId}/files`);
+    return this.apiService.get<any>(`projects/${projectId}/files`)
+      .pipe(map(res => res.data || res));
   }
 
   createProjectMessage(projectId: number, payload: MessageRequest, file?: File): Observable<MessageResource> {
