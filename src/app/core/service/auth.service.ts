@@ -182,7 +182,7 @@ export class AuthService {
   // Client Methods
   getClients(): Observable<Client[]> {
     return this.apiService
-      .get<any[]>('auth/clients', { page: 1, per_page: 1000 })
+      .get<any[]>('auth/clients?page=1&per_page=1000')
       .pipe(map(response => response.map(item => item || item.data)));
   }
 
