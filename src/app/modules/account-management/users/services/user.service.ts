@@ -25,7 +25,7 @@ export class UserService {
   private globalFilter: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private page: BehaviorSubject<number> = new BehaviorSubject<number>(1);
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   setGlobalFilter(filter: string) {
     this.globalFilter.next(filter);
@@ -78,14 +78,14 @@ export class UserService {
         value: ['name'],
       },
       {
-        name: USER.USER_ROLE_COLUMN,
+        name: USER.USER_IDENTIFICATION_COLUMN,
         show: true,
         filter: true,
         sort: {
           show: false,
-          field: 'roles.name',
+          field: 'id_card',
         },
-        value: [USER.USER_ROLE_VALUE],
+        value: ['id_card'],
       },
       {
         name: 'user.email',

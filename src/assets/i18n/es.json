@@ -116,6 +116,7 @@
     "name": "Nombre",
     "createdAt": "Creado el",
     "role": "Rol",
+    "identification": "Identificación",
     "modality": "Modalidad",
     "telephone": "Celular",
     "address": "Direccion domiciliaria",

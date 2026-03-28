@@ -202,4 +202,5 @@ export const USER = {
   USER_ROLE_VALUE: 'rols',
   USER_ROLE_COLUMN: 'user.role',
   USER_SUBROLE_COLUMN: 'user.subrole',
+  USER_IDENTIFICATION_COLUMN: 'user.identification',
 };
