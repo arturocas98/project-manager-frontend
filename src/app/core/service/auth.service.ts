@@ -12,12 +12,11 @@ import {
   CreateTeamRequest,
   TeamFilters,
   TeamMemberRequest,
-  UpdateTeamRequest
-} from "../../shared/models/team-models/team-request.model";
-import { Team, TeamManagement } from "../../shared/models/team-models/team.model";
+  UpdateTeamRequest,
+} from '../../shared/models/team-models/team-request.model';
+import { Team, TeamManagement } from '../../shared/models/team-models/team.model';
 import { Client, ClientRequest } from '../../shared/models/client.model';
 import { LocateResponse } from '../../shared/models/locate.response';
-
 
 export interface LoginData {
   id_card: string;
@@ -55,7 +54,6 @@ export class AuthService {
     this.loadProfileFromStorage();
   }
 
-
   login(data: LoginData): Observable<LoginResponse> {
     return this.http.post(`${environment.apiUrl}/auth/login`, data) as Observable<LoginResponse>;
   }
@@ -63,7 +61,6 @@ export class AuthService {
   register(data: RegisterData): Observable<HttpResponse<any>> {
     return this.http.post<any>(`${environment.apiUrl}/auth/register`, data, { observe: 'response' });
   }
-
 
   getProfile(): Observable<ApiSingleResponse<User>> {
     console.log('Getting user');
@@ -81,12 +78,10 @@ export class AuthService {
     return this.apiService.get<Profile[]>('user/profiles');
   }
 
-
   private updateProfileState(user: User): void {
     this._profile.set(user);
     localStorage.setItem(LOCAL_STORAGE_KEYS.profile, JSON.stringify(user));
   }
-
 
   getProfileLocal(): Profile {
     return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.profile)!) as Profile;
@@ -147,22 +142,14 @@ export class AuthService {
   }
 
   getTeams(filters?: TeamFilters): Observable<Team[]> {
-    return this.apiService
-      .get<any[]>('auth/team', filters)
-      .pipe(
-        map(response => response.map(item => item.data))
-      );
+    return this.apiService.get<any[]>('auth/team', filters).pipe(map(response => response.map(item => item.data)));
   }
-
 
   getTeamManagement(): Observable<TeamManagement[]> {
     return this.apiService
       .get<any[]>(`${environment.apiUrl}/auth/team/management`)
-      .pipe(
-        map(response => response.map(item => item.data))
-      );
+      .pipe(map(response => response.map(item => item.data)));
   }
-
 
   getTeam(id: number): Observable<Team> {
     return this.apiService.get<Team>(`${environment.apiUrl}/auth/team/${id}`);
@@ -194,9 +181,9 @@ export class AuthService {
 
   // Client Methods
   getClients(): Observable<Client[]> {
-    return this.apiService.get<any[]>('auth/clients').pipe(
-      map(response => response.map(item => item || item.data))
-    );
+    return this.apiService
+      .get<any[]>('auth/clients', { page: 1, per_page: 1000 })
+      .pipe(map(response => response.map(item => item || item.data)));
   }
 
   getClient(id: number): Observable<Client> {

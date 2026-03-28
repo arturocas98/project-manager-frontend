@@ -1,10 +1,14 @@
 <div class="surface-card shadow-xl border-round-2xl p-6 md:p-8 animate-fade-in">
   <p-toast position="top-right"></p-toast>
-  <p-confirmDialog [style]="{ width: '450px' }" acceptButtonStyleClass="p-button-danger border-round-lg"
-    rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+  <p-confirmDialog
+    [style]="{ width: '450px' }"
+    acceptButtonStyleClass="p-button-danger border-round-lg"
+    rejectButtonStyleClass="p-button-text"
+  ></p-confirmDialog>
 
   <div
-    class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-8 pb-4 border-bottom-1 border-gray-100">
+    class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-8 pb-4 border-bottom-1 border-gray-100"
+  >
     <div class="mb-4 md:mb-0">
       <h5 class="text-2xl font-extrabold text-color m-0 tracking-tight flex align-items-center gap-2">
         <i class="ph ph-users text-blue-500"></i> Gestionar Clientes
@@ -12,137 +16,210 @@
       <p class="text-sm text-color-secondary mt-1 m-0">Administra la base de datos de tus clientes.</p>
     </div>
     <div class="flex justify-content-between md:justify-content-end">
-      <button pButton pRipple label="Nuevo Cliente" icon="ph p-1 ph-plus-circle"
+      <button
+        pButton
+        pRipple
+        label="Nuevo Cliente"
+        icon="ph p-1 ph-plus-circle"
         class="p-button-success shadow-lg hover:shadow-xl transition-shadow border-round-lg p-button-sm font-semibold"
-        (click)="openNew()"></button>
+        (click)="openNew()"
+      ></button>
     </div>
   </div>
 
-  <p-table #dt [value]="clients()" [rows]="10" [paginator]="true" [loading]="loading()"
-    [globalFilterFields]="['name','ruc','email','locate.name_provinces','locate.name_canton']" [rowHover]="true" dataKey="id"
-    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas" [showCurrentPageReport]="true"
-    styleClass="p-datatable-sm md:p-datatable-lg" [tableStyle]="{ 'min-width': '50rem' }">
-
+  <p-table
+    #dt
+    [value]="clients()"
+    [rows]="10"
+    [paginator]="true"
+    [loading]="loading()"
+    [globalFilterFields]="['name', 'ruc', 'email', 'locate.name_provinces', 'locate.name_canton']"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} entradas"
+    [showCurrentPageReport]="true"
+    styleClass="p-datatable-sm md:p-datatable-lg"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-end h-10 mb-4">
         <span class="p-input-icon-left w-full md:w-20rem">
           <i class="ph ph-magnifying-glass text-color-secondary"></i>
-          <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
             placeholder="Buscar cliente..."
-            class="w-full border-round-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 py-2 pl-10" />
+            class="w-full border-round-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 py-2 pl-10"
+          />
         </span>
       </div>
     </ng-template>
 
     <ng-template pTemplate="header">
       <tr class="surface-card">
+        <th pSortableColumn="id" class="text-color font-bold py-4">ID <p-sortIcon field="id"></p-sortIcon></th>
         <th pSortableColumn="ruc" class="text-color font-bold py-4">RUC <p-sortIcon field="ruc"></p-sortIcon></th>
-        <th pSortableColumn="name" class="text-color font-bold py-4">Nombre <p-sortIcon field="name"></p-sortIcon>
+        <th pSortableColumn="name" class="text-color font-bold py-4">Nombre <p-sortIcon field="name"></p-sortIcon></th>
+        <th pSortableColumn="email" class="text-color font-bold py-4">
+          Correo <p-sortIcon field="email"></p-sortIcon>
         </th>
-        <th pSortableColumn="email" class="text-color font-bold py-4">Correo <p-sortIcon field="email"></p-sortIcon>
+        <th pSortableColumn="province" class="text-color font-bold py-4">
+          Provincia <p-sortIcon field="province"></p-sortIcon>
         </th>
-        <th pSortableColumn="province" class="text-color font-bold py-4">Provincia <p-sortIcon
-            field="province"></p-sortIcon></th>
-        <th pSortableColumn="canton" class="text-color font-bold py-4">Cantón <p-sortIcon field="canton"></p-sortIcon>
+        <th pSortableColumn="canton" class="text-color font-bold py-4">
+          Cantón <p-sortIcon field="canton"></p-sortIcon>
         </th>
-        <th pSortableColumn="phone" class="text-color font-bold py-4">Teléfono <p-sortIcon
-            field="phone"></p-sortIcon></th>
+        <th pSortableColumn="phone" class="text-color font-bold py-4">
+          Teléfono <p-sortIcon field="phone"></p-sortIcon>
+        </th>
         <th class="text-center w-8rem py-4">Acciones</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-clientVar>
       <tr>
-        <td class="font-medium text-color">{{clientVar.ruc}}</td>
-        <td class="font-semibold text-color">{{clientVar.name}}</td>
+        <td class="font-medium text-color">{{ clientVar.id }}</td>
+        <td class="font-medium text-color">{{ clientVar.ruc }}</td>
+        <td class="font-semibold text-color">{{ clientVar.name }}</td>
         <td class="text-sm text-color-secondary">
           <div class="flex align-items-center gap-1">
             <i class="ph-fill ph-envelope-simple text-color-secondary"></i>
-            {{clientVar.email}}
+            {{ clientVar.email }}
           </div>
         </td>
-        <td class="text-sm text-color">{{clientVar.locate?.name_provinces}}</td>
-        <td class="text-sm text-color">{{clientVar.locate?.name_canton}}</td>
+        <td class="text-sm text-color">{{ clientVar.locate?.name_provinces }}</td>
+        <td class="text-sm text-color">{{ clientVar.locate?.name_canton }}</td>
         <td class="text-sm text-color-secondary">
           <div class="flex align-items-center gap-1">
             <i class="ph-fill ph-phone cursor-pointer text-color-secondary"></i>
-            {{clientVar.phone}}
+            {{ clientVar.phone }}
           </div>
         </td>
         <td>
           <div class="flex gap-2 justify-content-center">
-            <button pButton pRipple icon="ph ph-pencil-simple" class="p-button-rounded p-button-text p-button-info"
-              (click)="editClient(clientVar)" pTooltip="Editar"></button>
-            <button pButton pRipple icon="ph ph-trash" class="p-button-rounded p-button-text p-button-danger"
-              (click)="deleteClient(clientVar)" pTooltip="Eliminar"></button>
+            <button
+              pButton
+              pRipple
+              icon="ph ph-pencil-simple"
+              class="p-button-rounded p-button-text p-button-info"
+              (click)="editClient(clientVar)"
+              pTooltip="Editar"
+            ></button>
+            <button
+              pButton
+              pRipple
+              icon="ph ph-trash"
+              class="p-button-rounded p-button-text p-button-danger"
+              (click)="deleteClient(clientVar)"
+              pTooltip="Eliminar"
+            ></button>
           </div>
         </td>
       </tr>
     </ng-template>
   </p-table>
-  <p-dialog [(visible)]="clientDialog" [style]="{ width: '550px', 'max-width': '95vw' }" header="Detalles del Cliente"
-    [modal]="true" class="p-fluid" [dismissableMask]="true">
+  <p-dialog
+    [(visible)]="clientDialog"
+    [style]="{ width: '550px', 'max-width': '95vw' }"
+    header="Detalles del Cliente"
+    [modal]="true"
+    class="p-fluid"
+    [dismissableMask]="true"
+  >
     <ng-template pTemplate="content">
       <div class="flex flex-column gap-3 mt-2">
-
         <!-- Ruc -->
         <div class="flex flex-column gap-1">
-          <label for="ruc" class="block text-sm font-semibold text-color">RUC <span
-              class="text-red-500">*</span></label>
+          <label for="ruc" class="block text-sm font-semibold text-color"
+            >RUC <span class="text-red-500">*</span></label
+          >
           <span class="p-input-icon-left w-full">
             <i class="ph ph-identification-card text-color-secondary"></i>
-            <input type="text" pInputText id="ruc" [(ngModel)]="client.ruc" required autofocus
-              [ngClass]="{'border-red-500 ring-1 ring-red-500': submitted() && !client.ruc}"
+            <input
+              type="text"
+              pInputText
+              id="ruc"
+              [(ngModel)]="client.ruc"
+              required
+              autofocus
+              [ngClass]="{ 'border-red-500 ring-1 ring-red-500': submitted() && !client.ruc }"
               class="w-full border-round-lg pl-10 border-gray-300 shadow-sm transition-all focus:border-blue-500 focus:ring-blue-500"
-              placeholder="17xxxxxxxx001" />
+              placeholder="17xxxxxxxx001"
+            />
           </span>
-          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.ruc">El RUC es
-            requerido.</small>
+          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.ruc"
+            >El RUC es requerido.</small
+          >
         </div>
 
         <!-- Nombre -->
         <div class="flex flex-column gap-1">
-          <label for="nombre" class="block text-sm font-semibold text-color">Nombre o Razón Social <span
-              class="text-red-500">*</span></label>
+          <label for="nombre" class="block text-sm font-semibold text-color"
+            >Nombre o Razón Social <span class="text-red-500">*</span></label
+          >
           <span class="p-input-icon-left w-full">
             <i class="ph ph-buildings text-color-secondary"></i>
-            <input type="text" pInputText id="nombre" [(ngModel)]="client.name" required
-              [ngClass]="{'border-red-500 ring-1 ring-red-500': submitted() && !client.name}"
+            <input
+              type="text"
+              pInputText
+              id="nombre"
+              [(ngModel)]="client.name"
+              required
+              [ngClass]="{ 'border-red-500 ring-1 ring-red-500': submitted() && !client.name }"
               class="w-full border-round-lg pl-10 border-gray-300 shadow-sm transition-all focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Google Ecuador S.A." />
+              placeholder="Google Ecuador S.A."
+            />
           </span>
-          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.name">El nombre es
-            requerido.</small>
+          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.name"
+            >El nombre es requerido.</small
+          >
         </div>
 
         <!-- Correo -->
         <div class="flex flex-column gap-1">
-          <label for="correo" class="block text-sm font-semibold text-color">Correo Electrónico <span
-              class="text-red-500">*</span></label>
+          <label for="correo" class="block text-sm font-semibold text-color"
+            >Correo Electrónico <span class="text-red-500">*</span></label
+          >
           <span class="p-input-icon-left w-full">
             <i class="ph ph-envelope-simple text-color-secondary"></i>
-            <input type="email" pInputText id="correo" [(ngModel)]="client.email" required
-              [ngClass]="{'border-red-500 ring-1 ring-red-500': submitted() && !client.email}"
+            <input
+              type="email"
+              pInputText
+              id="correo"
+              [(ngModel)]="client.email"
+              required
+              [ngClass]="{ 'border-red-500 ring-1 ring-red-500': submitted() && !client.email }"
               class="w-full border-round-lg pl-10 border-gray-300 shadow-sm transition-all focus:border-blue-500 focus:ring-blue-500"
-              placeholder="contacto@empresa.com" />
+              placeholder="contacto@empresa.com"
+            />
           </span>
-          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.email">El correo es
-            requerido.</small>
+          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.email"
+            >El correo es requerido.</small
+          >
         </div>
 
         <!-- Teléfono -->
         <div class="flex flex-column gap-1">
-          <label for="telefono" class="block text-sm font-semibold text-color">Teléfono <span
-              class="text-red-500">*</span></label>
+          <label for="telefono" class="block text-sm font-semibold text-color"
+            >Teléfono <span class="text-red-500">*</span></label
+          >
           <span class="p-input-icon-left w-full">
             <i class="ph ph-phone text-color-secondary"></i>
-            <input type="text" pInputText id="telefono" [(ngModel)]="client.phone" required
-              [ngClass]="{'border-red-500 ring-1 ring-red-500': submitted() && !client.phone}"
+            <input
+              type="text"
+              pInputText
+              id="telefono"
+              [(ngModel)]="client.phone"
+              required
+              [ngClass]="{ 'border-red-500 ring-1 ring-red-500': submitted() && !client.phone }"
               class="w-full border-round-lg pl-10 border-gray-300 shadow-sm transition-all focus:border-blue-500 focus:ring-blue-500"
-              placeholder="099xxxxxxx" />
+              placeholder="099xxxxxxx"
+            />
           </span>
-          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.phone">El teléfono es
-            requerido.</small>
+          <small class="text-red-500 text-xs font-semibold block" *ngIf="submitted() && !client.phone"
+            >El teléfono es requerido.</small
+          >
         </div>
 
         <!-- Provincia -->
@@ -150,13 +227,23 @@
           <label for="provincia" class="block text-sm font-semibold text-color flex items-center gap-1">
             <i class="ph ph-map-pin text-color"></i> Provincia <span class="text-red-500">*</span>
           </label>
-          <p-dropdown id="provincia" [options]="provinces" [(ngModel)]="selectedProvince"
-            (onChange)="onProvinceChange()" optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
+          <p-dropdown
+            id="provincia"
+            [options]="provinces"
+            [(ngModel)]="selectedProvince"
+            (onChange)="onProvinceChange()"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
             placeholder="Selecciona una provincia"
-            styleClass="w-full p-inputtext-sm rounded-lg border-gray-300 shadow-sm" appendTo="body"
-            [ngClass]="{'ng-invalid ng-dirty': submitted() && !selectedProvince}"></p-dropdown>
-          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !selectedProvince">La
-            provincia es requerida.</small>
+            styleClass="w-full p-inputtext-sm rounded-lg border-gray-300 shadow-sm"
+            appendTo="body"
+            [ngClass]="{ 'ng-invalid ng-dirty': submitted() && !selectedProvince }"
+          ></p-dropdown>
+          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !selectedProvince"
+            >La provincia es requerida.</small
+          >
         </div>
 
         <!-- Cantón -->
@@ -164,22 +251,46 @@
           <label for="canton" class="block text-sm font-semibold text-color flex items-center gap-1">
             <i class="ph ph-map-pin-line text-color"></i> Cantón <span class="text-red-500">*</span>
           </label>
-          <p-dropdown id="canton" [options]="cantons" [(ngModel)]="selectedCanton" (onChange)="onCantonChange()" optionLabel="label"
-            optionValue="value" [filter]="true" filterBy="label" placeholder="Selecciona un cantón"
-            [disabled]="!selectedProvince" styleClass="w-full p-inputtext-sm rounded-lg border-gray-300 shadow-sm"
-            appendTo="body" [ngClass]="{'ng-invalid ng-dirty': submitted() && !selectedCanton}"></p-dropdown>
-          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !selectedCanton">El cantón
-            es requerido.</small>
+          <p-dropdown
+            id="canton"
+            [options]="cantons"
+            [(ngModel)]="selectedCanton"
+            (onChange)="onCantonChange()"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
+            placeholder="Selecciona un cantón"
+            [disabled]="!selectedProvince"
+            styleClass="w-full p-inputtext-sm rounded-lg border-gray-300 shadow-sm"
+            appendTo="body"
+            [ngClass]="{ 'ng-invalid ng-dirty': submitted() && !selectedCanton }"
+          ></p-dropdown>
+          <small class="text-red-500 text-xs font-semibold block mt-1" *ngIf="submitted() && !selectedCanton"
+            >El cantón es requerido.</small
+          >
         </div>
       </div>
     </ng-template>
 
     <ng-template pTemplate="footer">
       <div class="flex gap-2 justify-content-end">
-        <button pButton pRipple label="Cancelar" icon="ph ph-x"
-          class="p-button-text p-button-secondary border-round-lg font-semibold" (click)="hideDialog()"></button>
-        <button pButton pRipple label="Guardar" icon="ph ph-check-circle"
-          class="p-button-primary shadow-md border-round-lg font-semibold" (click)="saveClient()"></button>
+        <button
+          pButton
+          pRipple
+          label="Cancelar"
+          icon="ph ph-x"
+          class="p-button-text p-button-secondary border-round-lg font-semibold"
+          (click)="hideDialog()"
+        ></button>
+        <button
+          pButton
+          pRipple
+          label="Guardar"
+          icon="ph ph-check-circle"
+          class="p-button-primary shadow-md border-round-lg font-semibold"
+          (click)="saveClient()"
+        ></button>
       </div>
     </ng-template>
   </p-dialog>
