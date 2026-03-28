@@ -20,13 +20,13 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessageModule } from 'primeng/message';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { AuthService } from "../../../core/service/auth.service";
-import { Team } from "../../../shared/models/team-models/team.model";
-import { Client } from "../../../shared/models/client.model";
-import { Profile } from "../../../shared/models/auth";
-import { CreateTeamRequest, TeamFilters } from "../../../shared/models/team-models/team-request.model";
-import { TooltipModule } from "primeng/tooltip";
-import { TeamManagementComponent } from "../team-management/team-management.component";
+import { AuthService } from '../../../core/service/auth.service';
+import { Team } from '../../../shared/models/team-models/team.model';
+import { Client } from '../../../shared/models/client.model';
+import { Profile } from '../../../shared/models/auth';
+import { CreateTeamRequest, TeamFilters } from '../../../shared/models/team-models/team-request.model';
+import { TooltipModule } from 'primeng/tooltip';
+import { TeamManagementComponent } from '../team-management/team-management.component';
 
 interface PageEvent {
   first: number;
@@ -58,7 +58,7 @@ interface PageEvent {
     ProgressSpinnerModule,
     MessageModule,
     TooltipModule,
-    TeamManagementComponent
+    TeamManagementComponent,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: 'team.component.html',
@@ -84,7 +84,7 @@ export class TeamComponent implements OnInit {
   teamFormData: CreateTeamRequest = {
     name: '',
     type: 'DEV',
-    client_id: null
+    client_id: null,
   };
 
   // Filtros
@@ -94,7 +94,7 @@ export class TeamComponent implements OnInit {
     sort_by: 'created_at',
     sort_order: 'desc',
     per_page: 10,
-    page: 1
+    page: 1,
   };
 
   // Paginación
@@ -105,35 +105,35 @@ export class TeamComponent implements OnInit {
 
   // Opciones para dropdowns
   typeOptions = [
-    { label: 'administrator', value: 'ADM' },
-    { label: 'leader', value: 'LDR' },
-    { label: 'developer', value: 'DEV' },
-    { label: 'tester', value: 'TST' },
-    { label: 'documenter', value: 'DOC' }
+    { label: 'Administrador', value: 'ADM' },
+    { label: 'Líder', value: 'LDR' },
+    { label: 'Desarrollador', value: 'DEV' },
+    { label: 'Tester', value: 'TST' },
+    { label: 'Documentador', value: 'DOC' },
   ];
 
   sortByOptions = [
     { label: 'Nombre', value: 'name' },
-    { label: 'Fecha creación', value: 'created_at' }
+    { label: 'Fecha creación', value: 'created_at' },
   ];
 
   sortOrderOptions = [
     { label: 'Ascendente', value: 'asc' },
-    { label: 'Descendente', value: 'desc' }
+    { label: 'Descendente', value: 'desc' },
   ];
 
   perPageOptions = [
     { label: '5 por página', value: 5 },
     { label: '10 por página', value: 10 },
     { label: '20 por página', value: 20 },
-    { label: '50 por página', value: 50 }
+    { label: '50 por página', value: 50 },
   ];
 
   constructor(
     private authService: AuthService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loadTeams();
@@ -142,10 +142,10 @@ export class TeamComponent implements OnInit {
 
   loadClients() {
     this.authService.getClients().subscribe({
-      next: (clients) => {
+      next: clients => {
         this.clients = clients;
       },
-      error: () => console.error('Failed to load clients')
+      error: () => console.error('Failed to load clients'),
     });
   }
 
@@ -156,7 +156,7 @@ export class TeamComponent implements OnInit {
         // Asumiendo que ApiService ya extrajo el data
         this.teams = response.data || response;
         console.log(this.teams);
-        console.log("Teamss");
+        console.log('Teamss');
         console.log(response);
         this.totalRecords = response.meta?.total || this.teams.length;
         this.loading = false;
@@ -165,15 +165,15 @@ export class TeamComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudieron cargar los equipos'
+          detail: 'No se pudieron cargar los equipos',
         });
         this.loading = false;
-      }
+      },
     });
   }
 
   loadTeamsLazy(event: any) {
-    this.filters.page = (event.first / event.rows) + 1;
+    this.filters.page = event.first / event.rows + 1;
     this.filters.per_page = event.rows;
     this.loadTeams();
   }
@@ -185,20 +185,29 @@ export class TeamComponent implements OnInit {
 
   getTagSeverity(type: string): string {
     switch (type) {
-      case 'ADM': return 'danger';
-      case 'LDR': return 'warning';
-      case 'DEV': return 'info';
-      case 'TST': return 'success';
-      case 'DOC': return 'help';
-      default: return 'info';
+      case 'ADM':
+        return 'danger';
+      case 'LDR':
+        return 'warning';
+      case 'DEV':
+        return 'info';
+      case 'TST':
+        return 'success';
+      case 'DOC':
+        return 'help';
+      default:
+        return 'info';
     }
   }
 
   getRoleSeverity(role: string): string {
     switch (role) {
-      case 'admin': return 'danger';
-      case 'editor': return 'warning';
-      default: return 'info';
+      case 'admin':
+        return 'danger';
+      case 'editor':
+        return 'warning';
+      default:
+        return 'info';
     }
   }
 
@@ -218,7 +227,7 @@ export class TeamComponent implements OnInit {
     this.teamFormData = {
       name: team.name,
       type: team.type,
-      client_id: team.client?.id || null
+      client_id: team.client?.id || null,
     };
     this.selectedTeam = team;
     this.teamDialogVisible = true;
@@ -232,7 +241,7 @@ export class TeamComponent implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
-            detail: 'Equipo actualizado correctamente'
+            detail: 'Equipo actualizado correctamente',
           });
           this.teamDialogVisible = false;
           this.loadTeams();
@@ -241,9 +250,9 @@ export class TeamComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'No se pudo actualizar el equipo'
+            detail: 'No se pudo actualizar el equipo',
           });
-        }
+        },
       });
     } else {
       // Crear equipo
@@ -252,7 +261,7 @@ export class TeamComponent implements OnInit {
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
-            detail: 'Equipo creado correctamente'
+            detail: 'Equipo creado correctamente',
           });
           this.teamDialogVisible = false;
           this.loadTeams();
@@ -261,9 +270,9 @@ export class TeamComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'No se pudo crear el equipo'
+            detail: 'No se pudo crear el equipo',
           });
-        }
+        },
       });
     }
   }
@@ -283,7 +292,7 @@ export class TeamComponent implements OnInit {
   loadProfiles() {
     this.loadingProfiles = true;
     this.authService.getProfiles().subscribe({
-      next: (profiles) => {
+      next: profiles => {
         this.profiles = profiles;
         this.filteredProfiles = profiles;
         this.loadingProfiles = false;
@@ -292,10 +301,10 @@ export class TeamComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudieron cargar los usuarios'
+          detail: 'No se pudieron cargar los usuarios',
         });
         this.loadingProfiles = false;
-      }
+      },
     });
   }
 
@@ -306,9 +315,8 @@ export class TeamComponent implements OnInit {
     }
 
     const term = this.memberSearchTerm.toLowerCase();
-    this.filteredProfiles = this.profiles.filter(p =>
-      p.name.toLowerCase().includes(term) ||
-      p.email.toLowerCase().includes(term)
+    this.filteredProfiles = this.profiles.filter(
+      p => p.name.toLowerCase().includes(term) || p.email.toLowerCase().includes(term)
     );
   }
 
@@ -321,12 +329,12 @@ export class TeamComponent implements OnInit {
 
     this.addingMemberId = userId;
     this.authService.addTeamMember(this.selectedTeam.id, { user_id: userId }).subscribe({
-      next: (updatedTeam) => {
+      next: updatedTeam => {
         this.addingMemberId = null;
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Miembro agregado correctamente'
+          detail: 'Miembro agregado correctamente',
         });
 
         // Actualizar vista local (por si el backend no trae la relación 'members')
@@ -347,14 +355,14 @@ export class TeamComponent implements OnInit {
         // Actualizar lista filtrada
         this.filterProfiles();
       },
-      error: (error) => {
+      error: error => {
         this.addingMemberId = null;
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: error.error?.message || 'No se pudo agregar el miembro'
+          detail: error.error?.message || 'No se pudo agregar el miembro',
         });
-      }
+      },
     });
   }
 
@@ -365,7 +373,7 @@ export class TeamComponent implements OnInit {
       icon: 'ph-bold ph-warning text-yellow-500 text-2xl mr-3',
       accept: () => {
         this.removeMember(userId);
-      }
+      },
     });
   }
 
@@ -374,11 +382,11 @@ export class TeamComponent implements OnInit {
     console.log(userId);
 
     this.authService.removeTeamMember(this.selectedTeam.id, userId).subscribe({
-      next: (updatedTeam) => {
+      next: updatedTeam => {
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Miembro eliminado correctamente'
+          detail: 'Miembro eliminado correctamente',
         });
 
         // Actualizar vista local (por si el backend no trae la relación 'members')
@@ -392,13 +400,13 @@ export class TeamComponent implements OnInit {
         // Refrescar tabla principal en background
         this.loadTeams();
       },
-      error: (error) => {
+      error: error => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: error.error?.message || 'No se pudo eliminar el miembro'
+          detail: error.error?.message || 'No se pudo eliminar el miembro',
         });
-      }
+      },
     });
   }
 
@@ -421,7 +429,7 @@ export class TeamComponent implements OnInit {
       icon: 'ph-bold ph-warning text-yellow-500 text-2xl mr-3',
       accept: () => {
         this.deleteTeam(team.id);
-      }
+      },
     });
   }
 
@@ -431,17 +439,17 @@ export class TeamComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Equipo eliminado correctamente'
+          detail: 'Equipo eliminado correctamente',
         });
         this.loadTeams();
       },
-      error: (error) => {
+      error: error => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: error.error?.message || 'No se pudo eliminar el equipo'
+          detail: error.error?.message || 'No se pudo eliminar el equipo',
         });
-      }
+      },
     });
   }
 }
