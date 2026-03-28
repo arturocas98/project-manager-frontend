@@ -104,7 +104,7 @@
 
         <button *ngIf="canManageTasks" pButton label="Editar" icon="ph-bold ph-pencil-simple"
                 class="p-button-primary border-round-xl shadow-2 p-button-md font-bold px-3 text-sm"
-                (click)="editTask(task?.id)" [disabled]="!task || loading"></button>
+                (click)="editTask(task.id)" [disabled]="!task || loading"></button>
       </div>
     </div>
 
@@ -246,14 +246,14 @@
           <p-tree [value]="treeData" [loading]="loading" class="w-full bg-transparent border-none p-0"
                   styleClass="border-none w-full p-0">
             <ng-template let-node pTemplate="default">
-              <div class="flex flex-col xl:flex-row xl:items-center justify-between w-full p-2 surface-ground border-round-xl mb-2 hover:shadow-md transition-all cursor-pointer border surface-border hover:border-primary"
+              <div class="flex flex-column xl:flex-row xl:align-items-center justify-content-between w-full p-2 surface-ground border-round-xl mb-2 hover:shadow-md transition-all cursor-pointer border-1 surface-border hover:border-primary"
                    (click)="navigateToTask(node.data.id)">
-                <div class="flex items-center gap-2 mb-2 xl:mb-0 flex-1 min-w-0">
-                  <div class="w-7 h-7 flex items-center justify-content-center border-circle surface-card shadow-sm flex-shrink-0">
+                <div class="flex align-items-center gap-2 mb-2 xl:mb-0 flex-1 min-w-0">
+                  <div class="w-2rem h-2rem flex align-items-center justify-content-center border-circle surface-card shadow-sm flex-shrink-0">
                     <i class="ph-bold text-sm" [ngClass]="node.children?.length ? 'ph-folder-open text-indigo-500' : 'ph-file-text text-blue-500'"></i>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <span class="font-bold text-color text-sm block truncate">{{ node.label }}</span>
+                    <span class="font-bold text-color text-sm block white-space-nowrap overflow-hidden text-overflow-ellipsis">{{ node.label }}</span>
                     <div class="flex gap-2 mt-1">
                       <span class="text-xs surface-card text-color-secondary px-2 py-0 border-round-md border-1 surface-border">
                         {{ node.data.type?.type || 'Sin tipo' }}
@@ -263,12 +263,12 @@
                     </div>
                   </div>
                 </div>
-                <div class="flex items-center gap-2 justify-end">
-                  <span class="flex items-center gap-1 text-xs font-semibold surface-card px-2 py-1 border-round-lg shadow-sm">
+                <div class="flex align-items-center gap-2 justify-content-end">
+                  <span class="flex align-items-center gap-1 text-xs font-semibold surface-card px-2 py-1 border-round-lg shadow-sm">
                     <i [class]="getPriorityIcon(node.data.priority) + ' text-xs'"></i>
                     {{ getPriorityInfo(node.data.priority).label }}
                   </span>
-                  <div class="flex items-center gap-1 text-xs text-color-secondary">
+                  <div class="flex align-items-center gap-1 text-xs text-color-secondary">
                     <i class="ph-bold ph-calendar-blank text-xs"></i>
                     <span>{{ getDisplayDate(node.data) | date:'shortDate' }}</span>
                   </div>
@@ -345,14 +345,14 @@
 
         <div *ngIf="!loadingComments && comments.length > 0" class="flex flex-column gap-3">
           <div *ngFor="let comment of comments" class="flex gap-3 p-3 surface-ground border-round-2xl border surface-border">
-            <p-avatar [label]="getUserInitials(comment.createdBy?.name || 'Usuario')" size="normal" shape="circle"
+            <p-avatar [label]="getUserInitials(comment.createdBy.name || 'Usuario')" size="normal" shape="circle"
                       [style]="{'background': '#10b981', 'width':'32px', 'height':'32px', 'font-size':'0.8rem'}" class="flex-shrink-0"></p-avatar>
             <div class="flex-1 min-w-0">
               <div class="flex flex-wrap justify-content-between align-items-start gap-2 mb-1">
                 <div>
-                  <span class="font-bold text-color text-sm">{{ comment.createdBy?.name || 'Usuario' }}</span>
-                  <span *ngIf="comment.createdBy?.user_role?.type" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0 border-round-lg ml-2">
-                    {{ getRoleNameInSpanish(comment.createdBy?.user_role?.type) }}
+                  <span class="font-bold text-color text-sm">{{ comment.createdBy.name || 'Usuario' }}</span>
+                  <span *ngIf="comment.createdBy.user_role?.type" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0 border-round-lg ml-2">
+                    {{ getRoleNameInSpanish(comment.createdBy.user_role?.type) }}
                   </span>
                 </div>
                 <span class="text-xs text-color-secondary flex items-center gap-1">

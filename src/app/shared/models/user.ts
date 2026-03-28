@@ -19,6 +19,22 @@ export interface User {
   password?: string;
   password_confirmation?: string;
   deleted_at?: string;
+  id_card?: string;
+  birthdate?: string;
+  employee_type?: string;
+  title?: string;
+  senescyt_record?: string;
+  locate?: {
+    id: number;
+    name_provinces: string;
+    name_canton: string;
+  };
+  locate_id?: number | null;
+  has_electronic_signature?: boolean;
+  administrative_direction?: string;
+  administrative_unit?: string;
+  entity_ruc?: string;
+  entity_name?: string;
 }
 export interface UserData {
   id: number;
@@ -32,6 +48,22 @@ export interface UserData {
   modality_id: string;
   address: string;
   telephone: string;
+  id_card?: string;
+  birthdate?: string;
+  employee_type?: string;
+  title?: string;
+  senescyt_record?: string;
+  locate?: {
+    id: number;
+    name_provinces: string;
+    name_canton: string;
+  };
+  locate_id?: number | null;
+  has_electronic_signature?: boolean;
+  administrative_direction?: string;
+  administrative_unit?: string;
+  entity_ruc?: string;
+  entity_name?: string;
 }
 
 export interface Profile {

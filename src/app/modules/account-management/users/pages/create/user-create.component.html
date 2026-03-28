@@ -77,6 +77,51 @@
             >
             </p-dropdown>
           </div>
+          <div class="field mb-4 col-6">
+            <label for="birthdate" class="font-medium text-900">Fecha de Nacimiento</label>
+            <p-calendar formControlName="birthdate" appendTo="body" [dateFormat]="shortLocalFormatDate" id="birthdate"></p-calendar>
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="employee_type" class="font-medium text-900">Tipo de Empleado</label>
+            <input formControlName="employee_type" id="employee_type" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="title" class="font-medium text-900">Título</label>
+            <input formControlName="title" id="title" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="senescyt_record" class="font-medium text-900">Registro Senescyt</label>
+            <input formControlName="senescyt_record" id="senescyt_record" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="province" class="font-medium text-900">Provincia</label>
+            <p-dropdown id="province" [options]="provinces" [(ngModel)]="selectedProvince" (onChange)="onProvinceChange()" [ngModelOptions]="{standalone: true}" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Selecciona una provincia" appendTo="body" styleClass="w-full"></p-dropdown>
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="canton" class="font-medium text-900">Cantón</label>
+             <p-dropdown id="canton" [options]="cantons" [(ngModel)]="selectedCanton" (onChange)="onCantonChange()" [ngModelOptions]="{standalone: true}" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Selecciona un cantón" [disabled]="!selectedProvince" appendTo="body" styleClass="w-full"></p-dropdown>
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="administrative_direction" class="font-medium text-900">Dirección Administrativa</label>
+            <input formControlName="administrative_direction" id="administrative_direction" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="administrative_unit" class="font-medium text-900">Unidad Administrativa</label>
+            <input formControlName="administrative_unit" id="administrative_unit" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="entity_ruc" class="font-medium text-900">RUC de la Entidad</label>
+            <input formControlName="entity_ruc" id="entity_ruc" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-6">
+            <label for="entity_name" class="font-medium text-900">Nombre de la Entidad</label>
+            <input formControlName="entity_name" id="entity_name" type="text" pInputText />
+          </div>
+          <div class="field mb-4 col-6 flex align-items-center">
+            <p-checkbox formControlName="has_electronic_signature" [binary]="true" inputId="has_electronic_signature"></p-checkbox>
+            <label for="has_electronic_signature" class="font-medium text-900 ml-2">¿Tiene Firma Electrónica?</label>
+          </div>
+
           <div class="col-12">
             <button pButton pRipple label="{{ 'user.create' | translate }}" class="w-auto mt-3"></button>
           </div>

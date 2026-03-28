@@ -86,7 +86,7 @@
           <td class="border-bottom-1 surface-border py-3">
             <span class="text-sm font-medium text-color-secondary flex align-items-center gap-1">
               <i class="ph ph-buildings" *ngIf="team.client"></i>
-              {{ team.client?.Nombre || 'Sin cliente' }}
+              {{ team.client?.name || 'Sin cliente' }}
             </span>
           </td>
           <td class="border-bottom-1 surface-border py-3">
@@ -319,7 +319,7 @@
       </h3>
       <div class="flex align-items-center gap-3 p-3 surface-card border-1 surface-border border-round-lg shadow-1"
         *ngIf="selectedTeam.created_by">
-        <p-avatar [label]="selectedTeam.created_by.name?.charAt(0) || ''" shape="circle" size="large"
+        <p-avatar [label]="selectedTeam.created_by.name.charAt(0) || ''" shape="circle" size="large"
           styleClass="bg-indigo-500 text-white font-bold shadow-1">
         </p-avatar>
         <div class="flex-1">
@@ -334,7 +334,7 @@
 
       <div class="flex align-items-center justify-content-between mt-5 mb-3">
         <h3 class="text-sm font-bold text-color-secondary uppercase m-0 flex align-items-center gap-2">
-          <i class="ph-bold ph-users"></i> Miembros ({{ selectedTeam.members?.length || 0 }})
+          <i class="ph-bold ph-users"></i> Miembros ({{ selectedTeam.members.length || 0 }})
         </h3>
         <button pButton label="Agregar" icon="ph-bold ph-plus"
           class="p-button-sm p-button-success p-button-outlined border-round-lg font-bold w-auto px-3"
@@ -345,7 +345,7 @@
         <div *ngFor="let member of selectedTeam.members || []"
           class="flex align-items-center justify-content-between p-3 surface-ground border-round-lg hover:surface-hover transition-colors transition-duration-150 border-1 surface-border">
           <div class="flex align-items-center gap-3">
-            <p-avatar [label]="member.name?.charAt(0) || ''" shape="circle" size="normal"
+            <p-avatar [label]="member.name.charAt(0) || ''" shape="circle" size="normal"
               styleClass="bg-primary text-white font-bold shadow-1">
             </p-avatar>
             <div>

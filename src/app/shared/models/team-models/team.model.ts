@@ -23,8 +23,8 @@ export interface Team {
   created_by: User;
   client?: {
     id: number;
-    Ruc: string;
-    Nombre: string;
+    ruc: string;
+    name: string;
   };
   created_at: string;
   updated_at: string;

@@ -65,7 +65,7 @@
               [ngStyle]="selectedAvatarMember?.user?.id === member.user.id ? {'transform': 'scale(1.1)', 'z-index': 10} : {}"
               styleClass="bg-indigo-100 text-indigo-800 text-sm font-bold shadow-1 hover:z-5 transition-transform hover:scale-110"
               (click)="toggleAvatarFilter(member)"
-              [pTooltip]="member.user.name + ' (' + member.role.type + ')'" tooltipPosition="bottom"></p-avatar>
+                      [pTooltip]="member.user.name + ' (' + translateRole(member.role.type) + ')'" tooltipPosition="bottom"></p-avatar>
             <p-avatar *ngIf="members.length > 3" label="+{{ members.length - 3 }}" shape="circle"
               styleClass="border-circle border-2 border-white bg-surface-200 text-color-secondary text-sm font-bold shadow-1 cursor-pointer hover:bg-surface-300 transition-colors"
               (click)="op.toggle($event)"
@@ -95,14 +95,30 @@
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading"
+  <div *ngIf="loading && !error"
     class="flex flex-column align-items-center justify-content-center flex-1 min-h-20rem border-round-3xl surface-card shadow-1 border-1 surface-border">
     <i class="ph ph-spinner-gap ph-spin text-indigo-500 text-5xl mb-3"></i>
     <span class="text-color-secondary font-medium text-lg">Cargando tablero...</span>
   </div>
 
+  <!-- Error State (New) -->
+  <div *ngIf="error && !loading" class="flex flex-column align-items-center justify-content-center flex-1 min-h-20rem border-round-3xl surface-card shadow-1 border-1 surface-border mt-4">
+    <div class="surface-card p-5 text-center max-w-35rem w-full">
+      <div class="bg-red-50 border-circle p-4 mb-4 inline-block">
+        <i class="ph ph-warning-circle text-6xl text-red-500"></i>
+      </div>
+      <h2 class="text-2xl font-extrabold text-color mb-2">Error al cargar</h2>
+      <p class="text-color-secondary mb-5 text-lg">{{ error }}</p>
+      <div class="flex gap-3 justify-content-center">
+        <button pButton label="Reintentar" icon="ph ph-arrows-clockwise"
+                class="p-button-primary border-round-xl p-button-md shadow-2 font-bold px-4"
+                (click)="loadBoard()"></button>
+      </div>
+    </div>
+  </div>
+
   <!-- Board Principal (Scrolling Header + Content) -->
-  <div *ngIf="!loading" cdkDropListGroup class="flex overflow-x-auto gap-4 pb-4 px-1 flex-1 align-items-start"
+  <div *ngIf="!loading && !error" cdkDropListGroup class="flex overflow-x-auto gap-4 pb-4 px-1 flex-1 align-items-start"
     style="min-height: 500px;">
 
     <!-- Iteración de Columnas -->
@@ -157,7 +173,7 @@
           <!-- Tarea: Metadatos Top -->
           <div class="flex align-items-center justify-content-between mb-2">
             <div class="flex align-items-center gap-1 text-xs font-bold text-gray-700">
-              <i [class]="getTypeIcon(task.type?.type || 'task')" class="text-sm"></i>
+              <i [class]="getTypeIcon(task.type.type || 'task')" class="text-sm"></i>
               <span>#{{ task.id }}</span>
               <span *ngIf="task.type?.type"
                     class="ml-1 text-xs px-2 py-1 border-round-lg bg-white-alpha-60 text-gray-800 border-1 border-black-alpha-20">
@@ -168,7 +184,7 @@
       <span
         class="text-xs px-2 py-1 font-bold border-round-3xl bg-black-alpha-20 text-gray-800 flex align-items-center gap-1"
         *ngIf="task.state?.state">
-        {{ task.state?.state | slice:0:15 }}<span *ngIf="(task.state?.state?.length || 0) > 15">...</span>
+        {{ task.state.state | slice:0:15 }}<span *ngIf="(task.state.state.length || 0) > 15">...</span>
       </span>
               <p-tag [value]="getPriorityDisplay(task.priority)" [severity]="getPrioritySeverity(task.priority)"
                      styleClass="text-sm px-2 py-1 border-round-3xl font-medium shadow-none bg-white-alpha-600 text-gray-800"></p-tag>
@@ -347,3 +363,4 @@
 </p-dialog>
 
 <p-confirmDialog></p-confirmDialog>
+<p-toast position="top-right"></p-toast>

@@ -271,7 +271,10 @@ export class ProjectSettingsComponent implements OnInit {
    */
   getRoleName(roleCode: string): string {
     const role = this.roleOptions.find(r => r.value === roleCode);
-    return role ? role.label : roleCode;
+    if (role) return role.label;
+
+    const map: any = { administrator: 'Administrador', leader: 'Lider', developer: 'Desarrollador', tester: 'Tester', documenter: 'Documentador' };
+    return map[roleCode.toLowerCase()] || roleCode;
   }
 
   /**

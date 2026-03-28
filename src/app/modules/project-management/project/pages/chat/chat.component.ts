@@ -33,7 +33,7 @@ import { MessageResource, MessageRequest, MessageUpdateRequest } from '../../../
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('scrollMe') private myScrollContainer!: ElementRef;
-  
+
   projectId!: number;
   messages: MessageResource[] = [];
   newMessage: string = '';
@@ -41,7 +41,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   submitting: boolean = false;
   currentUserId: number | null = null;
   selectedFile: File | null = null;
-  
+
   replyToMessage: MessageResource | null = null;
   editingMessage: MessageResource | null = null;
   editMessageText: string = '';
@@ -101,11 +101,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       next: (messages) => {
         let msgs = messages || [];
         msgs.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-        
+
         this.messages = msgs;
         this.buildMenuItems();
         this.loading = false;
-        
+
         const messageId = this.route.snapshot.queryParams['messageId'];
         if (messageId) {
           setTimeout(() => {
@@ -175,6 +175,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.selectedFile = null;
     }
   }
+
 
   removeSelectedFile(): void {
     this.selectedFile = null;
@@ -290,7 +291,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   getRoleNameInSpanish(role: string | null | undefined): string {
     if (!role) return 'Sin rol';
-    const map: any = { administrator: 'Administrador', leader: 'Líder', developer: 'Desarrollador', tester: 'Tester' };
+    const map: any = { administrator: 'Administrador', leader: 'Lider', developer: 'Desarrollador', tester: 'Tester', documenter: 'Documentador' };
     return map[role.toLowerCase()] || role;
   }
 }

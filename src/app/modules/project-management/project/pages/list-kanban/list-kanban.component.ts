@@ -99,6 +99,18 @@ export class ListKanbanComponent implements OnInit, OnDestroy {
   filtersActive = false;
   showFiltersPanel = false;
 
+  translateRole(roleType: string): string {
+    const roleMap: { [key: string]: string } = {
+      'administrator': 'Administrador',
+      'leader': 'Líder',
+      'developer': 'Desarrollador',
+      'tester': 'Tester',
+      'documenter': 'Documentador'
+    };
+
+    return roleMap[roleType?.toLowerCase()] || roleType || 'Sin rol';
+  }
+
   // Vista
   viewMode: 'board' | 'list' = 'list';
 

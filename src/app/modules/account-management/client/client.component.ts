@@ -12,6 +12,7 @@ import { ToastModule } from 'primeng/toast';
 import { Client, ClientRequest } from 'src/app/shared/models/client.model';
 import { LocateResponse } from 'src/app/shared/models/locate.response';
 import { AuthService } from 'src/app/core/service/auth.service';
+import {RippleModule} from "primeng/ripple";
 
 @Component({
   selector: 'app-client',
@@ -25,7 +26,8 @@ import { AuthService } from 'src/app/core/service/auth.service';
     InputTextModule,
     ConfirmDialogModule,
     DropdownModule,
-    ToastModule
+    ToastModule,
+    RippleModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './client.component.html',
@@ -35,7 +37,7 @@ export class ClientComponent implements OnInit {
   clients = signal<Client[]>([]);
   loading = signal<boolean>(false);
   clientDialog = signal<boolean>(false);
-  
+
   client: ClientRequest = this.getEmptyClient();
   selectedClientId: number | null = null;
   submitted = signal<boolean>(false);
@@ -43,6 +45,9 @@ export class ClientComponent implements OnInit {
   locations: LocateResponse[] = [];
   provinces: any[] = [];
   cantons: any[] = [];
+
+  selectedProvince: string = '';
+  selectedCanton: string = '';
 
   constructor(
     private authService: AuthService,
@@ -60,7 +65,7 @@ export class ClientComponent implements OnInit {
       next: (res) => {
         // the API returns { "data": [...] } but ApiService & our map might unwrap it.
         this.locations = Array.isArray(res) ? res : (res as any).data || [];
-        
+
         // Extract unique provinces
         const uniqueProvinces = [...new Set(this.locations.map(loc => loc.name_provinces))];
         this.provinces = uniqueProvinces.map(p => ({ label: p, value: p }));
@@ -71,20 +76,33 @@ export class ClientComponent implements OnInit {
 
   onProvinceChange() {
     // Re-calculate cantons when province changes
-    if (!this.client.Provincia) {
+    if (!this.selectedProvince) {
       this.cantons = [];
-      this.client.Canton = '';
+      this.selectedCanton = '';
+      this.client.locate_id = null;
       return;
     }
-    
+
     // reset Canton if it doesn't belong to the new province
-    this.client.Canton = '';
-    
+    this.selectedCanton = '';
+    this.client.locate_id = null;
+
     const filteredCantons = this.locations
-      .filter(loc => loc.name_provinces === this.client.Provincia)
+      .filter(loc => loc.name_provinces === this.selectedProvince)
       .map(loc => loc.name_canton);
-      
+
     this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
+  }
+
+  onCantonChange() {
+    if(this.selectedProvince && this.selectedCanton) {
+      const location = this.locations.find(
+        loc => loc.name_provinces === this.selectedProvince && loc.name_canton === this.selectedCanton
+      );
+      this.client.locate_id = location ? location.id : null;
+    } else {
+      this.client.locate_id = null;
+    }
   }
 
   loadClients() {
@@ -113,17 +131,18 @@ export class ClientComponent implements OnInit {
 
   getEmptyClient(): ClientRequest {
     return {
-      Ruc: '',
-      Nombre: '',
-      Correo: '',
-      Provincia: '',
-      Canton: '',
-      Telefono: ''
+      ruc: '',
+      name: '',
+      email: '',
+      locate_id: null,
+      phone: ''
     };
   }
 
   openNew() {
     this.client = this.getEmptyClient();
+    this.selectedProvince = '';
+    this.selectedCanton = '';
     this.selectedClientId = null;
     this.submitted.set(false);
     this.clientDialog.set(true);
@@ -131,31 +150,62 @@ export class ClientComponent implements OnInit {
 
   editClient(clientVar: Client) {
     this.client = {
-      Ruc: clientVar.Ruc,
-      Nombre: clientVar.Nombre,
-      Correo: clientVar.Correo,
-      Provincia: clientVar.Provincia,
-      Canton: clientVar.Canton,
-      Telefono: clientVar.Telefono
+      ruc: clientVar.ruc,
+      name: clientVar.name,
+      email: clientVar.email,
+      locate_id: clientVar.locate_id || null,
+      phone: clientVar.phone
     };
     this.selectedClientId = clientVar.id;
-    
-    // Load cantons for the selected client's province
-    if (this.client.Provincia) {
-       const filteredCantons = this.locations
-        .filter(loc => loc.name_provinces === this.client.Provincia)
-        .map(loc => loc.name_canton);
-       this.cantons = [...new Set(filteredCantons)].map(c => ({ label: c, value: c }));
+
+    const clientProv = clientVar.locate?.name_provinces;
+    const clientCant = clientVar.locate?.name_canton;
+
+    // Buscar la provincia que coincida (insensible a mayúsculas)
+    const matchingProvince = this.provinces.find(
+      p => p.value.toLowerCase() === clientProv?.toLowerCase()
+    );
+
+    if (matchingProvince) {
+      this.selectedProvince = matchingProvince.value; // Usar el valor exacto de la lista
     } else {
-       this.cantons = [];
+      this.selectedProvince = '';
     }
-    
+
+    // Cargar cantones
+    if (this.selectedProvince) {
+      const filteredCantons = this.locations
+        .filter(loc => loc.name_provinces?.toLowerCase() === this.selectedProvince?.toLowerCase())
+        .map(loc => loc.name_canton);
+
+      const uniqueCantons = [...new Set(filteredCantons)];
+      this.cantons = uniqueCantons.map(c => ({ label: c, value: c }));
+
+      // Buscar el cantón que coincida
+      const matchingCanton = this.cantons.find(
+        c => c.value.toLowerCase() === clientCant?.toLowerCase()
+      );
+
+      if (matchingCanton) {
+        this.selectedCanton = matchingCanton.value; // Usar el valor exacto de la lista
+        const location = this.locations.find(
+          loc => loc.name_provinces === this.selectedProvince && loc.name_canton === this.selectedCanton
+        );
+        this.client.locate_id = location ? location.id : null;
+      } else {
+        this.selectedCanton = '';
+      }
+    } else {
+      this.cantons = [];
+      this.selectedCanton = '';
+    }
+
     this.clientDialog.set(true);
   }
 
   deleteClient(clientVar: Client) {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + clientVar.Nombre + '?',
+      message: 'Are you sure you want to delete ' + clientVar.name + '?',
       header: 'Confirm',
       icon: 'ph ph-warning',
       accept: () => {
@@ -180,12 +230,13 @@ export class ClientComponent implements OnInit {
   saveClient() {
     this.submitted.set(true);
 
-    const isValid = this.client.Nombre?.trim() && 
-                    this.client.Ruc?.trim() && 
-                    this.client.Correo?.trim() && 
-                    this.client.Telefono?.trim() && 
-                    this.client.Provincia?.trim() && 
-                    this.client.Canton?.trim();
+    const isValid = this.client.name?.trim() &&
+                    this.client.ruc?.trim() &&
+                    this.client.email?.trim() &&
+                    this.client.phone?.trim() &&
+                    this.selectedProvince?.trim() &&
+                    this.selectedCanton?.trim() &&
+                    this.client.locate_id !== null;
 
     if (isValid) {
       if (this.selectedClientId) {
@@ -205,6 +256,7 @@ export class ClientComponent implements OnInit {
             this.clients.set([...this.clients()]); // trigger change detection if needed
             this.clientDialog.set(false);
             this.client = this.getEmptyClient();
+            this.loadClients();
           },
           error: () => {
              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not update client', life: 3000 });

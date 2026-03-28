@@ -1,11 +1,26 @@
 <div class="p-4 w-full">
   <p-toast></p-toast>
 
-  <div class="flex align-items-center justify-content-between mb-4">
+  <div class="flex flex-column md:flex-row align-items-center justify-content-between mb-4 gap-3">
     <h2 class="text-2xl font-semibold m-0 flex align-items-center gap-2">
       <i class="ph ph-folder-open text-primary"></i> Archivos del Proyecto
     </h2>
+    <div class="flex align-items-center gap-2">
+      <div class="p-buttonset mr-3 flex align-items-center">
+        <button pButton pRipple icon="ph ph-squares-four" (click)="viewMode = 'grid'" 
+                [class.p-button-outlined]="viewMode !== 'grid'" class="p-button-sm p-button-secondary border-round-left-3xl"></button>
+        <button pButton pRipple icon="ph ph-list" (click)="viewMode = 'list'" 
+                [class.p-button-outlined]="viewMode !== 'list'" class="p-button-sm p-button-secondary border-round-right-3xl"></button>
+      </div>
+      <p-fileUpload #fileUpload mode="basic" [auto]="true" chooseLabel="Subir Archivo" chooseIcon="ph ph-upload"
+        [customUpload]="true" (uploadHandler)="onUpload($event, fileUpload)" [disabled]="uploading"
+        [maxFileSize]="20971520" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.zip">
+      </p-fileUpload>
+      <i *ngIf="uploading" class="ph ph-spinner-gap ph-spin text-xl text-primary"></i>
+    </div>
   </div>
+
+  <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
 
   <div *ngIf="loading" class="grid">
     <div class="col-12 md:col-6 lg:col-4 xl:col-3" *ngFor="let i of [1,2,3,4]">
@@ -23,28 +38,29 @@
     </div>
   </div>
 
-  <div *ngIf="!loading && files.length === 0" class="flex flex-column align-items-center justify-content-center p-6 bg-white border-round shadow-1">
+  <div *ngIf="!loading && files.length === 0" class="flex flex-column align-items-center justify-content-center p-6 surface-card border-round shadow-1">
     <i class="ph ph-file-dashed text-6xl text-500 mb-3"></i>
     <span class="text-xl text-700 font-medium">No hay archivos en este proyecto.</span>
     <p class="text-500 mt-2">Los archivos enviados en el chat del proyecto o en las tareas aparecerán aquí.</p>
   </div>
 
-  <div *ngIf="!loading && files.length > 0" class="flex flex-wrap gap-4">
+  <!-- Vista en Cuadrícula -->
+  <div *ngIf="!loading && files.length > 0 && viewMode === 'grid'" class="flex flex-wrap gap-4">
     <div *ngFor="let file of files" class="w-full md:w-5 lg:w-3 xl:w-2">
       <p-card styleClass="shadow-3 border-round-xl hover:shadow-5 transition-all transition-duration-200 cursor-pointer h-full surface-card relative overflow-hidden">
         <!-- Decoration top border -->
         <div class="absolute top-0 left-0 w-full h-1rem surface-100"></div>
-        
+
         <div class="flex flex-column align-items-center pt-2 pb-0 px-2 h-full text-center">
           <!-- Icon container with dynamic bg based on generic file icon logic -->
           <div class="flex align-items-center justify-content-center w-5rem h-5rem border-circle surface-100 mb-3 hover:surface-200 transition-colors transition-duration-200">
             <i class="ph {{ getFileIcon(file.mime_type) }} text-4xl"></i>
           </div>
-          
+
           <h4 class="m-0 text-lg font-medium text-800 white-space-nowrap overflow-hidden text-overflow-ellipsis w-full px-2" [title]="file.file_name">
             {{ file.name || file.file_name }}
           </h4>
-          
+
           <div class="flex flex-column align-items-center gap-1 mt-2 text-500 w-full px-3">
             <span class="text-sm flex align-items-center gap-1"><i class="ph ph-hard-drives"></i> {{ formatBytes(file.size) }}</span>
             <span class="text-sm flex align-items-center gap-1"><i class="ph ph-calendar-blank"></i> {{ file.created_at | date:'shortDate' }}</span>
@@ -52,32 +68,96 @@
 
           <!-- Origen del archivo -->
           <div class="mt-3">
-            <span class="text-xs font-semibold px-2 py-1 border-round-2xl" 
-                  [ngClass]="file.model_type === 'messages' ? 'bg-indigo-50 text-indigo-600' : 'bg-orange-50 text-orange-600'">
-              <i class="ph" [ngClass]="file.model_type === 'messages' ? 'ph-chats' : 'ph-kanban'"></i> 
+            <span class="text-xs font-semibold px-2 py-1 border-round-2xl"
+                  [ngClass]="(file.model_type === 'messages' || (file.model_type && file.model_type.includes('Message'))) ? 'bg-indigo-50 text-indigo-600' : 'bg-orange-50 text-orange-600'">
+              <i class="ph" [ngClass]="(file.model_type === 'messages' || (file.model_type && file.model_type.includes('Message'))) ? 'ph-chats' : 'ph-kanban'"></i>
               {{ getOriginName(file.model_type) }}
             </span>
           </div>
 
           <!-- Actions -->
           <div class="flex flex-row gap-2 mt-auto pt-4 w-full justify-content-center">
-            <p-button 
-              icon="ph ph-download" 
-              label="Descargar" 
-              styleClass="p-button-outlined p-button-sm p-button-rounded border-round-3xl"
+            <p-button
+              icon="ph ph-download"
+              pTooltip="Descargar"
+              tooltipPosition="top"
+              styleClass="p-button-text p-button-sm p-button-rounded border-round-3xl"
               (onClick)="downloadFile(file)">
             </p-button>
-            
-            <p-button 
-              icon="ph ph-arrow-square-out" 
+
+            <p-button
+              icon="ph ph-trash"
+              pTooltip="Eliminar"
+              tooltipPosition="top"
+              styleClass="p-button-text p-button-sm p-button-rounded p-button-danger border-round-3xl"
+              (onClick)="deleteFile(file, $event)">
+            </p-button>
+
+            <p-button
+              icon="ph ph-arrow-square-out"
               pTooltip="Ir al origen"
               tooltipPosition="top"
               styleClass="p-button-text p-button-sm p-button-rounded p-button-secondary border-round-3xl"
-              (onClick)="goToOrigin(file)">
+              (onClick)="goToOrigin(file)"
+              *ngIf="file.model_type !== 'project' && file.model_type !== 'App\\Models\\Project'">
             </p-button>
           </div>
         </div>
       </p-card>
     </div>
   </div>
+
+  <!-- Vista en Lista -->
+  <div *ngIf="!loading && files.length > 0 && viewMode === 'list'" class="flex flex-column gap-3">
+    <div *ngFor="let file of files" class="surface-card shadow-1 border-round-xl p-3 flex align-items-center justify-content-between hover:shadow-3 transition-all transition-duration-200 w-full mb-1">
+      
+      <div class="flex align-items-center gap-4 w-full md:w-auto">
+        <div class="flex align-items-center justify-content-center w-3rem h-3rem border-circle surface-100 flex-shrink-0">
+          <i class="ph {{ getFileIcon(file.mime_type) }} text-2xl"></i>
+        </div>
+        <div class="flex flex-column gap-1">
+          <span class="text-lg font-medium text-800" [title]="file.file_name || file.name">{{ file.name || file.file_name }}</span>
+          <div class="flex flex-column md:flex-row md:align-items-center gap-2 md:gap-4 text-sm text-500">
+            <span class="flex align-items-center gap-1"><i class="ph ph-hard-drives"></i> {{ formatBytes(file.size) }}</span>
+            <span class="flex align-items-center gap-1"><i class="ph ph-calendar-blank"></i> {{ file.created_at | date:'shortDate' }}</span>
+            <span class="font-semibold px-2 py-1 border-round-2xl text-xs flex align-items-center gap-1 align-self-start md:align-self-auto"
+                  [ngClass]="(file.model_type === 'message' || (file.model_type && file.model_type.includes('Message'))) ? 'bg-indigo-50 text-indigo-600' : 'bg-orange-50 text-orange-600'">
+              <i class="ph" [ngClass]="(file.model_type === 'message' || (file.model_type && file.model_type.includes('Message'))) ? 'ph-chats' : 'ph-kanban'"></i>
+              {{ getOriginName(file.model_type) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones de la lista -->
+      <div class="flex align-items-center gap-2 mt-3 md:mt-0 lg:flex-row flex-shrink-0">
+        <p-button
+          icon="ph ph-download"
+          pTooltip="Descargar"
+          tooltipPosition="top"
+          styleClass="p-button-text p-button-rounded p-button-secondary"
+          (onClick)="downloadFile(file)">
+        </p-button>
+
+        <p-button
+          icon="ph ph-trash"
+          pTooltip="Eliminar"
+          tooltipPosition="top"
+          styleClass="p-button-text p-button-rounded p-button-danger"
+          (onClick)="deleteFile(file, $event)">
+        </p-button>
+
+        <p-button
+          icon="ph ph-arrow-square-out"
+          pTooltip="Ir al origen"
+          tooltipPosition="top"
+          styleClass="p-button-text p-button-rounded p-button-secondary"
+          (onClick)="goToOrigin(file)"
+          *ngIf="file.model_type !== 'project' && file.model_type !== 'App\\Models\\Project'">
+        </p-button>
+      </div>
+
+    </div>
+  </div>
+
 </div>

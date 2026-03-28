@@ -244,6 +244,14 @@ export function getLastMonthsNames(defaultLength: number = NUMBERS.SIX): string[
 
 export const getCssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
+const ROLE_MAP: Record<string, string> = {
+  administrator: 'Administrador',
+  leader: 'Lider',
+  developer: 'Desarrollador',
+  tester: 'Tester',
+  documenter: 'Documentador'
+};
+
 export const getRoleName = (roles: Role[]): string => {
-  return roles.map((role: Role) => role.name).join(', ') || Constants.emptyString;
+  return roles.map((role: Role) => ROLE_MAP[role.name.toLowerCase()] || role.name).join(', ') || Constants.emptyString;
 };

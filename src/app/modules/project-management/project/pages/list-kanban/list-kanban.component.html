@@ -46,7 +46,7 @@
                     [class.border-primary]="selectedAvatarMember?.user?.id === member.user.id"
                     [ngStyle]="selectedAvatarMember?.user?.id === member.user.id ? {'transform': 'scale(1.1)', 'z-index': 10} : {}"
             (click)="toggleAvatarFilter(member)"
-            [pTooltip]="member.user.name + ' (' + member.role.type + ')'" tooltipPosition="top">
+            [pTooltip]="member.user.name + ' (' + translateRole(member.role.type) + ')'" tooltipPosition="top">
           </p-avatar>
           <p-avatar *ngIf="members.length > 3" label="+{{ members.length - 3 }}" shape="circle" size="normal"
             class="cursor-pointer"
