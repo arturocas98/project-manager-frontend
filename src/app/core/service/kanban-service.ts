@@ -35,32 +35,23 @@ export class KanbanService {
    * Obtiene todas las tareas del proyecto
    */
   getProjectTasks(projectId: number): Observable<KanbanTask[]> {
-
     if (!this.projectTasksCache.has(projectId)) {
-
       const subject = new BehaviorSubject<KanbanTask[]>([]);
       this.projectTasksCache.set(projectId, subject);
 
       // primera carga
       this.apiService
         .get<KanbanTask[]>(`projects/${projectId}/incidences`)
-        .pipe(
-          tap(tasks => subject.next(tasks))
-        )
+        .pipe(tap(tasks => subject.next(tasks)))
         .subscribe();
-
     } else {
-
       const subject = this.projectTasksCache.get(projectId)!;
 
       // refresco en segundo plano
       this.apiService
         .get<KanbanTask[]>(`projects/${projectId}/incidences`)
-        .pipe(
-          tap(tasks => subject.next(tasks))
-        )
+        .pipe(tap(tasks => subject.next(tasks)))
         .subscribe();
-
     }
 
     return this.projectTasksCache.get(projectId)!.asObservable();
@@ -70,7 +61,7 @@ export class KanbanService {
    * Obtiene los miembros del proyecto
    */
   getProjectMembers(projectId: number): Observable<ProjectMember[]> {
-    return this.apiService.get<ProjectMember[]>(`projects/${projectId}/members`);
+    return this.apiService.get<ProjectMember[]>(`projects/${projectId}/members?page=1&per_page=1000`);
   }
 
   /**
@@ -116,9 +107,7 @@ export class KanbanService {
    */
   private organizeTasksByStatus(tasks: KanbanTask[]): KanbanColumn[] {
     // Ordenar tareas por fecha de creación (más recientes primero)
-    const sortedTasks = [...tasks].sort((a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+    const sortedTasks = [...tasks].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     // Columnas basadas en los estados de la base de datos
     const columns: KanbanColumn[] = [
@@ -197,13 +186,13 @@ export class KanbanService {
    */
   getStateIdFromString(state: string): number {
     const stateMap: Record<string, number> = {
-      'asignado': this.STATE_IDS.asignado,
-      'ejecutando': this.STATE_IDS.ejecutando,
-      'suspendido': this.STATE_IDS.suspendido,
-      'terminada': this.STATE_IDS.terminada,
+      asignado: this.STATE_IDS.asignado,
+      ejecutando: this.STATE_IDS.ejecutando,
+      suspendido: this.STATE_IDS.suspendido,
+      terminada: this.STATE_IDS.terminada,
       'terminada (fuera de plazo)': this.STATE_IDS.terminada_fuera_plazo,
       'en revisión': this.STATE_IDS.en_revision,
-      'finalizada': this.STATE_IDS.finalizada,
+      finalizada: this.STATE_IDS.finalizada,
     };
     return stateMap[state.toLowerCase()] || this.STATE_IDS.asignado;
   }
@@ -252,7 +241,7 @@ export class KanbanService {
    */
   updateTaskStatus(projectId: number, taskId: number, newStateId: number): Observable<any> {
     return this.apiService.put(`projects/${projectId}/incidences/${taskId}/update`, {
-      incidence_state_id: newStateId
+      incidence_state_id: newStateId,
     });
   }
 
