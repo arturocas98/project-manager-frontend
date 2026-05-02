@@ -1,28 +1,29 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import {
-  IncidenceDetail, IncidenceDetailChild,
+  IncidenceDetail,
+  IncidenceDetailChild,
   IncidenceModel,
-  TaskUpdateModelRequest
-} from "../../../../../shared/models/task-models/task-create-model";
-import {ProjectMember} from "../../../../../shared/models/kanban.models";
-import {Subject, Subscription, takeUntil} from "rxjs";
-import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
-import {ActivatedRoute, Router} from "@angular/router";
-import {ProjectService} from "../../../../../core/service/project.service";
-import {KanbanService} from "../../../../../core/service/kanban-service";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {ToastModule} from "primeng/toast";
-import {ProgressSpinnerModule} from "primeng/progressspinner";
-import {ButtonModule} from "primeng/button";
-import {DatePipe, NgClass, NgIf} from "@angular/common";
-import {ChipsModule} from "primeng/chips";
-import {InputTextareaModule} from "primeng/inputtextarea";
-import {DropdownModule} from "primeng/dropdown";
-import {CalendarModule} from "primeng/calendar";
-import {AccordionModule} from "primeng/accordion";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
-import {DialogModule} from "primeng/dialog";
-import {TagModule} from "primeng/tag";
+  TaskUpdateModelRequest,
+} from '../../../../../shared/models/task-models/task-create-model';
+import { ProjectMember } from '../../../../../shared/models/kanban.models';
+import { Subject, Subscription, takeUntil } from 'rxjs';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProjectService } from '../../../../../core/service/project.service';
+import { KanbanService } from '../../../../../core/service/kanban-service';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ButtonModule } from 'primeng/button';
+import { DatePipe, NgClass, NgIf } from '@angular/common';
+import { ChipsModule } from 'primeng/chips';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { DropdownModule } from 'primeng/dropdown';
+import { CalendarModule } from 'primeng/calendar';
+import { AccordionModule } from 'primeng/accordion';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-task-update',
@@ -43,7 +44,7 @@ import {TagModule} from "primeng/tag";
     ConfirmDialogModule,
     DialogModule,
     TagModule,
-    FormsModule
+    FormsModule,
   ],
   templateUrl: './task-update.component.html',
 })
@@ -72,10 +73,10 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
 
   // Lista de miembros del proyecto
   members: ProjectMember[] = [];
-  memberOptions: { label: string, value: number, role: string }[] = [];
+  memberOptions: { label: string; value: number; role: string }[] = [];
 
   // Lista de tareas para seleccionar padre
-  parentOptions: { label: string, value: number }[] = [];
+  parentOptions: { label: string; value: number }[] = [];
   showParentSelector = false;
   parentLabel = '';
 
@@ -94,7 +95,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     { label: 'Baja', value: 1 },
     { label: 'Media', value: 2 },
     { label: 'Alta', value: 3 },
-    { label: 'Crítica', value: 4 }
+    { label: 'Crítica', value: 4 },
   ];
 
   formatDate(date: Date | null): string | null {
@@ -113,7 +114,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     { label: 'History', value: 2 },
     { label: 'Task', value: 3 },
     { label: 'Bug', value: 4 },
-    { label: 'Subtask', value: 5 }
+    { label: 'Subtask', value: 5 },
   ];
 
   categories = [
@@ -126,7 +127,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     { label: 'Soporte/Validación', value: 7 },
     { label: 'Corrección de errores', value: 8 },
     { label: 'Reunión/Coordinación', value: 9 },
-    { label: 'Migración', value: 10 }
+    { label: 'Migración', value: 10 },
   ];
 
   private readonly stateMap: Record<number, string> = {
@@ -135,28 +136,28 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     3: 'Review',
     4: 'Closed',
     5: 'Locked',
-    6: 'Finished'
+    6: 'Finished',
   };
 
   // Mapeo de tipos para el selector de padre
-  private readonly typeParentMap: Record<number, { parentType: number, label: string }> = {
-    2: { parentType: 1, label: 'Epic Padre' },      // History -> Epic
-    3: { parentType: 2, label: 'History Padre' },   // Task -> History
-    4: { parentType: 3, label: 'Task Padre' },      // Bug -> Task
-    5: { parentType: 3, label: 'Task Padre' }       // Subtask -> Task
+  private readonly typeParentMap: Record<number, { parentType: number; label: string }> = {
+    2: { parentType: 1, label: 'Epic Padre' }, // History -> Epic
+    3: { parentType: 2, label: 'History Padre' }, // Task -> History
+    4: { parentType: 3, label: 'Task Padre' }, // Bug -> Task
+    5: { parentType: 3, label: 'Task Padre' }, // Subtask -> Task
   };
 
   taskForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
     description: ['', Validators.required],
     priority: [<number | null>null, Validators.required],
-    type: [{value: <number | null>null, disabled: true}, Validators.required],
+    type: [{ value: <number | null>null, disabled: true }, Validators.required],
     category: [<number | null>null, Validators.required],
     assigned_user_id: [<number | null>null],
     parent_id: [<number | null>null],
-    state_id: [{value: <number | null>null, disabled: true}, Validators.required],
+    state_id: [{ value: <number | null>null, disabled: true }, Validators.required],
     start_date: [<string | null>null],
-    due_date: [<string | null>null]
+    due_date: [<string | null>null],
   });
 
   constructor(
@@ -210,12 +211,12 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
         this.patchFormValues(task);
         this.loading = false;
       },
-      error: (error) => {
+      error: error => {
         console.error('Error loading task details:', error);
         this.error = 'No se pudo cargar la información de la tarea';
         this.loading = false;
         this.showError('Error', 'Error al cargar la tarea');
-      }
+      },
     });
 
     this.subscriptions.push(taskSub);
@@ -246,26 +247,27 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
    * Carga los miembros del proyecto
    */
   private loadMembers(): void {
-    this.kanbanService.getProjectMembers(this.projectId)
+    this.kanbanService
+      .getProjectMembers(this.projectId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (members) => {
+        next: members => {
           this.members = members;
           this.memberOptions = members.map(member => ({
             label: `${member.user.name} (${member.role.type})`,
             value: member.user.id,
-            role: member.role.type
+            role: member.role.type,
           }));
         },
-        error: (error) => {
+        error: error => {
           console.error('Error loading members:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: 'No se pudieron cargar los miembros del proyecto',
-            life: 5000
+            life: 5000,
           });
-        }
+        },
       });
   }
 
@@ -275,29 +277,32 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   private patchFormValues(task: IncidenceDetail) {
     // Mapear prioridad string a ID
     const priorityMap: Record<string, number> = {
-      'low': 1,
-      'medium': 2,
-      'high': 3,
-      'critical': 4
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
     };
 
     const priorityId = task.priority ? priorityMap[task.priority.toLowerCase()] : 2;
 
-    this.taskForm.patchValue({
-      title: task.title,
-      description: task.description,
-      priority: priorityId,
-      type: task.type?.id,
-      category: task.category?.id,
-      assigned_user_id: task.assigned_to?.id || null,
-      parent_id: task.parent?.id || null,
-      state_id: task.state?.id,
-      start_date: task.start_date,
-      due_date: task.due_date
-    });
+    this.taskForm.patchValue(
+      {
+        title: task.title,
+        description: task.description,
+        priority: priorityId,
+        type: task.type?.id,
+        category: task.category?.id,
+        assigned_user_id: task.assigned_to?.id || null,
+        parent_id: task.parent?.id || null,
+        state_id: task.state?.id,
+        start_date: task.start_date,
+        due_date: task.due_date,
+      },
+      { emitEvent: false }
+    );
 
     if (task.type?.id && task.type.id in this.typeParentMap) {
-      this.updateParentSelector(task.type.id);
+      this.updateParentSelector(task.type.id, { preserveParentId: true });
       this.updateAssignedUserValidator(task.type.id);
     }
   }
@@ -321,8 +326,13 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
   /**
    * Actualiza el selector de padre según el tipo seleccionado
    */
-  private updateParentSelector(typeId: number) {
-    this.taskForm.patchValue({ parent_id: null });
+  private updateParentSelector(
+    typeId: number,
+    options?: { preserveParentId?: boolean }
+  ) {
+    if (!options?.preserveParentId) {
+      this.taskForm.patchValue({ parent_id: null }, { emitEvent: false });
+    }
 
     const parentConfig = this.typeParentMap[typeId];
 
@@ -358,14 +368,14 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
    */
   private loadParentOptions(parentTypeId: number) {
     const taskSub = this.kanbanService.getProjectTasks(this.projectId).subscribe({
-      next: (tasks) => {
+      next: tasks => {
         const filteredTasks = tasks.filter(task => {
           return task.type.id === parentTypeId && task.id !== this.taskId;
         });
 
         this.parentOptions = filteredTasks.map(task => ({
           label: task.title,
-          value: task.id
+          value: task.id,
         }));
 
         if (this.parentOptions.length === 0 && this.showParentSelector) {
@@ -374,20 +384,20 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
             severity: 'warn',
             summary: 'Sin opciones',
             detail: `No hay ${parentTypeName}s disponibles para seleccionar como padre`,
-            life: 5000
+            life: 5000,
           });
         }
       },
-      error: (error) => {
+      error: error => {
         console.error('Error loading parent options:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'No se pudieron cargar las opciones de padre',
-          life: 5000
+          life: 5000,
         });
         this.parentOptions = [];
-      }
+      },
     });
 
     this.subscriptions.push(taskSub);
@@ -435,7 +445,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       assigned_user_id: formValue.assigned_user_id || null,
       parent_incidence_id: formValue.parent_id || null,
       start_date: this.formatDate(formValue.start_date ? new Date(formValue.start_date) : null),
-      due_date: this.formatDate(formValue.due_date ? new Date(formValue.due_date) : null)
+      due_date: this.formatDate(formValue.due_date ? new Date(formValue.due_date) : null),
     };
   }
 
@@ -447,7 +457,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       severity: 'error',
       summary: summary,
       detail: detail,
-      life: 5000
+      life: 5000,
     });
   }
 
@@ -484,18 +494,14 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
           severity: 'success',
           summary: 'Éxito',
           detail: 'Tarea eliminada correctamente',
-          life: 3000
+          life: 3000,
         });
 
         setTimeout(() => {
-          this.router.navigate([
-            '/project-management/projects/kanban',
-            this.projectId,
-            'project-kanban'
-          ]);
+          this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-kanban']);
         }, 1500);
       },
-      error: (error) => {
+      error: error => {
         this.deleting = false;
         console.error('Error deleting task:', error);
         const errorMsg = error.error?.message || error.message || 'No se pudo eliminar la tarea';
@@ -503,9 +509,9 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
           severity: 'error',
           summary: 'Error',
           detail: errorMsg,
-          life: 5000
+          life: 5000,
         });
-      }
+      },
     });
   }
 
@@ -514,12 +520,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
    */
   navigateToParent() {
     if (this.task?.parent) {
-      this.router.navigate([
-        '/project-management/projects/kanban',
-        this.projectId,
-        'task-update',
-        this.task.parent.id
-      ]);
+      this.router.navigate(['/project-management/projects/kanban', this.projectId, 'task-update', this.task.parent.id]);
     }
   }
 
@@ -538,12 +539,8 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       rejectButtonStyleClass: 'p-button-text p-button-secondary gap-2 border-round-xl font-bold',
       defaultFocus: 'accept',
       accept: () => {
-        this.router.navigate([
-          '/project-management/projects/kanban',
-          this.projectId,
-          'project-kanban'
-        ]);
-      }
+        this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-kanban']);
+      },
     });
   }
 
@@ -565,7 +562,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
         severity: 'error',
         summary: 'Formulario inválido',
         detail: `Campos requeridos: ${invalidFields.join(', ')}`,
-        life: 5000
+        life: 5000,
       });
 
       return;
@@ -582,7 +579,7 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
       rejectButtonStyleClass: 'p-button-text p-button-secondary font-bold border-round-xl',
       accept: () => {
         this.performUpdate();
-      }
+      },
     });
   }
   markAsDirty(fieldName: string) {
@@ -596,11 +593,11 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
     const updateData = this.prepareUpdateData();
 
     const updateSub = this.projectService.UpdateTask(updateData, this.projectId, this.taskId).subscribe({
-      next: (response) => {
+      next: response => {
         this.saving = false;
         this.showSuccessDialog(response.title);
       },
-      error: (error) => {
+      error: error => {
         this.saving = false;
         console.error('Error updating task:', error);
         const errorMsg = error.error?.message || error.message || 'No se pudo actualizar la tarea';
@@ -608,9 +605,9 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
           severity: 'error',
           summary: 'Error',
           detail: errorMsg,
-          life: 5000
+          life: 5000,
         });
-      }
+      },
     });
 
     this.subscriptions.push(updateSub);
@@ -631,19 +628,11 @@ export class TaskUpdateComponent implements OnInit, OnDestroy {
         acceptButtonStyleClass: 'p-button-danger p-button-raised font-bold border-round-xl shadow-2',
         rejectButtonStyleClass: 'p-button-text p-button-secondary font-bold border-round-xl',
         accept: () => {
-          this.router.navigate([
-            '/project-management/projects/kanban',
-            this.projectId,
-            'project-kanban'
-          ]);
-        }
+          this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-kanban']);
+        },
       });
     } else {
-      this.router.navigate([
-        '/project-management/projects/kanban',
-        this.projectId,
-        'project-kanban'
-      ]);
+      this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-kanban']);
     }
   }
 }
