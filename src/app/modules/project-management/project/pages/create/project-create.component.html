@@ -1,8 +1,11 @@
 <div class="flex align-items-center justify-content-center min-h-screen p-4">
-  <div class="w-full max-w-7xl flex flex-column surface-card surface-border border-1 border-round-3xl shadow-2xl overflow-hidden">
-
+  <div
+    class="w-full max-w-7xl flex flex-column surface-card surface-border border-1 border-round-3xl shadow-2xl overflow-hidden"
+  >
     <!-- Encabezado compacto con ilustración -->
-    <div class="flex flex-column md:flex-row md:align-items-center md:justify-content-between gap-4 p-5 md:p-6 surface-ground border-bottom-1 surface-border">
+    <div
+      class="flex flex-column md:flex-row md:align-items-center md:justify-content-between gap-4 p-5 md:p-6 surface-ground border-bottom-1 surface-border"
+    >
       <div class="flex flex-column gap-1">
         <h2 class="text-2xl md:text-3xl font-bold text-color m-0">Crear Proyecto</h2>
         <p class="text-color-secondary m-0">Completa la información para registrar un nuevo proyecto</p>
@@ -11,7 +14,6 @@
 
     <!-- Formulario -->
     <div class="w-full p-5 md:p-8 flex-1">
-
       <!-- Loading State -->
       <div *ngIf="loading" class="flex justify-content-center my-6">
         <i class="pi pi-spin pi-spinner" style="font-size: 2.5rem; color: var(--indigo-600)"></i>
@@ -24,10 +26,8 @@
       </div>
 
       <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
-
         <!-- Grid de 2 columnas -->
         <div class="grid">
-
           <!-- Columna Izquierda -->
           <div class="col-12 lg:col-6">
             <div class="mb-4">
@@ -41,10 +41,15 @@
                   formControlName="ContractNo"
                   class="w-full"
                   placeholder="Ej: CONT-2024-001"
-                  [ngClass]="{ 'p-invalid': projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched }"
+                  [ngClass]="{
+                    'p-invalid': projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched,
+                  }"
                 />
               </div>
-              <small *ngIf="projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched" class="p-error block mt-2">
+              <small
+                *ngIf="projectForm.get('ContractNo')?.invalid && projectForm.get('ContractNo')?.touched"
+                class="p-error block mt-2"
+              >
                 El número de contrato es obligatorio
               </small>
             </div>
@@ -56,24 +61,27 @@
                   <i class="pi pi-building"></i>
                 </span>
 
-                              <p-dropdown
-                                formControlName="client_id"
-                                [options]="clients"
-                                optionLabel="Nombre"
-                                optionValue="id"
-                                placeholder="Seleccionar cliente"
-                                [filter]="true"
-                                filterBy="Nombre"
-                                [showClear]="true"
-                                styleClass="w-full"
-                                appendTo="body"
-                                [ngClass]="{
+                <p-dropdown
+                  formControlName="client_id"
+                  [options]="clients"
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Seleccionar cliente"
+                  [filter]="true"
+                  filterBy="name"
+                  [showClear]="true"
+                  styleClass="w-full"
+                  appendTo="body"
+                  [ngClass]="{
                     'ng-invalid ng-dirty':
-                    projectForm.get('client_id')?.invalid &&
-                    projectForm.get('client_id')?.touched
-                  }"></p-dropdown>
+                      projectForm.get('client_id')?.invalid && projectForm.get('client_id')?.touched,
+                  }"
+                ></p-dropdown>
               </div>
-              <small *ngIf="projectForm.get('client_id')?.invalid && projectForm.get('client_id')?.touched" class="p-error block mt-2">
+              <small
+                *ngIf="projectForm.get('client_id')?.invalid && projectForm.get('client_id')?.touched"
+                class="p-error block mt-2"
+              >
                 El cliente es obligatorio
               </small>
             </div>
@@ -89,10 +97,15 @@
                   formControlName="project_type"
                   class="w-full"
                   placeholder="Ej: Desarrollo de Software"
-                  [ngClass]="{ 'p-invalid': projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched }"
+                  [ngClass]="{
+                    'p-invalid': projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched,
+                  }"
                 />
               </div>
-              <small *ngIf="projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched" class="p-error block mt-2">
+              <small
+                *ngIf="projectForm.get('project_type')?.invalid && projectForm.get('project_type')?.touched"
+                class="p-error block mt-2"
+              >
                 El tipo de proyecto es obligatorio
               </small>
             </div>
@@ -111,10 +124,15 @@
                   type="date"
                   formControlName="start_date"
                   class="w-full"
-                  [ngClass]="{ 'p-invalid': projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched }"
+                  [ngClass]="{
+                    'p-invalid': projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched,
+                  }"
                 />
               </div>
-              <small *ngIf="projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched" class="p-error block mt-2">
+              <small
+                *ngIf="projectForm.get('start_date')?.invalid && projectForm.get('start_date')?.touched"
+                class="p-error block mt-2"
+              >
                 La fecha de inicio es obligatoria
               </small>
             </div>
@@ -125,13 +143,7 @@
                 <span class="p-inputgroup-addon">
                   <i class="pi pi-clock"></i>
                 </span>
-                <input
-                  pInputText
-                  type="number"
-                  formControlName="duration_days"
-                  class="w-full"
-                  placeholder="Ej: 90"
-                />
+                <input pInputText type="number" formControlName="duration_days" class="w-full" placeholder="Ej: 90" />
               </div>
             </div>
 
@@ -147,10 +159,19 @@
                   formControlName="administrator_email"
                   class="w-full"
                   placeholder="admin@empresa.com"
-                  [ngClass]="{ 'p-invalid': projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched }"
+                  [ngClass]="{
+                    'p-invalid':
+                      projectForm.get('administrator_email')?.invalid &&
+                      projectForm.get('administrator_email')?.touched,
+                  }"
                 />
               </div>
-              <small *ngIf="projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched" class="p-error block mt-2">
+              <small
+                *ngIf="
+                  projectForm.get('administrator_email')?.invalid && projectForm.get('administrator_email')?.touched
+                "
+                class="p-error block mt-2"
+              >
                 Ingrese un email válido
               </small>
             </div>
@@ -179,12 +200,7 @@
                 <span class="p-inputgroup-addon">
                   <i class="pi pi-sitemap"></i>
                 </span>
-                <input
-                  pInputText
-                  formControlName="last_phase"
-                  class="w-full"
-                  placeholder="Ej: Fase de Desarrollo"
-                />
+                <input pInputText formControlName="last_phase" class="w-full" placeholder="Ej: Fase de Desarrollo" />
               </div>
             </div>
 
@@ -215,22 +231,24 @@
             </h3>
           </div>
           <p class="text-color-secondary mt-0 mb-3 text-sm">
-            Los miembros de los equipos seleccionados se añadirán al proyecto automáticamente. Obtendrán el rol designado por su equipo.
+            Los miembros de los equipos seleccionados se añadirán al proyecto automáticamente. Obtendrán el rol
+            designado por su equipo.
           </p>
           <div class="w-full">
             <p-multiSelect
               [options]="teamOptions"
               [(ngModel)]="selectedTeamIds"
-              [ngModelOptions]="{standalone: true}"
+              [ngModelOptions]="{ standalone: true }"
               (onChange)="onTeamsChange($event)"
               defaultLabel="Seleccionar equipos..."
               optionLabel="label"
               optionValue="value"
               display="chip"
               class="w-full text-base"
-              [style]="{'width': '100%'}"
+              [style]="{ width: '100%' }"
               emptyMessage="No hay equipos disponibles"
-              selectedItemsLabel="{0} equipos seleccionados">
+              selectedItemsLabel="{0} equipos seleccionados"
+            >
             </p-multiSelect>
           </div>
         </div>
@@ -254,22 +272,26 @@
           </div>
 
           <!-- Lista de miembros -->
-          <div *ngIf="selectedMembers.length === 0"
-               class="text-center py-5 text-color-secondary border-round border-1 border-dashed">
+          <div
+            *ngIf="selectedMembers.length === 0"
+            class="text-center py-5 text-color-secondary border-round border-1 border-dashed"
+          >
             <i class="pi pi-users text-4xl mb-3 block opacity-50"></i>
             <span>No hay miembros seleccionados</span>
           </div>
 
-          <div *ngFor="let member of selectedMembers; let last = last"
-               class="flex flex-column md:flex-row md:align-items-center gap-3 p-3"
-               [ngClass]="{ 'border-bottom-1 surface-border': !last }">
-
+          <div
+            *ngFor="let member of selectedMembers; let last = last"
+            class="flex flex-column md:flex-row md:align-items-center gap-3 p-3"
+            [ngClass]="{ 'border-bottom-1 surface-border': !last }"
+          >
             <div class="flex align-items-center gap-3 flex-1">
               <p-avatar
                 [label]="getInitials(member.name)"
                 shape="circle"
                 size="large"
-                styleClass="bg-indigo-500 text-white">
+                styleClass="bg-indigo-500 text-white"
+              >
               </p-avatar>
 
               <div>
@@ -279,10 +301,7 @@
             </div>
 
             <div class="flex align-items-center gap-2">
-              <p-tag
-                [value]="member.role_label"
-                [severity]="getRoleSeverity(member.role_type)">
-              </p-tag>
+              <p-tag [value]="member.role_label" [severity]="getRoleSeverity(member.role_type)"> </p-tag>
 
               <button
                 pButton
@@ -290,8 +309,8 @@
                 icon="pi pi-pencil"
                 class="p-button-rounded p-button-text p-button-sm"
                 (click)="openEditRoleDialog(member)"
-                pTooltip="Editar rol">
-              </button>
+                pTooltip="Editar rol"
+              ></button>
 
               <button
                 pButton
@@ -299,8 +318,8 @@
                 icon="pi pi-trash"
                 class="p-button-rounded p-button-text p-button-sm p-button-danger"
                 (click)="removeMember(member.user_id)"
-                pTooltip="Eliminar">
-              </button>
+                pTooltip="Eliminar"
+              ></button>
             </div>
           </div>
         </div>
@@ -310,13 +329,7 @@
 
         <!-- Botones -->
         <div class="flex justify-content-end gap-3 pt-4 border-top-1 surface-border">
-          <button
-            pButton
-            type="button"
-            label="Cancelar"
-            icon="pi pi-times"
-            class="p-button-text">
-          </button>
+          <button pButton type="button" label="Cancelar" icon="pi pi-times" class="p-button-text"></button>
           <button
             pButton
             type="submit"
@@ -324,8 +337,8 @@
             icon="pi pi-check"
             class="p-button-raised p-button-success px-5"
             [disabled]="projectForm.invalid || loading"
-            [loading]="loading">
-          </button>
+            [loading]="loading"
+          ></button>
         </div>
       </form>
     </div>
@@ -343,39 +356,37 @@
   [style]="{ width: '95vw', maxWidth: '600px' }"
   [draggable]="false"
   [resizable]="false"
-  [contentStyle]="{'overflow': 'visible'}"
-  [baseZIndex]="10000">
-
+  [contentStyle]="{ overflow: 'visible' }"
+  [baseZIndex]="10000"
+>
   <form [formGroup]="addMemberForm" (ngSubmit)="addMemberToList()" class="flex flex-column gap-4 p-2">
-
     <!-- Selector de Usuario -->
     <div>
-      <label class="block text-color font-medium mb-2">
-        Usuario <span class="text-red-500">*</span>
-      </label>
+      <label class="block text-color font-medium mb-2"> Usuario <span class="text-red-500">*</span> </label>
       <p-dropdown
         formControlName="user_id"
         [options]="availableUserOptions"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Seleccionar usuario"
-      [filter]="true"
-      [showClear]="true"
-      [style]="{'width': '100%'}"
-      [panelStyle]="{'max-height': '300px'}"
-      appendTo="body">
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar usuario"
+        [filter]="true"
+        [showClear]="true"
+        [style]="{ width: '100%' }"
+        [panelStyle]="{ 'max-height': '300px' }"
+        appendTo="body"
+      >
       </p-dropdown>
-      <small *ngIf="addMemberForm.get('user_id')?.invalid && addMemberForm.get('user_id')?.touched"
-             class="p-error block mt-2">
+      <small
+        *ngIf="addMemberForm.get('user_id')?.invalid && addMemberForm.get('user_id')?.touched"
+        class="p-error block mt-2"
+      >
         Debes seleccionar un usuario
       </small>
     </div>
 
     <!-- Selector de Rol -->
     <div>
-      <label class="block text-color font-medium mb-2">
-        Rol <span class="text-red-500">*</span>
-      </label>
+      <label class="block text-color font-medium mb-2"> Rol <span class="text-red-500">*</span> </label>
       <p-dropdown
         formControlName="role_type"
         [options]="roleOptions"
@@ -383,16 +394,18 @@
         optionValue="value"
         placeholder="Seleccionar rol"
         [showClear]="true"
-        [style]="{'width': '100%'}"
-        [panelStyle]="{'max-height': '300px'}"
-        appendTo="body">
+        [style]="{ width: '100%' }"
+        [panelStyle]="{ 'max-height': '300px' }"
+        appendTo="body"
+      >
       </p-dropdown>
-      <small *ngIf="addMemberForm.get('role_type')?.invalid && addMemberForm.get('role_type')?.touched"
-             class="p-error block mt-2">
+      <small
+        *ngIf="addMemberForm.get('role_type')?.invalid && addMemberForm.get('role_type')?.touched"
+        class="p-error block mt-2"
+      >
         Debes seleccionar un rol
       </small>
     </div>
-
   </form>
 
   <ng-template pTemplate="footer">
@@ -402,8 +415,8 @@
         label="Cancelar"
         icon="pi pi-times"
         class="p-button-text"
-        (click)="showAddMemberDialog = false; addMemberForm.reset()">
-      </button>
+        (click)="showAddMemberDialog = false; addMemberForm.reset()"
+      ></button>
       <button
         pButton
         label="Añadir"
@@ -412,11 +425,10 @@
         [disabled]="addMemberForm.invalid || addMemberLoading"
         [loading]="addMemberLoading"
         (click)="addMemberToList()"
-        type="button">
-      </button>
+        type="button"
+      ></button>
     </div>
   </ng-template>
-
 </p-dialog>
 
 <!-- Diálogo para editar rol -->
@@ -427,18 +439,18 @@
   [style]="{ width: '95vw', maxWidth: '500px' }"
   [draggable]="false"
   [resizable]="false"
-  [contentStyle]="{'overflow': 'visible'}"
-  [baseZIndex]="10000">
-
+  [contentStyle]="{ overflow: 'visible' }"
+  [baseZIndex]="10000"
+>
   <div *ngIf="memberToEdit" class="flex flex-column gap-4 p-2">
-
     <!-- Información del miembro -->
     <div class="flex align-items-center gap-3 p-3 surface-ground border-round">
       <p-avatar
         [label]="getInitials(memberToEdit.name)"
         shape="circle"
         size="large"
-        styleClass="bg-indigo-500 text-white">
+        styleClass="bg-indigo-500 text-white"
+      >
       </p-avatar>
       <div>
         <div class="font-medium text-lg">{{ memberToEdit.name }}</div>
@@ -447,12 +459,9 @@
     </div>
 
     <form [formGroup]="editRoleForm" (ngSubmit)="updateMemberRole()" class="flex flex-column gap-4">
-
       <!-- Selector de Rol -->
       <div>
-        <label class="block text-color font-medium mb-2">
-          Rol <span class="text-red-500">*</span>
-        </label>
+        <label class="block text-color font-medium mb-2"> Rol <span class="text-red-500">*</span> </label>
         <p-dropdown
           formControlName="role_type"
           [options]="roleOptions"
@@ -460,12 +469,15 @@
           optionValue="value"
           placeholder="Seleccionar rol"
           [showClear]="false"
-          [style]="{'width': '100%'}"
-          [panelStyle]="{'max-height': '300px'}"
-          appendTo="body">
+          [style]="{ width: '100%' }"
+          [panelStyle]="{ 'max-height': '300px' }"
+          appendTo="body"
+        >
         </p-dropdown>
-        <small *ngIf="editRoleForm.get('role_type')?.invalid && editRoleForm.get('role_type')?.touched"
-               class="p-error block mt-2">
+        <small
+          *ngIf="editRoleForm.get('role_type')?.invalid && editRoleForm.get('role_type')?.touched"
+          class="p-error block mt-2"
+        >
           Debes seleccionar un rol
         </small>
       </div>
@@ -476,8 +488,8 @@
           label="Cancelar"
           icon="pi pi-times"
           class="p-button-text"
-          (click)="showEditRoleDialog = false; editRoleForm.reset()">
-        </button>
+          (click)="showEditRoleDialog = false; editRoleForm.reset()"
+        ></button>
         <button
           pButton
           label="Guardar Cambios"
@@ -485,8 +497,8 @@
           class="p-button-raised p-button-primary"
           [disabled]="editRoleForm.invalid || editRoleLoading"
           [loading]="editRoleLoading"
-          type="submit">
-        </button>
+          type="submit"
+        ></button>
       </div>
     </form>
   </div>
@@ -498,21 +510,18 @@
   [closable]="false"
   [draggable]="false"
   [resizable]="false"
-  [style]="{width: '420px'}"
+  [style]="{ width: '420px' }"
 >
-
   <div class="flex flex-column align-items-center text-center p-4">
-
     <div class="bg-green-100 flex align-items-center justify-content-center border-circle w-5rem h-5rem mb-4">
       <i class="pi pi-check-circle text-green-600 text-4xl"></i>
     </div>
 
-    <h2 class="text-xl font-semibold text-green-700 mb-2">
-      Proyecto creado
-    </h2>
+    <h2 class="text-xl font-semibold text-green-700 mb-2">Proyecto creado</h2>
 
     <p class="text-600 mb-4">
-      El proyecto "<strong>{{ successProjectName }}</strong>" fue creado correctamente.
+      El proyecto "<strong>{{ successProjectName }}</strong
+      >" fue creado correctamente.
     </p>
 
     <div class="flex gap-3">
@@ -524,15 +533,7 @@
         (click)="goToProjects()"
       ></button>
 
-      <button
-        pButton
-        label="Cerrar"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeSuccessDialog()"
-      ></button>
+      <button pButton label="Cerrar" icon="pi pi-times" class="p-button-text" (click)="closeSuccessDialog()"></button>
     </div>
-
   </div>
-
 </p-dialog>

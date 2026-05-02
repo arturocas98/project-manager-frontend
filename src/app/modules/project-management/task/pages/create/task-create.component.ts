@@ -1,19 +1,19 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
-import {NgClass, NgIf} from "@angular/common";
-import {DropdownModule} from "primeng/dropdown";
-import {ButtonModule} from "primeng/button";
-import {ChipsModule} from "primeng/chips";
-import {InputTextareaModule} from "primeng/inputtextarea";
-import {ActivatedRoute, Router} from "@angular/router";
-import {ProjectService} from "../../../../../core/service/project.service";
-import {ConfirmationService, MessageService} from "primeng/api";
-import {ConfirmDialogModule} from "primeng/confirmdialog";
-import {TaskCreateModelRequest} from "../../../../../shared/models/task-models/task-create-model";
-import {KanbanService} from "../../../../../core/service/kanban-service";
-import {Subject, Subscription, takeUntil} from "rxjs";
-import {ProjectMember} from "../../../../../shared/models/kanban.models";
-import {CalendarModule} from "primeng/calendar";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgClass, NgIf } from '@angular/common';
+import { DropdownModule } from 'primeng/dropdown';
+import { ButtonModule } from 'primeng/button';
+import { ChipsModule } from 'primeng/chips';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProjectService } from '../../../../../core/service/project.service';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TaskCreateModelRequest } from '../../../../../shared/models/task-models/task-create-model';
+import { KanbanService } from '../../../../../core/service/kanban-service';
+import { Subject, Subscription, takeUntil } from 'rxjs';
+import { ProjectMember } from '../../../../../shared/models/kanban.models';
+import { CalendarModule } from 'primeng/calendar';
 import { FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-task-create',
@@ -27,7 +27,7 @@ import { FormGroup } from '@angular/forms';
     InputTextareaModule,
     NgIf,
     ConfirmDialogModule,
-    CalendarModule
+    CalendarModule,
   ],
   templateUrl: './task-create.component.html',
 })
@@ -40,10 +40,10 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
 
   // Lista de miembros del proyecto
   members: ProjectMember[] = [];
-  memberOptions: { label: string, value: number, role: string }[] = [];
+  memberOptions: { label: string; value: number; role: string }[] = [];
 
   // Lista de tareas para seleccionar padre
-  parentOptions: { label: string, value: number }[] = [];
+  parentOptions: { label: string; value: number }[] = [];
   showParentSelector = false;
   parentLabel = '';
 
@@ -55,7 +55,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     { label: 'Crítica', value: 'critical' },
     { label: 'Alta', value: 'high' },
     { label: 'Media', value: 'medium' },
-    { label: 'Baja', value: 'low' }
+    { label: 'Baja', value: 'low' },
   ];
 
   types = [
@@ -63,7 +63,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     { label: 'History', value: 'history_user' },
     { label: 'Task', value: 'task' },
     { label: 'Subtask', value: 'subtask' },
-    { label: 'Bug', value: 'bug' }
+    { label: 'Bug', value: 'bug' },
   ];
 
   categories = [
@@ -76,7 +76,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     { label: 'Soporte/Validación', value: 7 },
     { label: 'Corrección de errores', value: 8 },
     { label: 'Reunión/Coordinación', value: 9 },
-    { label: 'Migración', value: 10 }
+    { label: 'Migración', value: 10 },
   ];
 
   private readonly stateMap: Record<number, string> = {
@@ -86,30 +86,33 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     4: 'Terminada',
     5: 'Terminada (fuera de plazo)',
     6: 'En Revisión',
-    7: 'Finalizada'
+    7: 'Finalizada',
   };
 
   // Mapeo de tipos a IDs
   private readonly typeIdMap: Record<string, number> = {
-    'epic': 1,
-    'history_user': 2,
-    'task': 3,
-    'subtask': 5,
-    'bug': 4
+    epic: 1,
+    history_user: 2,
+    task: 3,
+    subtask: 5,
+    bug: 4,
   };
 
-  taskForm = this.fb.group({
-    title: ['', Validators.required],
-    description: ['', Validators.required],
-    priority: ['', Validators.required],
-    type: ['', Validators.required],
-    category: ['', Validators.required],
-    assigned_user_id: [null],
-    parent_id: [null],
-    start_date: [null], // Nuevo campo
-    due_date: [null], // Nuevo campo
-    state_id: [{value: this.stateId, disabled: true}, Validators.required]
-  }, { validators: this.dateRangeValidator }); // Validador personalizado para fechas
+  taskForm = this.fb.group(
+    {
+      title: ['', Validators.required],
+      description: ['', Validators.required],
+      priority: ['', Validators.required],
+      type: ['', Validators.required],
+      category: ['', Validators.required],
+      assigned_user_id: [null],
+      parent_id: [null],
+      start_date: [null], // Nuevo campo
+      due_date: [null], // Nuevo campo
+      state_id: [{ value: this.stateId, disabled: true }, Validators.required],
+    },
+    { validators: this.dateRangeValidator }
+  ); // Validador personalizado para fechas
 
   constructor(
     private fb: FormBuilder,
@@ -136,7 +139,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
 
     // Inicializar form con stateId
     this.taskForm.patchValue({
-      state_id: this.stateId
+      state_id: this.stateId,
     });
 
     // Cargar miembros del proyecto
@@ -171,7 +174,9 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       due.setHours(0, 0, 0, 0);
 
       if (start > due) {
-        group.get('due_date')?.setErrors({ dateError: 'La fecha de vencimiento debe ser posterior o igual a la fecha de inicio' });
+        group
+          .get('due_date')
+          ?.setErrors({ dateError: 'La fecha de vencimiento debe ser posterior o igual a la fecha de inicio' });
         return { dateRange: true };
       }
     }
@@ -199,26 +204,27 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
    * Carga los miembros del proyecto
    */
   private loadMembers(): void {
-    this.kanbanService.getProjectMembers(this.projectId)
+    this.kanbanService
+      .getProjectMembers(this.projectId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (members) => {
+        next: members => {
           this.members = members;
           this.memberOptions = members.map(member => ({
             label: `${member.user.name} (${member.role.type})`,
             value: member.user.id,
-            role: member.role.type
+            role: member.role.type,
           }));
         },
-        error: (error) => {
+        error: error => {
           console.error('Error loading members:', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
             detail: 'No se pudieron cargar los miembros del proyecto',
-            life: 5000
+            life: 5000,
           });
-        }
+        },
       });
   }
 
@@ -280,7 +286,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
 
     this.taskForm.patchValue({
       start_date: startDate,
-      due_date: dueDate
+      due_date: dueDate,
     });
 
     this.validateDates();
@@ -354,7 +360,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     this.loading = true;
 
     const taskSub = this.kanbanService.getProjectTasks(this.projectId).subscribe({
-      next: (tasks) => {
+      next: tasks => {
         // Filtrar tareas por tipo
         const filteredTasks = tasks.filter(task => {
           return task.type?.type === type;
@@ -363,7 +369,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
         // Mapear a opciones del dropdown
         this.parentOptions = filteredTasks.map(task => ({
           label: task.title,
-          value: task.id
+          value: task.id,
         }));
 
         // Si no hay opciones disponibles, mostrar mensaje
@@ -372,23 +378,23 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
             severity: 'warn',
             summary: 'Sin opciones',
             detail: `No hay ${type}s disponibles para seleccionar como padre`,
-            life: 5000
+            life: 5000,
           });
         }
 
         this.loading = false;
       },
-      error: (error) => {
+      error: error => {
         console.error('Error loading parent options:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'No se pudieron cargar las opciones de padre',
-          life: 5000
+          life: 5000,
         });
         this.parentOptions = [];
         this.loading = false;
-      }
+      },
     });
 
     this.subscriptions.push(taskSub);
@@ -411,9 +417,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       return '';
     }
 
-    const selectedMember = this.memberOptions.find(
-      m => m.value === selectedId
-    );
+    const selectedMember = this.memberOptions.find(m => m.value === selectedId);
 
     return selectedMember ? selectedMember.label : '';
   }
@@ -440,7 +444,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       assigned_user_id: formValue.assigned_user_id || null,
       start_date: formatDate(formValue.start_date) || new Date().toISOString().split('T')[0],
       due_date: formatDate(formValue.due_date) || this.calculateDueDate(formValue.priority || 'medium'),
-      parent_incidence_id: formValue.parent_id || null
+      parent_incidence_id: formValue.parent_id || null,
     };
   }
 
@@ -449,10 +453,10 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
    */
   private getPriorityId(priority: string): number {
     const priorityMap: Record<string, number> = {
-      'low': 1,
-      'medium': 2,
-      'high': 3,
-      'critical': 4
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
     };
     return priorityMap[priority] || 2;
   }
@@ -506,15 +510,11 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       rejectButtonStyleClass: 'p-button-text p-button-secondary gap-2',
       defaultFocus: 'accept',
       accept: () => {
-        this.router.navigate([
-          '/project-management/projects/kanban',
-          this.projectId,
-          'project-kanban'
-        ]);
+        this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-kanban']);
       },
       reject: () => {
         console.log('Diálogo cerrado');
-      }
+      },
     });
   }
 
@@ -532,7 +532,7 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Por favor completa todos los campos requeridos correctamente'
+        detail: 'Por favor completa todos los campos requeridos correctamente',
       });
 
       return;
@@ -542,12 +542,12 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
     const taskData = this.prepareTaskData();
     console.log(taskData);
     this.projectService.createTask(taskData, this.projectId).subscribe({
-      next: (response) => {
+      next: response => {
         this.loading = false;
         this.showSuccessDialog(response.title);
         this.taskForm.reset();
       },
-      error: (error) => {
+      error: error => {
         this.loading = false;
         console.error('Error creating task:', error);
         this.errorMessage = error.error?.message || 'Error al crear el proyecto';
@@ -556,17 +556,13 @@ export class TaskCreateComponent implements OnInit, OnDestroy {
           severity: 'error',
           summary: 'Error',
           detail: this.errorMessage ?? 'Error',
-          life: 5000
+          life: 5000,
         });
-      }
+      },
     });
   }
 
   onCancel() {
-    this.router.navigate([
-      '/project-management/projects/kanban',
-      this.projectId,
-      'project-kanban'
-    ]);
+    this.router.navigate(['/project-management/projects/kanban', this.projectId, 'project-kanban']);
   }
 }

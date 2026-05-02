@@ -11,21 +11,21 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService, MenuItem, MessageService, TreeNode } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { Subscription } from 'rxjs';
-import { ProjectService } from "../../../../../core/service/project.service";
+import { ProjectService } from '../../../../../core/service/project.service';
 import {
   IncidenceDetail,
   IncidenceDetailChild,
-  TaskUpdateModelRequest
-} from "../../../../../shared/models/task-models/task-create-model";
-import { TreeModule } from "primeng/tree";
-import { TruncatePipe } from "../../../../../shared/Pipes/TruncatePipe";
-import { CommentResponse } from "../../../../../shared/models/task-models/CommentResponse";
-import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { InputTextareaModule } from "primeng/inputtextarea";
-import { FormsModule } from "@angular/forms";
-import { ScrollPanelModule } from "primeng/scrollpanel";
-import { MenuModule } from "primeng/menu";
-import { DialogModule } from "primeng/dialog";
+  TaskUpdateModelRequest,
+} from '../../../../../shared/models/task-models/task-create-model';
+import { TreeModule } from 'primeng/tree';
+import { TruncatePipe } from '../../../../../shared/Pipes/TruncatePipe';
+import { CommentResponse } from '../../../../../shared/models/task-models/CommentResponse';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { FormsModule } from '@angular/forms';
+import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { MenuModule } from 'primeng/menu';
+import { DialogModule } from 'primeng/dialog';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
 
@@ -129,7 +129,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     private projectService: ProjectService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) { }
+  ) {}
 
   ngOnInit() {
     const roleTypeStr = localStorage.getItem('role_type');
@@ -273,22 +273,24 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
     this.submittingComment = true;
 
-    const commentSub = this.projectService.createComment(this.projectId, this.taskId, this.newComment, this.selectedFile || undefined).subscribe({
-      next: newComment => {
-        this.comments = [newComment, ...this.comments];
-        this.buildCommentMenuItems();
-        this.newComment = '';
-        this.selectedFile = null; // Limpiar archivo
-        this.submittingComment = false;
-        this.showSuccess('Comentario agregado', 'El comentario se publicó correctamente');
-        this.loadComments();
-      },
-      error: error => {
-        console.error('Error creating comment:', error);
-        this.submittingComment = false;
-        this.showError('Error', 'No se pudo publicar el comentario');
-      },
-    });
+    const commentSub = this.projectService
+      .createComment(this.projectId, this.taskId, this.newComment, this.selectedFile || undefined)
+      .subscribe({
+        next: newComment => {
+          this.comments = [newComment, ...this.comments];
+          this.buildCommentMenuItems();
+          this.newComment = '';
+          this.selectedFile = null; // Limpiar archivo
+          this.submittingComment = false;
+          this.showSuccess('Comentario agregado', 'El comentario se publicó correctamente');
+          this.loadComments();
+        },
+        error: error => {
+          console.error('Error creating comment:', error);
+          this.submittingComment = false;
+          this.showError('Error', error.error?.message || error.message || 'No se pudo publicar el comentario');
+        },
+      });
 
     this.subscriptions.push(commentSub);
   }
@@ -398,6 +400,11 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/project-management/projects/kanban', this.projectId, 'task-details', taskId], {
       queryParamsHandling: 'merge',
     });
+  }
+
+  canDeleteComment(comment: CommentResponse): boolean {
+    if (this.canManageTasks) return true;
+    return this.currentUserId != null && comment.createdBy.id === this.currentUserId;
   }
 
   createTask(columnId: number): void {
@@ -538,7 +545,7 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
         this.updateTaskState(3); // Estado de suspension
-      }
+      },
     });
   }
 
@@ -549,7 +556,10 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
 
     // Mapeo inverso de id de prioridad
     const priorityMap: Record<string, number> = {
-      'low': 1, 'medium': 2, 'high': 3, 'critical': 4
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
     };
     const priorityId = this.task.priority ? priorityMap[this.task.priority.toLowerCase()] : 2;
 
@@ -563,11 +573,11 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
       assigned_user_id: this.task.assigned_to?.id || null,
       parent_incidence_id: this.task.parent?.id || null,
       start_date: this.task.start_date,
-      due_date: this.task.due_date
+      due_date: this.task.due_date,
     };
 
     const updateSub = this.projectService.UpdateTask(updateData, this.projectId, this.taskId).subscribe({
-      next: (response) => {
+      next: response => {
         if (comment && comment.trim() !== '') {
           this.projectService.createComment(this.projectId, this.taskId, comment).subscribe({
             next: () => {
@@ -576,17 +586,17 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
             error: () => {
               this.showError('Advertencia', 'El estado fue actualizado, pero no se pudo enviar el comentario');
               this.finishStateUpdate();
-            }
+            },
           });
         } else {
           this.finishStateUpdate();
         }
       },
-      error: (error) => {
+      error: error => {
         this.updatingState = false;
         console.error('Error updating task state:', error);
         this.showError('Error', 'No se pudo actualizar el estado de la tarea');
-      }
+      },
     });
 
     this.subscriptions.push(updateSub);
