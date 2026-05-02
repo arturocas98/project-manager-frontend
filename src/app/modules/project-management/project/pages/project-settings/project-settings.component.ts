@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ButtonModule } from "primeng/button";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { ToastModule } from "primeng/toast";
@@ -51,6 +51,7 @@ import { catchError } from "rxjs/operators";
     FormsModule,
   ],
   templateUrl: './project-settings.component.html',
+  styleUrls: ['./project-settings.component.scss'],
 })
 export class ProjectSettingsComponent implements OnInit {
   state_options: Option[] = [
@@ -135,7 +136,8 @@ export class ProjectSettingsComponent implements OnInit {
     private messageService: MessageService,
     private http: HttpClient,
     private kanbanService: KanbanService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.projectForm = this.fb.group({
       ContractNo: ['', Validators.required],
@@ -399,8 +401,69 @@ export class ProjectSettingsComponent implements OnInit {
     const role = this.roleOptions.find(r => r.value === roleCode);
     if (role) return role.label;
 
-    const map: any = { administrator: 'Administrador', leader: 'Lider', developer: 'Desarrollador', tester: 'Tester', documenter: 'Documentador' };
+    const mapped = this.normalizeRoleTypeForForm(roleCode);
+    if (mapped) {
+      const opt = this.roleOptions.find(r => r.value === mapped);
+      if (opt) return opt.label;
+    }
+
+    const map: Record<string, string> = {
+      administrator: 'Administrador',
+      administrador: 'Administrador',
+      leader: 'Lider',
+      lider: 'Lider',
+      developer: 'Desarrollador',
+      desarrollador: 'Desarrollador',
+      tester: 'Tester',
+      documenter: 'Documentador',
+      documentador: 'Documentador',
+    };
     return map[roleCode.toLowerCase()] || roleCode;
+  }
+
+  /**
+   * El backend puede mandar tipo en slug (leader, developer) o igual al optionValue del dropdown (LDR, DEV).
+   */
+  private normalizeRoleTypeForForm(apiType: string | undefined | null): string | null {
+    const raw = (apiType ?? '').trim();
+    if (!raw) return null;
+
+    if (this.roleOptions.some(o => o.value === raw)) {
+      return raw;
+    }
+
+    const synonymToCode: Record<string, string> = {
+      leader: 'LDR',
+      ldr: 'LDR',
+      lider: 'LDR',
+
+      developer: 'DEV',
+      dev: 'DEV',
+      desarrollador: 'DEV',
+
+      tester: 'TST',
+      tst: 'TST',
+      qa: 'TST',
+
+      documenter: 'DOC',
+      doc: 'DOC',
+      documentador: 'DOC',
+
+      administrator: 'LDR',
+      administrador: 'LDR',
+    };
+
+    const key = raw
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+
+    const mapped = synonymToCode[key];
+    if (mapped && this.roleOptions.some(o => o.value === mapped)) {
+      return mapped;
+    }
+
+    return null;
   }
 
   /**
@@ -424,10 +487,15 @@ export class ProjectSettingsComponent implements OnInit {
    */
   openEditRoleDialog(member: ProjectMember) {
     this.selectedMember = member;
-    this.editRoleForm.patchValue({
-      role_type: member.role.type
-    });
     this.showEditRoleDialog = true;
+
+    const roleCode = this.normalizeRoleTypeForForm(member.role?.type);
+
+    // El contenido está en *ngIf dentro del dialog; tras el siguiente ciclo PrimeNG muestra bien el dropdown.
+    queueMicrotask(() => {
+      this.editRoleForm.reset({ role_type: roleCode });
+      this.cdr.detectChanges();
+    });
   }
 
   /**

@@ -44,9 +44,9 @@
     <span class="text-green-700 font-medium">{{ successMessage }}</span>
   </div>
 
-  <div class="grid grid-nogutter gap-4" *ngIf="!loading">
-    <!-- Columna Izquierda: Formularios (8 / 12) -->
-    <div class="col-12 xl:col-8 flex flex-column gap-4">
+  <div class="settings-two-col" *ngIf="!loading">
+    <!-- Columna izquierda: formulario (crece hasta ~62%; el resto lo ocupa equipo) -->
+    <div class="settings-col-form flex flex-column gap-4">
       <form [formGroup]="projectForm" (ngSubmit)="onUpdate()" class="flex flex-column gap-4 m-0">
 
         <!-- Información General -->
@@ -212,9 +212,12 @@
       </form>
     </div>
 
-    <!-- Columna Derecha: Miembros (4 / 12) -->
-    <div class="col-12 xl:col flex">
-      <div class="surface-card p-4 md:p-5 border-round-2xl shadow-1 flex flex-column w-full h-full">
+    <!-- Columna derecha: equipo y miembros (fracción proporcional para llenar el hueco derecho) -->
+    <div class="settings-col-team flex flex-column w-full"
+      style="position: sticky; top: 1rem; z-index: 2;">
+      <div
+        class="surface-card p-4 md:p-5 border-round-2xl shadow-1 flex flex-column w-full min-h-0"
+        style="max-height: min(calc(100vh - 8rem), 900px);">
         <!-- Header Miembros -->
         <div class="flex align-items-center justify-content-between mb-4 pb-3 border-bottom-1 surface-border">
           <div class="flex align-items-center gap-2">
@@ -259,7 +262,7 @@
         </div>
 
         <!-- Lista de Miembros -->
-        <div class="flex-1 overflow-auto bg-surface-50 border-round-xl p-3" style="min-height: 300px;">
+        <div class="flex-1 overflow-y-auto bg-surface-50 border-round-xl p-3 min-h-0" style="min-height: 200px;">
           <div *ngIf="member.length === 0"
             class="p-4 text-center text-color-secondary flex flex-column align-items-center justify-content-center h-full">
             <i class="ph ph-users text-4xl mb-3 text-400"></i>

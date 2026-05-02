@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Dos columnas reales incluso cuando el área útil es < breakpoint lg de PrimeFlex (sidebar + tabs). */
+.settings-two-col {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  align-items: start;
+  grid-template-columns: minmax(0, 1fr);
+
+  /* Área útil con sidebar suele ser <992px; a partir de sm el equipo comparte fila y llena el hueco */
+  @media (min-width: 640px) {
+    grid-template-columns: minmax(0, 1.65fr) minmax(220px, 1fr);
+  }
+}
+
+.settings-col-form,
+.settings-col-team {
+  min-width: 0;
+}
