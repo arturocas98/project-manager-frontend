@@ -25,6 +25,11 @@ import { Option } from "../../../../../shared/models/general";
 import { TranslateModule } from "@ngx-translate/core";
 import { Client } from "../../../../../shared/models/client.model";
 import { AuthService } from "../../../../../core/service/auth.service";
+import { Team } from "../../../../../shared/models/team-models/team.model";
+import { MultiSelectModule } from "primeng/multiselect";
+import { FormsModule } from "@angular/forms";
+import { forkJoin, firstValueFrom, Observable, of } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 @Component({
   selector: 'app-project-settings',
@@ -41,7 +46,9 @@ import { AuthService } from "../../../../../core/service/auth.service";
     DialogModule,
     TooltipModule,
     NgForOf,
-    TranslateModule
+    TranslateModule,
+    MultiSelectModule,
+    FormsModule,
   ],
   templateUrl: './project-settings.component.html',
 })
@@ -88,6 +95,13 @@ export class ProjectSettingsComponent implements OnInit {
   memberOptions: { label: string, value: number }[] = [];
   member: ProjectMember[] = [];
   clients: Client[] = [];
+
+  /** Equipos de trabajo (misma lógica que en creación de proyecto) */
+  allTeams: Team[] = [];
+  teamOptions: { label: string; value: number }[] = [];
+  selectedTeamIds: number[] = [];
+  previousTeamIds: number[] = [];
+  teamsOperationLoading = false;
 
   get selectedClient(): Client | null {
     const clientId = this.projectForm.get('client_id')?.value;
@@ -164,6 +178,118 @@ export class ProjectSettingsComponent implements OnInit {
     this.loadUnassignedUsers();
     this.loadMembers();
     this.loadClients();
+    this.loadAllTeams();
+  }
+
+  loadAllTeams(): void {
+    this.authService.getTeams().subscribe({
+      next: teams => {
+        this.allTeams = teams;
+        this.teamOptions = teams.map(team => ({
+          label: `${team.name} (${team.type})`,
+          value: team.id
+        }));
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los equipos'
+        });
+      }
+    });
+  }
+
+  async onTeamsChange(event: { value: number[] }): Promise<void> {
+    const currentTeamIds = [...(event.value ?? [])];
+    const addedTeams = currentTeamIds.filter(id => !this.previousTeamIds.includes(id));
+    const removedTeams = this.previousTeamIds.filter(id => !currentTeamIds.includes(id));
+
+    if (addedTeams.length === 0 && removedTeams.length === 0) {
+      return;
+    }
+
+    const removeObservables = this.buildTeamRemoveRequests(removedTeams);
+    this.teamsOperationLoading = true;
+
+    try {
+      if (removeObservables.length > 0) {
+        await firstValueFrom(forkJoin(removeObservables));
+        const members = await firstValueFrom(this.kanbanService.getProjectMembers(this.projectId));
+        this.member = members;
+      }
+
+      const addObservables = this.buildTeamAddRequests(addedTeams);
+      if (addObservables.length > 0) {
+        await firstValueFrom(forkJoin(addObservables));
+      }
+
+      this.previousTeamIds = [...currentTeamIds];
+      this.loadMembers();
+      this.loadUnassignedUsers();
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Equipos actualizados',
+        detail: 'Los miembros del proyecto se han sincronizado con los equipos seleccionados.',
+        life: 3000
+      });
+    } catch (err: unknown) {
+      console.error(err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudieron aplicar los cambios de equipos',
+        life: 5000
+      });
+    } finally {
+      this.teamsOperationLoading = false;
+    }
+  }
+
+  private buildTeamRemoveRequests(removedTeams: number[]): Observable<unknown>[] {
+    const observables: Observable<unknown>[] = [];
+    for (const teamId of removedTeams) {
+      const team = this.allTeams.find(t => t.id === teamId);
+      if (!team?.members) continue;
+      for (const tm of team.members) {
+        const pm = this.member.find(m => m.user.id === tm.id && m.role.type === team.type);
+        if (pm) {
+          observables.push(
+            this.projectService.removeMember(this.projectId, tm.id).pipe(
+              catchError(err => {
+                console.error(err);
+                return of(null);
+              })
+            )
+          );
+        }
+      }
+    }
+    return observables;
+  }
+
+  private buildTeamAddRequests(addedTeams: number[]): Observable<unknown>[] {
+    const observables: Observable<unknown>[] = [];
+    for (const teamId of addedTeams) {
+      const team = this.allTeams.find(t => t.id === teamId);
+      if (!team?.members) continue;
+      for (const tm of team.members) {
+        if (!this.member.some(m => m.user.id === tm.id)) {
+          observables.push(
+            this.projectService.addMember(this.projectId, {
+              user_id: tm.id,
+              role_type: team.type
+            }).pipe(
+              catchError(err => {
+                console.error(err);
+                return of(null);
+              })
+            )
+          );
+        }
+      }
+    }
+    return observables;
   }
 
   loadClients() {
