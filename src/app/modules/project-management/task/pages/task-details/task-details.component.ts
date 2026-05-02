@@ -402,6 +402,11 @@ export class TaskDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  canDeleteComment(comment: CommentResponse): boolean {
+    if (this.canManageTasks) return true;
+    return this.currentUserId != null && comment.createdBy.id === this.currentUserId;
+  }
+
   createTask(columnId: number): void {
     this.router.navigate(['/project-management/projects/kanban', this.projectId, 'create-task', columnId]);
   }

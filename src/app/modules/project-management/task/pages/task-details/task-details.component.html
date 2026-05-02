@@ -355,9 +355,15 @@
                     {{ getRoleNameInSpanish(comment.createdBy.user_role?.type) }}
                   </span>
                 </div>
-                <span class="text-xs text-color-secondary flex items-center gap-1">
-                  <i class="ph-bold ph-clock text-xs"></i> {{ comment.created_at ? (comment.created_at | date:'short') : '' }}
-                </span>
+                <div class="flex align-items-center gap-2 flex-shrink-0">
+                  <span class="text-xs text-color-secondary flex items-center gap-1">
+                    <i class="ph-bold ph-clock text-xs"></i> {{ comment.created_at ? (comment.created_at | date:'short') : '' }}
+                  </span>
+                  <button *ngIf="canDeleteComment(comment)" pButton type="button" icon="ph-bold ph-trash"
+                          class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                          pTooltip="Eliminar comentario" tooltipPosition="left"
+                          (click)="confirmDeleteComment(comment); $event.stopPropagation()"></button>
+                </div>
               </div>
               <p class="text-color text-sm line-height-3 mb-2">{{ comment.description }}</p>
 
